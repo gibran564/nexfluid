@@ -55,3 +55,21 @@ describe('NexFrame · inspectorControl="tab"', () => {
     expect(container.querySelector('.nx-frame__tab')).toBeNull();
   });
 });
+
+describe('NexFrame anidado dentro de un marco con pestaña', () => {
+  it('el marco interior conserva sus propios controles (botón en su barra, sin pestaña)', () => {
+    act(() => root.render(
+      <NexFrame height={600} inspectorControl="tab" inspectorLabel="Propiedades" inspector={<p>Props del catálogo</p>}>
+        <NexFrame nested height={400} inspector={<p>Inspector del laboratorio</p>}><p>Lienzo</p></NexFrame>
+      </NexFrame>,
+    ));
+    const [outer, inner] = Array.from(container.querySelectorAll<HTMLElement>('.nx-frame'));
+    const own = (frame: HTMLElement, sel: string) => Array.from(frame.querySelectorAll(sel)).filter((el) => el.closest('.nx-frame') === frame);
+    expect(outer!.dataset.inspectorControl).toBe('tab');
+    expect(own(outer!, '.nx-frame__tab')).toHaveLength(1);
+    expect(own(outer!, '.nx-frame__top [data-region="inspector"]')).toHaveLength(0);
+    expect(inner!.dataset.inspectorControl).toBe('toolbar');
+    expect(own(inner!, '.nx-frame__tab')).toHaveLength(0);
+    expect(own(inner!, '.nx-frame__top [data-region="inspector"]')).toHaveLength(1);
+  });
+});

@@ -186,3 +186,15 @@ describe('foco: un solo indicador en campos compuestos', () => {
     assert.deepEqual(own.map((r) => r.selectors.join(', ')), [], 'el input interno no debe tener borde ni sombra propios');
   });
 });
+
+describe('NexFrame: el estado de un marco no alcanza a los marcos anidados', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  it('las reglas .nx-frame[estado] llegan a sus regiones por hijos directos, no por descendencia', () => {
+    // Un laboratorio (NexFrame) dentro del catálogo (otro NexFrame) no debe heredar
+    // su modo compacto, su superposición del inspector ni su modo de pestaña.
+    const leaks = css.match(/\.nx-frame(?:\[[^\]]+\])+ (?!>)\.nx-frame__[a-z-]+/g) ?? [];
+    assert.deepEqual(leaks, []);
+    const morph = css.match(/\.nx-frame__layout\[data-nx-morphing\] (?!>)[.:]/g) ?? [];
+    assert.deepEqual(morph, []);
+  });
+});

@@ -138,6 +138,9 @@ export function App() {
         navigationRole="complementary"
         canvasMinWidth={560}
         inspectorLabel="Propiedades"
+        // Catálogo: la pestaña lateral «Propiedades» es el único control del panel
+        // (sin botón en la barra). El laboratorio, anidado, conserva sus controles.
+        inspectorControl="tab"
         canvasLabel={page?.title ?? 'Contenido'}
       >
         <div className="doc-canvas" id="contenido-doc">{content}</div>

@@ -138,8 +138,6 @@ export function CompositionLabPage() {
           nested
           height={space === 'constrained' ? 680 : 760}
           canvasMinWidth={440}
-          inspectorControl="tab"
-          inspectorLabel="Propiedades"
           canvasAs="div"
           layout={layout}
           canvasLabel="Lienzo del espacio de trabajo"
