@@ -8,7 +8,7 @@
  * cuanto todo está en reposo.
  */
 import { useEffect, useRef } from 'react';
-import { FluidValue, MOTION_PRESETS, sharedClock, type MotionPresetName, type Tick } from '@nexfluid/core';
+import { FluidValue, MORPH_PHYSICS, MOTION_PRESETS, sharedClock, type MorphPhysicsName, type MotionPresetName, type SpringParams, type Tick } from '@nexfluid/core';
 import type { NexMotion } from '@nexfluid/components';
 
 /** Preset del motor para cada nivel físico y papel dentro del componente. */
@@ -19,9 +19,18 @@ export function presetFor(level: NexMotion, role: 'lead' | 'trail' | 'press' = '
   return 'magnetic';
 }
 
+/** Un preset del motor o parámetros explícitos (p. ej. una familia de NexMorph). */
+export type SpringPreset = MotionPresetName | { spring: SpringParams; viscosity: number };
+
+/** Familia de NexMorph como preset de resorte. */
+export function morphSpring(name: MorphPhysicsName): SpringPreset {
+  const p = MORPH_PHYSICS[name];
+  return { spring: { mass: p.mass, stiffness: p.stiffness, damping: p.damping }, viscosity: p.viscosity };
+}
+
 export interface SpringSet {
   /** Anima hacia los objetivos con los presets dados (uno por valor). */
-  to(targets: readonly number[], presets: readonly MotionPresetName[]): void;
+  to(targets: readonly number[], presets: readonly SpringPreset[]): void;
   /** Coloca sin animar. */
   jump(targets: readonly number[]): void;
   values(): number[];
@@ -50,7 +59,8 @@ export function useSprings(initial: readonly number[], onFrame: (values: number[
       to(targets, presets) {
         targets.forEach((t, i) => {
           const v = s.values[i]!;
-          const p = MOTION_PRESETS[presets[i] ?? presets[0] ?? 'flow'];
+          const name = presets[i] ?? presets[0] ?? 'flow';
+          const p = typeof name === 'string' ? MOTION_PRESETS[name] : name;
           v.params = p.spring;
           v.viscosity = p.viscosity;
           v.set(t);

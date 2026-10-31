@@ -94,14 +94,14 @@ export function ArchitecturePage() {
 }
 
 const ROADMAP: Record<string, ReadonlyArray<readonly [string, 'piloto' | 'propuesto' | 'laboratorio']>> = {
-  Actions: [['NexButton', 'piloto'], ['NexIconButton', 'piloto'], ['NexSegmented', 'piloto'], ['NexToggle', 'propuesto'], ['NexSwitch', 'propuesto']],
+  Actions: [['NexButton', 'piloto'], ['NexActionButton', 'piloto'], ['NexIconButton', 'piloto'], ['NexSegmented', 'piloto'], ['NexToggle', 'propuesto'], ['NexSwitch', 'propuesto']],
   Surfaces: [['NexCard', 'piloto'], ['NexBadge', 'piloto'], ['NexPanel', 'piloto'], ['NexSurface', 'piloto'], ['NexDivider', 'propuesto']],
-  Navigation: [['NexTabs / NexTab', 'piloto'], ['NexNav', 'piloto'], ['NexBreadcrumbs', 'propuesto'], ['NexToolbar', 'propuesto'], ['NexDock', 'propuesto']],
+  Navigation: [['NexTabs / NexTab', 'piloto'], ['NexNav', 'piloto'], ['NexBreadcrumbs', 'propuesto'], ['NexToolbar', 'propuesto'], ['NexDock', 'piloto']],
   Layout: [['NexFrame', 'piloto'], ['NexContainer', 'propuesto'], ['NexGrid', 'propuesto'], ['NexStack', 'propuesto'], ['NexSplitView', 'propuesto'], ['NexResizablePanel', 'propuesto']],
   Inputs: [['NexInput', 'propuesto'], ['NexSelect', 'propuesto'], ['NexCheckbox', 'propuesto'], ['NexSlider', 'propuesto'], ['NexSearch', 'propuesto']],
   Content: [['NexMarkdown', 'piloto'], ['NexCodeBlock', 'piloto'], ['NexTable', 'propuesto'], ['NexEmptyState', 'propuesto'], ['NexSkeleton', 'propuesto'], ['NexTooltip', 'propuesto']],
   Widgets: [['NexMarkdownWidget', 'piloto'], ['NexPropertiesWidget', 'piloto'], ['NexFileWidget', 'propuesto'], ['NexPreviewWidget', 'piloto'], ['NexExplorerWidget', 'piloto'], ['NexStatusWidget', 'propuesto'], ['NexInspectorWidget', 'piloto']],
-  Motion: [['FluidBlob', 'laboratorio'], ['FluidMorph (tarjeta → panel)', 'piloto'], ['FluidReveal', 'propuesto'], ['FluidPresence', 'propuesto'], ['FluidMetaballs', 'propuesto']],
+  Motion: [['FluidBlob', 'laboratorio'], ['NexMorph (transformación continua)', 'piloto'], ['FluidReveal', 'propuesto'], ['FluidPresence', 'propuesto'], ['Metaballs (cuello dock → panel)', 'laboratorio']],
 };
 
 export function RoadmapPage() {

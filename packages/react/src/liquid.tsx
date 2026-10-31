@@ -45,7 +45,10 @@ export function useLiquid({ host, active, orientation, form, motion }: LiquidOpt
     const stretch = Math.max(0, (Math.abs(e - s) - len) / len);
     const pinchVar = host.current ? parseFloat(getComputedStyle(host.current).getPropertyValue('--nx-pinch')) || 0.6 : 0.6;
     const pinch = Math.min(1, stretch * 1.4) * pinchVar;
-    path.current?.setAttribute('d', liquidCapsule(s, e, t.thick, pinch, { vertical, offset: t.cross }));
+    // Volumen aproximadamente constante: al estirarse, la gota adelgaza (hasta un 28 %) y se recupera al llegar.
+    const thin = t.thick > 6 ? Math.max(0.72, Math.sqrt(1 / (1 + stretch))) : 1;
+    const thick = t.thick * thin;
+    path.current?.setAttribute('d', liquidCapsule(s, e, thick, pinch, { vertical, offset: t.cross + (t.thick - thick) / 2 }));
   }, [host, vertical]);
 
   const springs = useSprings([0, 0], ([s, e]) => paint(s!, e!), 0.05);

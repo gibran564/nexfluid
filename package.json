@@ -22,6 +22,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "tokens": "node packages/foundation/gen-tokens.ts",
     "presets": "node packages/core/preset-table.ts",
+    "morph": "node packages/core/morph-table.ts",
     "build:lib": "node scripts/build-lib.ts",
     "build:docs": "vite build apps/docs",
     "build:playground": "vite build apps/playground",

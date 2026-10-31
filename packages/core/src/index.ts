@@ -16,5 +16,13 @@ export { baseRadius, makeHarmonics, sampleContour, mixContours, polygonArea, toS
 export type { Point, BaseGeometry, Harmonic, Deformation, ContourOptions } from './shape.ts';
 export { membraneOutline, membranePath, morphMembranes, liquidCapsule, MEMBRANE_POINTS } from './membrane.ts';
 export type { MembraneOptions } from './membrane.ts';
+export {
+  MORPH_PHYSICS, resolveMorphPhysics, isMorphPhysicsName, dampingForOvershoot, overshootOf, morphTimeline, morphTiming,
+  morphRect, morphPath, deformContour, resampleContour, alignContours, metaballPath, MorphTransition,
+} from './morph.ts';
+export type {
+  MorphPhysics, MorphPhysicsName, MorphPhysicsOverrides, MorphTarget, MorphSample, MorphTimeline, Rect, MorphEndpoint,
+  MorphState, MorphFrame, MorphPathOptions, Circle, MorphTransitionOptions,
+} from './morph.ts';
 export { createFluidBlob } from './fluid-blob.ts';
 export type { FluidBlobOptions, FluidBlobHandle } from './fluid-blob.ts';

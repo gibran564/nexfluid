@@ -10,6 +10,7 @@ import { ColorPage, IconsPage, MotionTokensPage, SpacingPage, ThemesPage, Typogr
 import { CoverPage } from './pages/cover.tsx';
 import { ComparePage, DirectionsPage, GrammarPage } from './pages/identity.tsx';
 import { MotionOverviewPage } from './pages/motion.tsx';
+import { MorphStudioPage } from './pages/morph-studio.tsx';
 import { PatternsPage, PlaygroundPage } from './pages/patterns.tsx';
 import { CompositionLabPage } from './pages/composition-lab.tsx';
 import { QualityPage } from './pages/quality.tsx';
@@ -74,6 +75,7 @@ export const PAGES: readonly PageDef[] = [
   component(previewDoc, 'Widgets', undefined, 'vista previa dispositivo'),
 
   { path: 'motion', title: 'NexFluid', section: 'Movimiento', keywords: 'motor resortes presets', render: () => <MotionOverviewPage /> },
+  { path: 'motion/nexmorph', title: 'NexMorph Studio', section: 'Movimiento', keywords: 'morph transformacion tarjeta panel dock boton marco fisica', render: () => <MorphStudioPage /> },
   component(fluidBlobDoc, 'Movimiento', undefined, 'blob organico'),
 
   { path: 'patrones', title: 'Patrones para Nextudio', section: 'Patrones', keywords: 'ejemplos', render: () => <PatternsPage /> },

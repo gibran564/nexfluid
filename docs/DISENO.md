@@ -41,7 +41,7 @@ Las cuatro son conjuntos de tokens reales (`data-nx-direction`) aplicados a los 
 * **attract**: el borde más cercano al puntero se abomba (campo de influencia gaussiano, normal hacia fuera); el borde gana tensión; aparece la zona cromática bajo el puntero.
 * **deform**: la presión aplasta conservando el área.
 * **activate**: la zona cromática inunda la membrana.
-* **morph**: la membrana cambia de forma (tarjeta → panel) con el mismo número de puntos.
+* **morph**: la membrana cambia de forma (tarjeta → panel) con el mismo número de puntos; ver NexMorph (§ 6).
 * **settle**: recuperación con la física de su familia.
 
 Teclado equivalente: foco visible = attract; Intro/Espacio = activate. Movimiento reducido: los estados cambian de color, no de forma.
@@ -85,14 +85,65 @@ Se conserva la paleta vigente (seis temas). Lo nuevo es su papel: el acento marc
 5. **Direcciones como tokens**: explorar A/B/C no requiere componentes distintos.
 6. **Paleta conservada**: decisión de producto; la reinvención está en forma, materia, tipografía, composición y física.
 
-## 6. Limitaciones
+## 6. NexMorph — transformación continua de materia
+
+Una superficie se convierte en otra cambiando posición, tamaño, contorno y función; el contenido se coreografía aparte. Demostración y parámetros en NexDocs → Movimiento → **NexMorph Studio**.
+
+### Arquitectura
+
+* **Núcleo (`@nexfluid/core`, sin DOM ni React):** `MorphTransition` (controlador interrumpible: `open`, `close`, `pause`, `seek`, `resume`), familias de física `MORPH_PHYSICS`, `morphTimeline`/`morphTiming` (simulación exacta), `morphRect`, `morphPath`, `deformContour` (estiramiento por velocidad con área constante), `resampleContour` y `alignContours` (correspondencia de puntos), `metaballPath`.
+* **React (`@nexfluid/react`):** `NexMorph` (`.Source`, `.Target`, `.Trigger`, `.Title`, `.Close`, `.Incoming`, `.Shared`), `useNexMorph`, `useNexMorphSource` y un controlador imperativo para herramientas. Sobre él: la expansión de `NexCard` (misma API, más `expansionContainer`, `expansionPhysics`, `expansionChrome`, `expanded`), `NexDock`, y con las mismas familias `NexActionButton` y las transiciones espaciales de `NexFrame` (`motion`).
+
+### Canales y coreografía
+
+| Canal | Papel |
+|---|---|
+| position | El centro de la superficie: lidera (sin viscosidad). |
+| size | Ancho y alto: siguen con viscosidad τ. La caja crece desde el centro del origen. |
+| contour | Radio y color de la membrana: τ × 1.6, llega el último. |
+| content | Contenido entrante: empieza cuando size ≥ 60 %; al cerrar sale primero y la superficie no se mueve hasta que ha bajado del 35 %. |
+
+El contenido saliente (el del origen) se deriva de size. Los elementos compartidos (`data-nx-morph-shared`, p. ej. el título de la tarjeta) viajan con traslación y **escala uniforme**: el texto nunca se estira. El resto del contenido entra escalonado (`--nx-morph-in`, `--nx-morph-i`); los contenedores que llevan un elemento compartido reciben su material con el contenido.
+
+### Física (medida con `npm run morph`)
+
+| Familia | Uso | Superficie | Percibida | Sobrepaso |
+|---|---|---|---|---|
+| precision | micro: estados del botón | 154 ms | 196 ms | 0.2 % |
+| flow | micro: anchura del botón | 200 ms | 271 ms | 0.8 % |
+| viscous | paneles densos | 429 ms | 508 ms | 0 % |
+| morph | tarjeta → panel | 362 ms | 375 ms | 2.2 % |
+| spatial | dock, marco | 467 ms | 496 ms | 0 % |
+
+Parámetros: masa, rigidez, amortiguación (o sobrepaso deseado), viscosidad, tensión superficial, deformación y umbral de reposo. Sin rebote exagerado (≤ 4 %, comprobado por prueba) y sin movimiento perpetuo: el reloj compartido se duerme en reposo.
+
+### Implementación en el DOM
+
+El panel destino se monta **una vez en su lugar final**: su contenido nunca se recoloca ni se reescala. En cada fotograma sólo cambian el trazado SVG de la membrana, el `clip-path: path()` del contenido, las transformaciones de los elementos compartidos y dos variables CSS. React no vuelve a renderizar por fotograma. Todas las medidas se hacen en coordenadas del panel sin escalar (funciona bajo un ancestro transformado), y el origen se mide en cada fotograma, así que el regreso va a su posición **actual** aunque el layout haya cambiado o haya habido scroll. Movimiento reducido: mismo estado final, sin trayecto.
+
+### Alternativas consideradas
+
+* **Motion `layoutId` / FLIP clásico:** interpolan cajas escalando el contenido (texto deformado) o requieren contra-escalas; no cambian la familia del contorno. Se usa FLIP sólo donde sirve: elementos compartidos con escala uniforme. No se añadió la dependencia.
+* **View Transitions API:** captura imágenes y las funde; no es interrumpible a mitad ni reorientable desde la velocidad actual, y el contenido es una captura, no estado real.
+* **WAAPI:** necesita keyframes conocidos de antemano; una interrupción reinicia en vez de continuar con la velocidad actual.
+* **Interpolación de trazados SVG arbitrarios:** se cubre con remuestreo + correspondencia (`resampleContour`, `alignContours`); las membranas ya comparten 48 puntos, así que no hace falta en el caso general.
+* **Canvas/WebGL:** innecesario para un contorno de 48 puntos; mantendría el contenido fuera del DOM accesible.
+
+### Limitaciones
+
+* Fluidez no medida en un equipo modesto; el panel del navegador usado para validar limita requestAnimationFrame, así que la validación visual se hizo con el scrubber (`seek`), que pinta fotogramas exactos de la simulación.
+* `clip-path: path()` repinta el contenido recortado en cada fotograma durante la transformación (sólo mientras dura).
+* En `NexFrame` las columnas laterales se animan con layout real (el lienzo central se recompone en cada fotograma); el contenido de las regiones conserva su ancho final y no se recompone.
+* La expansión modal no bloquea el desplazamiento de la página (la transformación sigue al origen si se desplaza).
+
+## 7. Limitaciones
 
 * Fluidez no medida aún en un equipo modesto (NexDocs → Accesibilidad y rendimiento incluye el medidor).
 * `corner-shape` sólo en Chromium reciente; en otros navegadores el modo estático usa `border-radius` (el modo vivo SVG es igual en todos).
 * La versión publicada de Bricolage Grotesque no trae eje de anchura: `--nx-display-stretch` sólo actúa con fuentes que lo tengan.
-* La expansión tarjeta → panel atrapa el foco de forma básica y no bloquea el desplazamiento de la página.
+* La expansión tarjeta → panel (NexMorph) atrapa el foco en modo modal y no bloquea el desplazamiento de la página.
 * Probado en Chromium y jsdom; sin Safari ni Firefox.
 
-## 7. Pendiente
+## 8. Pendiente
 
-Medición de fps en equipos modestos; pruebas visuales de regresión por tema/dirección; NexInput/NexSelect/NexDialog/NexMenu; metaballs para fusión de varias superficies; generación de tablas de API desde los tipos.
+Medición de fps en equipos modestos; pruebas visuales de regresión por tema/dirección; NexInput/NexSelect/NexDialog/NexMenu; fusión de más de dos superficies con metaballs; generación de tablas de API desde los tipos.

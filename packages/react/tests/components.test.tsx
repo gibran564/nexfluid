@@ -246,7 +246,7 @@ describe('NexFrame', () => {
   });
 
   it('el botón del inspector lo muestra y oculta con aria-expanded', () => {
-    render(<NexFrame height={600} canvasAs="div" inspector={<p>Props</p>}>X</NexFrame>);
+    render(<NexFrame height={600} canvasAs="div" motion="none" inspector={<p>Props</p>}>X</NexFrame>);
     const toggle = $('[data-region="inspector"]');
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
     click(toggle);
@@ -257,6 +257,16 @@ describe('NexFrame', () => {
     expect(insp.hasAttribute('data-empty')).toBe(false);
     click(insp.querySelector('.nx-frame__rail button')!);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('transición espacial: al cerrar, la región conserva su contenido hasta que la columna se retrae', () => {
+    render(<NexFrame height={600} canvasAs="div" motion="fluid" inspector={<p>Props</p>}>X</NexFrame>);
+    click($('[data-region="inspector"]'));
+    const insp = $('[data-nexframe-region="inspector"]');
+    expect(insp.hasAttribute('data-closing')).toBe(true);
+    expect(insp.hasAttribute('data-collapsed')).toBe(false);
+    expect(insp.textContent).toContain('Props');
+    expect($('.nx-frame__layout').hasAttribute('data-nx-morphing')).toBe(true);
   });
 
   it('el separador redimensiona con teclado dentro de sus límites', () => {

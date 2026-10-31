@@ -16,6 +16,7 @@ npm run dev              # NexDocs en http://127.0.0.1:5290
 npm run dev:playground   # laboratorio del motor en http://127.0.0.1:5288
 npm test                 # Node (motor, tokens, contrato CSS, arquitectura) + Vitest (React, axe, SSR)
 npm run typecheck
+npm run morph            # duraciones medidas de las familias NexMorph
 npm run build            # dist/ de los paquetes → verificación de exports → NexDocs y Playground estáticos
 ```
 
@@ -24,14 +25,14 @@ npm run build            # dist/ de los paquetes → verificación de exports �
 | Módulo | Paquete | Contenido |
 |---|---|---|
 | NexFoundation | `@nexfluid/foundation` | Tokens TS (fuente única) → `tokens.css`; temas, direcciones, familias geométricas, materiales, tipografía, movimiento, iconos. Compatibilidad opcional en `compat/nextudio.css` |
-| NexFluid | `@nexfluid/core` | Resortes analíticos, viscosidad exacta, presets medidos, reloj compartido, geometría orgánica, membranas y gotas líquidas |
+| NexFluid | `@nexfluid/core` | Resortes analíticos, viscosidad exacta, presets medidos, reloj compartido, geometría orgánica, membranas, gotas líquidas y NexMorph (transformación continua) |
 | NexComponents | `@nexfluid/components` | Contrato sin framework: `styles.css` (`nx-*`, `data-nx-*`) y comportamiento puro |
 | NexBridge + NexWidgets | `@nexfluid/react` (`.`, `./markdown`, `./widgets`, `./motion`) | Componentes React 19 tipados y SSR-seguros |
 | NexDocs | `apps/docs` | Documentación; consume sólo los `exports` públicos |
 
 ## Componentes
 
-`NexSurface` (membrana), `NexButton`, `NexIconButton`, `NexSegmented`, `NexBadge`, `NexCard` (con expansión a panel), `NexPanel`, `NexTabs`, `NexNav`, `NexFrame` (+ `NexFrameRegion`), `NexCodeBlock`, `NexMarkdown`, `NexIcon`, `NexProvider`; widgets `NexMarkdownWidget`, `NexPropertiesWidget`, `NexInspectorWidget`, `NexExplorerWidget`, `NexPreviewWidget`; motion `FluidBlob`.
+`NexSurface` (membrana), `NexMorph` (transformación continua), `NexButton`, `NexActionButton`, `NexIconButton`, `NexSegmented`, `NexBadge`, `NexCard` (con expansión a panel), `NexPanel`, `NexTabs`, `NexNav`, `NexDock`, `NexFrame` (+ `NexFrameRegion`), `NexCodeBlock`, `NexMarkdown`, `NexIcon`, `NexProvider`; widgets `NexMarkdownWidget`, `NexPropertiesWidget`, `NexInspectorWidget`, `NexExplorerWidget`, `NexPreviewWidget`; motion `FluidBlob`.
 
 ## Uso mínimo
 
@@ -50,5 +51,5 @@ import { NexProvider, NexCard, NexTabs, NexTab } from '@nexfluid/react';
 
 ## Documentación
 
-* [docs/DISENO.md](docs/DISENO.md) — gramática, direcciones, decisiones y limitaciones.
+* [docs/DISENO.md](docs/DISENO.md) — gramática, direcciones, NexMorph, decisiones y limitaciones.
 * [docs/TOKENS.md](docs/TOKENS.md) y [docs/MEDICIONES.md](docs/MEDICIONES.md) — presets del motor y mediciones (fase 1).

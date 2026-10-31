@@ -1,20 +1,19 @@
 'use client';
 
 import {
-  createContext, useCallback, useContext, useEffect, useId, useRef, useState,
-  type AnchorHTMLAttributes, type HTMLAttributes, type KeyboardEvent, type ReactNode,
+  createContext, useCallback, useContext, useRef, useState,
+  type AnchorHTMLAttributes, type HTMLAttributes, type ReactNode, type RefObject,
 } from 'react';
-import { createPortal } from 'react-dom';
-import { membranePath } from '@nexfluid/core';
+import type { MorphPhysics, MorphPhysicsName } from '@nexfluid/core';
 import type { Material, ShapeFamily } from '@nexfluid/foundation';
 import { cx, type NexAppearance, type NexDensity, type NexMotion } from '@nexfluid/components';
 import { NexIconButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';
-import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
-import { useSprings } from './springs.ts';
+import { NexMorph, useNexMorphSource, type NexMorphTargetProps } from './morph.tsx';
+import { useNex } from './provider.tsx';
 import { NexSurface } from './surface.tsx';
 
-const CardContext = createContext<{ headingLevel: 2 | 3 | 4; expand: (() => void) | null; titleId: string }>({ headingLevel: 3, expand: null, titleId: '' });
+const CardContext = createContext<{ headingLevel: 2 | 3 | 4; expand: (() => void) | null }>({ headingLevel: 3, expand: null });
 
 export interface NexCardProps extends HTMLAttributes<HTMLElement> {
   /** `outlined`/`default` membrana · `filled` hundida · `ghost` transparente · `editorial` tinta con titular grande. */
@@ -30,36 +29,78 @@ export interface NexCardProps extends HTMLAttributes<HTMLElement> {
   headingLevel?: 2 | 3 | 4;
   /**
    * Contenido ampliado. Si se da, la tarjeta ofrece «Ampliar» y se transforma
-   * en un panel (morfología de membrana) con este contenido.
+   * (NexMorph) en un panel con este contenido; al cerrar vuelve a su sitio.
    */
   expansion?: ReactNode;
   /** Título del panel ampliado (por defecto, el texto de NexCard.Title). */
   expansionTitle?: string;
+  /** Dónde se abre: `viewport` (modal, por defecto) o un contenedor posicionado (región, no modal). */
+  expansionContainer?: NexMorphTargetProps['container'];
+  /** Física de la transformación (familia NexMorph). Por defecto `morph`. */
+  expansionPhysics?: MorphPhysicsName | MorphPhysics;
+  /** `false`: sin cabecera ni cierre propios; el contenido usa `NexMorph.Title` y `NexMorph.Close`. */
+  expansionChrome?: boolean;
+  /** Estado de la expansión (controlado). */
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
   children?: ReactNode;
 }
 
 const MATERIAL: Record<NexAppearance, Material> = { default: 'base', outlined: 'base', filled: 'sunken', ghost: 'clear', editorial: 'ink' };
 
 /** Tarjeta: una membrana viva con composición editorial interna. */
-function CardRoot({
-  appearance = 'outlined', shape, density, motion, interactive, selected, as = 'article', headingLevel = 3,
-  expansion, expansionTitle, className, children, ...rest
-}: NexCardProps) {
+function CardRoot(props: NexCardProps) {
+  const {
+    expansion, expansionTitle, expansionContainer = 'viewport', expansionPhysics = 'morph', expansionChrome = true,
+    expanded, onExpandedChange, motion,
+  } = props;
   const defaults = useNex();
   const level = motion ?? defaults.motion;
   const root = useRef<HTMLElement>(null);
-  const [open, setOpen] = useState(false);
-  const titleId = `nx-card-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
-  const trigger = useRef<HTMLElement | null>(null);
-  const expand = useCallback(() => {
-    trigger.current = document.activeElement as HTMLElement | null;
-    setOpen(true);
-  }, []);
+  const [inner, setInner] = useState(false);
+  const open = expanded ?? inner;
+  const setOpen = useCallback((v: boolean) => {
+    if (expanded === undefined) setInner(v);
+    onExpandedChange?.(v);
+  }, [expanded, onExpandedChange]);
+  if (!expansion) return <CardSurface {...props} level={level} root={root} expand={null} />;
+  const title = expansionTitle ?? root.current?.querySelector('.nx-card__title')?.textContent ?? 'Detalle';
   return (
-    <CardContext.Provider value={{ headingLevel, expand: expansion ? expand : null, titleId }}>
+    <NexMorph open={open} onOpenChange={setOpen} physics={expansionPhysics} motion={level}>
+      <CardSurface {...props} level={level} root={root} expand={() => setOpen(true)} />
+      <NexMorph.Target container={expansionContainer} label={title}>
+        {expansionChrome ? (
+          <>
+            <div className="nx-expansion__header">
+              <NexMorph.Title className="nx-expansion__title nx-type-title">{title}</NexMorph.Title>
+              <NexMorph.Close />
+            </div>
+            <div className="nx-expansion__body">{expansion}</div>
+          </>
+        ) : expansion}
+      </NexMorph.Target>
+    </NexMorph>
+  );
+}
+
+function CardSurface({
+  appearance = 'outlined', shape, density, interactive, selected, as = 'article', headingLevel = 3,
+  expansion, expansionTitle: _t, expansionContainer: _c, expansionPhysics: _p, expansionChrome: _h, expanded: _e, onExpandedChange: _o,
+  motion: _m, className, children, level, root, expand, ...rest
+}: NexCardProps & { level: NexMotion; root: RefObject<HTMLElement | null>; expand: (() => void) | null }) {
+  const defaults = useNex();
+  const source = useNexMorphSource<HTMLElement>();
+  const sourceRef = source.ref;
+  const ref = useCallback((node: HTMLElement | null) => {
+    root.current = node;
+    if (expand) sourceRef(node);
+  }, [root, expand, sourceRef]);
+  return (
+    <CardContext.Provider value={{ headingLevel, expand }}>
       <NexSurface
         {...rest}
-        ref={root}
+        {...(expand ? source.props : null)}
+        ref={ref}
         as={as}
         kind="surface"
         shape={shape ?? (expansion ? 'morph' : undefined)}
@@ -75,124 +116,7 @@ function CardRoot({
       >
         {children}
       </NexSurface>
-      {expansion && open && (
-        <Expansion
-          origin={root}
-          title={expansionTitle ?? root.current?.querySelector('.nx-card__title')?.textContent ?? 'Detalle'}
-          motion={level}
-          onClose={() => {
-            setOpen(false);
-            trigger.current?.focus();
-          }}
-        >
-          {expansion}
-        </Expansion>
-      )}
     </CardContext.Provider>
-  );
-}
-
-/**
- * Morfología tarjeta → panel: la membrana del panel nace con la caja de la
- * tarjeta y fluye hasta su tamaño final (física «surface»: viscosa); el
- * contenido emerge al asentarse. Al cerrar, vuelve a la tarjeta.
- */
-function Expansion({ origin, title, motion, onClose, children }: { origin: React.RefObject<HTMLElement | null>; title: string; motion: NexMotion; onClose: () => void; children: ReactNode }) {
-  const preference = useMotionPreference();
-  const host = useRef<HTMLDivElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-  const shape = useRef<SVGPathElement>(null);
-  const edge = useRef<SVGPathElement>(null);
-  const svg = useRef<SVGSVGElement>(null);
-  const closing = useRef(false);
-  const titleId = `nx-exp-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
-  const animate = canAnimate(motion, preference);
-
-  const place = (x: number, y: number, w: number, h: number) => {
-    const p = panel.current;
-    if (!p) return;
-    Object.assign(p.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` });
-    const d = membranePath(w, h, { radius: Math.min(26, 12 + w / 40), smoothing: 0.9 });
-    svg.current?.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    shape.current?.setAttribute('d', d);
-    edge.current?.setAttribute('d', d);
-  };
-  const targetRect = () => {
-    const w = Math.min(760, innerWidth - 32);
-    const h = Math.min(innerHeight * 0.84, 680);
-    return [(innerWidth - w) / 2, (innerHeight - h) / 2, w, h];
-  };
-  const springs = useSprings([0, 0, 0, 0], ([x, y, w, h]) => {
-    place(x!, y!, w!, h!);
-    const t = targetRect();
-    const settled = Math.abs(w! - t[2]!) < 1 && Math.abs(h! - t[3]!) < 1;
-    if (host.current) {
-      if (settled && !closing.current) host.current.dataset.nxSettled = '';
-      else delete host.current.dataset.nxSettled;
-    }
-  }, 0.5);
-
-  const fromRect = () => {
-    const r = origin.current?.getBoundingClientRect();
-    return r ? [r.left, r.top, r.width, r.height] : targetRect();
-  };
-
-  useEffect(() => {
-    const start = fromRect();
-    springs.jump(start);
-    host.current!.dataset.nxOpen = '';
-    if (animate) springs.to(targetRect(), ['viscous', 'viscous', 'viscous', 'viscous']);
-    else {
-      springs.jump(targetRect());
-      host.current!.dataset.nxSettled = '';
-    }
-    host.current?.querySelector<HTMLElement>('[data-nx-autofocus]')?.focus();
-    const onResize = () => { if (!closing.current) springs.jump(targetRect()); };
-    addEventListener('resize', onResize);
-    return () => removeEventListener('resize', onResize);
-  }, []); // eslint-disable-line
-
-  const close = () => {
-    if (closing.current) return;
-    closing.current = true;
-    delete host.current?.dataset.nxSettled;
-    delete host.current?.dataset.nxOpen;
-    if (!animate) return onClose();
-    springs.to(fromRect(), ['flow', 'flow', 'flow', 'flow']);
-    setTimeout(onClose, 380);
-  };
-
-  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape') {
-      e.stopPropagation();
-      close();
-    }
-    if (e.key === 'Tab') {
-      const focusables = Array.from(panel.current?.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])') ?? []);
-      if (focusables.length === 0) return;
-      const first = focusables[0]!;
-      const last = focusables[focusables.length - 1]!;
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-  };
-
-  return createPortal(
-    <div ref={host} className="nx-expansion nx-root" onKeyDown={onKey}>
-      <button type="button" className="nx-expansion__scrim" tabIndex={-1} aria-hidden="true" onClick={close} />
-      <div ref={panel} className="nx-expansion__panel nx-surface" data-nx-drawn="" data-nx-material="raised" data-nx-shape="morph" role="dialog" aria-modal="true" aria-labelledby={titleId}>
-        <svg ref={svg} className="nx-surface__shape" aria-hidden="true" focusable="false" preserveAspectRatio="none">
-          <path ref={shape} className="nx-surface__fill" />
-          <path ref={edge} className="nx-surface__edge" />
-        </svg>
-        <div className="nx-expansion__header">
-          <h2 id={titleId} className="nx-expansion__title nx-type-title">{title}</h2>
-          <NexIconButton label="Cerrar" icon={<NexIcon name="close" />} onClick={close} data-nx-autofocus="" />
-        </div>
-        <div className="nx-expansion__body">{children}</div>
-      </div>
-    </div>,
-    document.body,
   );
 }
 
@@ -222,7 +146,8 @@ export function NexCardEyebrow({ className, ...rest }: HTMLAttributes<HTMLParagr
 export function NexCardTitle({ className, as, ...rest }: HTMLAttributes<HTMLHeadingElement> & { as?: 'h2' | 'h3' | 'h4' | 'p' }) {
   const { headingLevel } = useContext(CardContext);
   const Tag = as ?? (`h${headingLevel}` as 'h2' | 'h3' | 'h4');
-  return <Tag {...rest} className={cx('nx-card__title', className)} />;
+  // Elemento compartido: continúa en el título del panel ampliado (NexMorph).
+  return <Tag data-nx-morph-shared="title" {...rest} className={cx('nx-card__title', className)} />;
 }
 export function NexCardDescription({ className, ...rest }: HTMLAttributes<HTMLParagraphElement>) {
   return <p {...rest} className={cx('nx-card__description', className)} />;

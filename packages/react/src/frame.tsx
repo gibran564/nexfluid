@@ -5,14 +5,15 @@ import {
   type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { cx, toDomId, type NexDensity } from '@nexfluid/components';
-import { useNex } from './provider.tsx';
+import { cx, toDomId, type NexDensity, type NexMotion } from '@nexfluid/components';
+import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { NexIcon } from './icon.tsx';
+import { morphSpring, useSprings } from './springs.ts';
 
 /**
- * Regiones de NexFrame. Son las del NexFrame de Nextudio (`FrameRegionName`
- * en la integración `nexframe-global`) más `identity` y `navigation`, que allí
- * pertenecen al AppFrame de la aplicación.
+ * Regiones de NexFrame: las del contrato de regiones de NexFrame en Nextudio
+ * (`FrameRegionName`) más `identity` y `navigation`, que allí pertenecen al
+ * marco de la aplicación.
  */
 export type NexFrameRegionName = 'identity' | 'heading' | 'actions' | 'tools' | 'filters' | 'navigation' | 'explorer' | 'inspector' | 'bottom';
 
@@ -65,8 +66,16 @@ export interface NexFrameProps {
   /** `split`: todas las regiones abiertas · `focus`: explorador e inspector se retraen a rieles y el lienzo se expande. */
   layout?: 'split' | 'focus';
   density?: NexDensity;
+  /**
+   * Transiciones espaciales (explorador e inspector que se abren, se retraen o
+   * cambian de disposición): las columnas fluyen con física «spatial» y el
+   * contenido conserva su ancho mientras la membrana lo descubre. `none`: inmediato.
+   */
+  motion?: NexMotion;
   height?: 'viewport' | 'fill' | number | string;
   canvasAs?: 'main' | 'div';
+  /** Marco dentro de otra página (un panel, una demostración): sin landmarks de nivel superior; lienzo e inspector son regiones. */
+  nested?: boolean;
   canvasLabel?: string;
   navigationLabel?: string;
   navigationRole?: 'navigation' | 'complementary';
@@ -112,7 +121,7 @@ function useOpen(controlled: boolean | undefined, initial: boolean, onChange?: (
  */
 export function NexFrame({
   children, identity, heading, actions, tools, filters, navigation, explorer, inspector, bottom,
-  variant = 'floating', layout = 'split', density, height = 'viewport', canvasAs = 'main', canvasLabel = 'Contenido',
+  variant = 'floating', layout = 'split', density, motion, height = 'viewport', canvasAs = 'main', nested = false, canvasLabel = 'Contenido',
   navigationLabel = 'Navegación', navigationRole = 'navigation', explorerLabel = 'Explorador',
   inspectorLabel = 'Inspector', bottomLabel = 'Panel inferior',
   inspectorOpen: inspectorOpenProp, defaultInspectorOpen = layout !== 'focus', onInspectorOpenChange,
@@ -122,8 +131,11 @@ export function NexFrame({
   className, style,
 }: NexFrameProps) {
   const defaults = useNex();
+  const level = motion ?? defaults.motion;
+  const preference = useMotionPreference();
   const id = toDomId('nx-frame', useId());
   const root = useRef<HTMLDivElement>(null);
+  const layoutEl = useRef<HTMLDivElement>(null);
   const navToggle = useRef<HTMLButtonElement>(null);
   const inspectorToggleRef = useRef<HTMLButtonElement>(null);
 
@@ -195,17 +207,62 @@ export function NexFrame({
   const navigationDrawer = compact !== 'wide';
 
   // Columnas y áreas según las regiones presentes: sin columnas vacías ni costuras dobles.
+  const RAIL = 44;
+  const explorerTarget = explorerOpen ? explorerWidth : RAIL;
+  const inspectorTarget = inspectorOpen ? inspectorWidth : RAIL;
   const grid = useMemo(() => {
-    const cols: string[] = [];
     const names: string[] = [];
-    if (has.navigation && !navigationDrawer) { cols.push(`${navigationWidth}px`); names.push('nav'); }
-    if (has.explorer) { cols.push(explorerOpen ? `${explorerWidth}px` : '44px'); names.push('explorer'); }
-    cols.push('minmax(0, 1fr)'); names.push('canvas');
-    if (has.inspector && !inspectorOverlay) { cols.push(inspectorOpen ? `${inspectorWidth}px` : '44px'); names.push('inspector'); }
+    if (has.navigation && !navigationDrawer) names.push('nav');
+    if (has.explorer) names.push('explorer');
+    names.push('canvas');
+    if (has.inspector && !inspectorOverlay) names.push('inspector');
+    const px = (v: number) => `${Math.round(v * 10) / 10}px`;
+    const cols = (ex: number, ins: number) => names.map((n) => (n === 'nav' ? `${navigationWidth}px` : n === 'explorer' ? px(ex) : n === 'inspector' ? px(ins) : 'minmax(0, 1fr)')).join(' ');
     const row = (center: string) => names.map((n) => (n === 'canvas' ? center : n)).join(' ');
     const top = names.map((n) => (n === 'nav' ? 'nav' : 'top')).join(' ');
-    return { cols: cols.join(' '), areas: `'${top}' '${row('canvas')}' '${row(has.bottom ? 'bottom' : 'canvas')}'` };
-  }, [has.navigation, has.explorer, has.inspector, has.bottom, navigationDrawer, inspectorOverlay, explorerOpen, inspectorOpen, inspectorWidth, navigationWidth, explorerWidth]);
+    return { cols, areas: `'${top}' '${row('canvas')}' '${row(has.bottom ? 'bottom' : 'canvas')}'` };
+  }, [has.navigation, has.explorer, has.inspector, has.bottom, navigationDrawer, inspectorOverlay, navigationWidth]);
+
+  // Transición espacial: los rieles se abren y se cierran como materia, no aparecen.
+  // El contenido de la región se queda montado y con su ancho final (no se reescribe
+  // el texto en cada fotograma); sólo pasa a riel cuando la columna ya se ha cerrado.
+  const [explorerShown, setExplorerShown] = useState(explorerOpen);
+  const [inspectorShown, setInspectorShown] = useState(inspectorOpen);
+  const tracks = useSprings([explorerTarget, inspectorTarget], ([ex, ins]) => {
+    const el = layoutEl.current;
+    if (!el) return;
+    el.style.setProperty('--nx-frame-cols', grid.cols(ex!, ins!));
+    const reveal = (w: number, full: number) => Math.min(1, Math.max(0, (w - RAIL) / Math.max(1, full - RAIL))).toFixed(3);
+    el.style.setProperty('--nx-explorer-reveal', reveal(ex!, explorerWidth));
+    el.style.setProperty('--nx-inspector-reveal', reveal(ins!, inspectorWidth));
+    if (!tracks.moving) {
+      delete el.dataset.nxMorphing;
+      setExplorerShown(explorerOpenRef.current);
+      setInspectorShown(inspectorOpenRef.current);
+    }
+  }, 0.5);
+  const explorerOpenRef = useRef(explorerOpen);
+  explorerOpenRef.current = explorerOpen;
+  const inspectorOpenRef = useRef(inspectorOpen);
+  inspectorOpenRef.current = inspectorOpen;
+  const previousOpen = useRef({ explorer: explorerOpen, inspector: inspectorOpen });
+  useIsoLayoutEffect(() => {
+    const el = layoutEl.current;
+    const toggled = previousOpen.current.explorer !== explorerOpen || previousOpen.current.inspector !== inspectorOpen;
+    previousOpen.current = { explorer: explorerOpen, inspector: inspectorOpen };
+    const animate = toggled && el && canAnimate(level, preference) && root.current?.dataset.nxInput !== 'keyboard';
+    if (explorerOpen) setExplorerShown(true);
+    if (inspectorOpen) setInspectorShown(true);
+    if (animate) {
+      // React acaba de escribir el destino: se repone el estado visual actual antes de pintar.
+      const [ex, ins] = tracks.values();
+      el.style.setProperty('--nx-frame-cols', grid.cols(ex!, ins!));
+      el.dataset.nxMorphing = '';
+      tracks.to([explorerTarget, inspectorTarget], [morphSpring('spatial'), morphSpring('spatial')]);
+    } else {
+      tracks.jump([explorerTarget, inspectorTarget]);
+    }
+  }, [explorerTarget, inspectorTarget, grid]);
 
   const closeOverlays = (restore: boolean) => {
     if (navigationOpen) {
@@ -264,7 +321,8 @@ export function NexFrame({
     </button>
   );
 
-  const CanvasTag = canvasAs;
+  const CanvasTag = nested ? 'div' : canvasAs;
+  const InspectorTag = nested ? 'div' : 'aside';
   return (
     <FrameContext.Provider value={context}>
       <div
@@ -283,7 +341,14 @@ export function NexFrame({
           if (e.key === 'Escape') closeOverlays(true);
         }}
       >
-        <div className="nx-frame__layout" style={{ '--nx-frame-cols': grid.cols, '--nx-frame-areas': grid.areas } as CSSProperties}>
+        <div
+          ref={layoutEl}
+          className="nx-frame__layout"
+          style={{
+            '--nx-frame-cols': grid.cols(explorerTarget, inspectorTarget), '--nx-frame-areas': grid.areas,
+            '--nx-explorer-w': `${explorerWidth}px`, '--nx-inspector-w': `${inspectorWidth}px`,
+          } as CSSProperties}
+        >
           <div
             ref={refs.navigation}
             id={`${id}-navigation`}
@@ -322,7 +387,8 @@ export function NexFrame({
             role={has.explorer ? 'region' : undefined}
             aria-label={has.explorer ? explorerLabel : undefined}
             data-empty={empty('explorer')}
-            data-collapsed={has.explorer && !explorerOpen ? '' : undefined}
+            data-collapsed={has.explorer && !explorerOpen && !explorerShown ? '' : undefined}
+            data-closing={has.explorer && !explorerOpen && explorerShown ? '' : undefined}
             tabIndex={has.explorer && explorerOpen ? 0 : undefined}
             data-nexframe-region="explorer"
           >
@@ -332,17 +398,19 @@ export function NexFrame({
             </div>
             <div ref={refs.explorer} className="nx-frame__slot">{explorer}</div>
           </div>
-          <CanvasTag className={cx(regionClass, 'nx-frame__canvas')} data-nx-role="surface" id={`${id}-canvas`} aria-label={canvasLabel} tabIndex={0} data-nexframe-region="canvas">
+          <CanvasTag className={cx(regionClass, 'nx-frame__canvas')} data-nx-role="surface" id={`${id}-canvas`} role={nested ? 'region' : undefined} aria-label={canvasLabel} tabIndex={0} data-nexframe-region="canvas">
             {children}
           </CanvasTag>
-          <aside
+          <InspectorTag
             id={`${id}-inspector`}
+            role={nested && has.inspector ? 'region' : undefined}
             className={cx(regionClass, 'nx-frame__inspector')}
             data-nx-role="surface"
             data-nx-material="raised"
             aria-label={inspectorLabel}
             data-empty={has.inspector ? undefined : ''}
-            data-collapsed={has.inspector && !inspectorOpen ? '' : undefined}
+            data-collapsed={has.inspector && !inspectorOpen && !inspectorShown ? '' : undefined}
+            data-closing={has.inspector && !inspectorOpen && inspectorShown ? '' : undefined}
             data-nexframe-region="inspector"
           >
             <div className="nx-frame__rail">
@@ -371,7 +439,7 @@ export function NexFrame({
             <div className="nx-frame__inspector-scroll" inert={!inspectorOpen ? true : undefined}>
               <div ref={refs.inspector} className="nx-frame__slot">{inspector}</div>
             </div>
-          </aside>
+          </InspectorTag>
           <div ref={refs.bottom} className={cx(regionClass, 'nx-frame__bottom')} data-nx-role="surface" data-nx-material="sunken" role={has.bottom ? 'region' : undefined} aria-label={has.bottom ? bottomLabel : undefined} tabIndex={has.bottom ? 0 : undefined} data-empty={empty('bottom')} data-nexframe-region="bottom">
             {bottom}
           </div>

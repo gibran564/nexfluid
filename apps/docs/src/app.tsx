@@ -84,13 +84,13 @@ function Settings({ settings, set }: { settings: DocsSettings; set: (p: Partial<
     <div className="doc-settings" role="group" aria-label="Preferencias de la documentación">
       <label className="doc-select">
         <span>Dirección</span>
-        <select value={settings.direction} onChange={(e) => set({ direction: e.target.value })}>
+        <select aria-label="Dirección" value={settings.direction} onChange={(e) => set({ direction: e.target.value })}>
           {Object.entries(DIRECTIONS).map(([id, d]) => <option key={id} value={id}>{d.name}</option>)}
         </select>
       </label>
       <label className="doc-select">
         <span>Tema</span>
-        <select value={settings.theme} onChange={(e) => set({ theme: e.target.value })}>
+        <select aria-label="Tema" value={settings.theme} onChange={(e) => set({ theme: e.target.value })}>
           {Object.entries(THEMES).map(([id, t]) => <option key={id} value={id}>{t.name}</option>)}
         </select>
       </label>

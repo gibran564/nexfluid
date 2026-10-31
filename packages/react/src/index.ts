@@ -38,3 +38,13 @@ export { NexCodeBlock } from './code-block.tsx';
 export type { NexCodeBlockProps } from './code-block.tsx';
 export type { NexAppearance, NexDensity, NexMotion, NexTone } from '@nexfluid/components';
 export type { ShapeFamily, Material, DirectionName } from '@nexfluid/foundation';
+export {
+  NexMorph, NexMorphSource, NexMorphTarget, NexMorphTrigger, NexMorphTitle, NexMorphClose, NexMorphIncoming, NexMorphShared,
+  useNexMorph, useNexMorphSource,
+} from './morph.tsx';
+export type { NexMorphProps, NexMorphController, NexMorphSourceProps, NexMorphTargetProps } from './morph.tsx';
+export type { MorphFrame, MorphPhysics, MorphPhysicsName, MorphState } from '@nexfluid/core';
+export { NexActionButton } from './action-button.tsx';
+export type { NexActionButtonProps, NexActionStatus } from './action-button.tsx';
+export { NexDock } from './dock.tsx';
+export type { NexDockProps, NexDockItem } from './dock.tsx';
