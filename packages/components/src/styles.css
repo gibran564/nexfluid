@@ -596,10 +596,57 @@
   }
   .nx-frame__inspector:is([data-collapsed], [data-closing]) { display: none; }
   .nx-frame__separator { display: none; }
+  .nx-frame[data-inspector-control='tab'] .nx-frame__layout { grid-template-areas: 'top' 'explorer' 'canvas' 'inspector' 'bottom'; grid-template-rows: auto auto minmax(0, 1fr) auto auto; }
+  .nx-frame[data-inspector-control='tab'] .nx-frame__inspector { grid-area: inspector; position: relative; inset: auto; max-height: none; flex-direction: column; }
+  .nx-frame[data-inspector-control='tab'] .nx-frame__inspector:is([data-collapsed], [data-closing]) { display: flex; }
+  .nx-frame[data-inspector-control='tab'] .nx-frame__inspector > .nx-frame__rail[data-tab] { width: auto; height: 44px; padding: 0 6px; }
+  .nx-frame[data-inspector-control='tab'] .nx-frame__tab { flex-direction: row; justify-content: center; height: 100%; }
+  .nx-frame[data-inspector-control='tab'] .nx-frame__tab > .nx-frame__rail-label { writing-mode: initial; transform: none; }
+  .nx-frame[data-inspector-control='tab'] .nx-frame__inspector > .nx-frame__inspector-scroll {
+    position: absolute; z-index: var(--nx-layer-overlay); left: 0; right: 0; bottom: calc(100% + 6px); max-height: 60vh; height: auto;
+    border-radius: var(--nx-r, 20px); background: var(--nx-surface-raised);
+    box-shadow: 0 -12px 36px color-mix(in srgb, var(--nx-fg) 14%, transparent), inset 0 0 0 1px var(--nx-border);
+    animation: nx-frame-sheet var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+  }
+  .nx-frame[data-inspector-control='tab'] .nx-frame__inspector:is([data-collapsed], [data-closing]) > .nx-frame__inspector-scroll { display: none; }
 }
 
 /* ---- NexPreviewBoundary: el contenido responde a su contenedor ------------ */
 .nx-boundary { container: nx-boundary / inline-size; min-width: 0; max-width: 100%; }
+
+/* ---- Inspector con pestaña (inspectorControl="tab") ------------------------- */
+/* Una sola pestaña lateral abre y recoge el panel. Siempre visible: cerrado, la
+   columna mide la pestaña; abierto, el panel se despliega junto a ella con la
+   física espacial de las columnas. En superposición (compacto, estrecho) la
+   pestaña queda en su sitio y el panel flota a su lado o encima. */
+.nx-frame[data-inspector-control='tab'] .nx-frame__inspector { display: flex; flex-direction: row; }
+.nx-frame[data-inspector-control='tab'] .nx-frame__inspector > .nx-frame__rail[data-tab] { display: flex; flex: none; width: 44px; padding: 6px 0; }
+.nx-frame[data-inspector-control='tab'] .nx-frame__inspector[data-closing] > .nx-frame__rail[data-tab] { display: flex; }
+.nx-frame[data-inspector-control='tab'] .nx-frame__inspector > .nx-frame__inspector-scroll { flex: 1; min-width: 0; }
+.nx-frame[data-inspector-control='tab'] .nx-frame__layout[data-nx-morphing] .nx-frame__inspector > .nx-frame__inspector-scroll { min-width: calc(var(--nx-inspector-w) - 2px); }
+.nx-frame__tab {
+  display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; height: 100%; padding: 8px 0; border: 0; border-radius: calc(var(--nx-r, 18px) - 6px);
+  background: transparent; color: var(--nx-fg-muted); cursor: pointer;
+  transition: background var(--nx-motion-state-duration) var(--nx-motion-state-easing), color var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-frame__tab:hover { background: var(--nx-surface-sunken); color: var(--nx-fg); }
+.nx-frame__tab[aria-expanded='true'] { color: var(--nx-fg); }
+.nx-frame__tab[aria-expanded='true'] > .nx-icon { color: var(--nx-accent); }
+.nx-frame__tab:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: -3px; }
+.nx-frame__tab > .nx-frame__rail-label { color: inherit; }
+
+/* Compacto: la pestaña sigue en su columna; el panel flota a su izquierda. */
+.nx-frame[data-nx-space='compact'][data-inspector-control='tab'] .nx-frame__inspector { position: relative; inset: auto; width: auto; z-index: auto; }
+.nx-frame[data-nx-space='compact'][data-inspector-control='tab'] .nx-frame__inspector:is([data-collapsed], [data-closing]) { display: flex; }
+.nx-frame[data-nx-space='compact'][data-inspector-control='tab'] .nx-frame__inspector > .nx-frame__inspector-scroll {
+  position: absolute; z-index: var(--nx-layer-overlay); top: 0; bottom: 0; right: calc(100% + var(--nx-gap));
+  width: min(var(--nx-inspector-w), calc(100cqi - 120px)); height: auto;
+  border-radius: var(--nx-r, 20px); background: var(--nx-surface-raised);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--nx-fg) 14%, transparent), inset 0 0 0 1px var(--nx-border);
+  animation: nx-frame-sheet-side var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+}
+.nx-frame[data-nx-space='compact'][data-inspector-control='tab'] .nx-frame__inspector:is([data-collapsed], [data-closing]) > .nx-frame__inspector-scroll { display: none; }
+.nx-frame[data-nx-space='compact'][data-inspector-control='tab'] .nx-frame__inspector:not([data-collapsed], [data-closing]) { animation: none; }
 
 /* ---- NexCodeBlock (content · hundida) ------------------------------------- */
 .nx-code { min-width: 0; overflow: hidden; color: var(--nx-fg); }
@@ -1086,7 +1133,7 @@
 /* ---- Política de movimiento ---------------------------------------------- */
 [data-nx-motion='none'], [data-nx-motion='none'] * { transition: none !important; animation: none !important; }
 [data-nx-input='keyboard'] :is(.nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-surface__zone, .nx-panel__body-wrap) { transition: none !important; animation: none !important; }
-[data-nx-motion-pref='reduce'] :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill, .nx-input, .nx-checkbox__control, .nx-checkbox__check, .nx-checkbox__dash, .nx-select__trigger, .nx-select__popup, .nx-select__chevron) { transition: none !important; animation: none !important; }
+[data-nx-motion-pref='reduce'] :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-frame__inspector-scroll, .nx-frame__tab, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill, .nx-input, .nx-checkbox__control, .nx-checkbox__check, .nx-checkbox__dash, .nx-select__trigger, .nx-select__popup, .nx-select__chevron) { transition: none !important; animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
-  :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill, .nx-input, .nx-checkbox__control, .nx-checkbox__check, .nx-checkbox__dash, .nx-select__trigger, .nx-select__popup, .nx-select__chevron):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
+  :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-frame__inspector-scroll, .nx-frame__tab, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill, .nx-input, .nx-checkbox__control, .nx-checkbox__check, .nx-checkbox__dash, .nx-select__trigger, .nx-select__popup, .nx-select__chevron):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
 }

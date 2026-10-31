@@ -90,6 +90,13 @@ export interface NexFrameProps {
   onExplorerOpenChange?: (open: boolean) => void;
   /** Botón para mostrar/ocultar el inspector junto a las acciones. */
   inspectorToggle?: boolean;
+  /**
+   * Quién abre y cierra el inspector. `toolbar` (por defecto): botón junto a las
+   * acciones y riel cuando está cerrado. `tab`: una sola pestaña lateral con su
+   * nombre, siempre visible; abierto, el panel se despliega junto a ella y la
+   * misma pestaña lo recoge. Sin botón en la barra (no hay controles duplicados).
+   */
+  inspectorControl?: 'toolbar' | 'tab';
   inspectorWidth?: number;
   defaultInspectorWidth?: number;
   onInspectorWidthChange?: (width: number) => void;
@@ -131,7 +138,7 @@ export function NexFrame({
   navigationLabel = 'Navegación', navigationRole = 'navigation', explorerLabel = 'Explorador',
   inspectorLabel = 'Inspector', bottomLabel = 'Panel inferior',
   inspectorOpen: inspectorOpenProp, defaultInspectorOpen = layout !== 'focus', onInspectorOpenChange,
-  explorerOpen: explorerOpenProp, defaultExplorerOpen = layout !== 'focus', onExplorerOpenChange, inspectorToggle,
+  explorerOpen: explorerOpenProp, defaultExplorerOpen = layout !== 'focus', onExplorerOpenChange, inspectorToggle, inspectorControl = 'toolbar',
   inspectorWidth: inspectorWidthProp, defaultInspectorWidth = 300, onInspectorWidthChange,
   inspectorResizable = false, inspectorMinWidth = 220, inspectorMaxWidth = 480, navigationWidth = 248, explorerWidth = 240,
   canvasMinWidth = 420, className, style,
@@ -183,7 +190,7 @@ export function NexFrame({
   // espacio que de verdad le queda al lienzo: las regiones laterales se pliegan
   // antes de que el lienzo baje de `canvasMinWidth`.
   const [fold, setFold] = useState(0);
-  const sizing = useRef({ explorer: false, inspector: false, navigation: false, explorerWidth, inspectorWidth: defaultInspectorWidth, navigationWidth, canvasMinWidth });
+  const sizing = useRef({ explorer: false, inspector: false, navigation: false, explorerWidth, inspectorWidth: defaultInspectorWidth, navigationWidth, canvasMinWidth, tab: inspectorControl === 'tab' });
   const measureRef = useRef<() => void>(() => {});
   measureRef.current = () => {
     const el = root.current;
@@ -202,7 +209,7 @@ export function NexFrame({
     const gap = parseFloat(cs.columnGap) || 0;
     const z = sizing.current;
     const nav = z.navigation && tier === 'wide' ? z.navigationWidth + gap : 0;
-    const sides = [z.inspector ? z.inspectorWidth : 0, z.explorer ? z.explorerWidth : 0];
+    const sides = [z.inspector ? z.inspectorWidth + (z.tab ? 44 : 0) : 0, z.explorer ? z.explorerWidth : 0];
     setFold(columnsToFold({ available: w - pad - nav, sides, gap, mainMin: z.canvasMinWidth }));
   };
   useIsoLayoutEffect(() => {
@@ -229,7 +236,7 @@ export function NexFrame({
     ([['identity', identity], ['heading', heading], ['actions', actions], ['tools', tools], ['filters', filters], ['navigation', navigation], ['explorer', explorer], ['inspector', inspector], ['bottom', bottom]] as const).map(([r, p]) => [r, filled(r, p)]),
   ) as Record<NexFrameRegionName, boolean>;
   const empty = (r: NexFrameRegionName) => (has[r] ? undefined : '');
-  sizing.current = { explorer: has.explorer, inspector: has.inspector, navigation: has.navigation, explorerWidth, inspectorWidth, navigationWidth, canvasMinWidth };
+  sizing.current = { explorer: has.explorer, inspector: has.inspector, navigation: has.navigation, explorerWidth, inspectorWidth, navigationWidth, canvasMinWidth, tab: inspectorControl === 'tab' };
   useIsoLayoutEffect(() => measureRef.current(), [has.explorer, has.inspector, has.navigation, explorerWidth, inspectorWidth, navigationWidth, canvasMinWidth]);
   const inspectorOverlay = compact === 'narrow' || fold >= 1;
   const explorerFolded = compact !== 'narrow' && fold >= 2;
@@ -254,25 +261,28 @@ export function NexFrame({
       if (explorerOpenProp === undefined && layout !== 'focus' && compact !== 'narrow') setExplorerInner(true);
     }
   }, [inspectorOverlay, explorerFolded]); // eslint-disable-line react-hooks/exhaustive-deps
-  const showInspectorToggle = has.inspector && (inspectorToggle ?? true);
+  const tabControl = inspectorControl === 'tab';
+  const showInspectorToggle = has.inspector && !tabControl && (inspectorToggle ?? true);
   const navigationDrawer = compact !== 'wide';
 
   // Columnas y áreas según las regiones presentes: sin columnas vacías ni costuras dobles.
   const RAIL = 44;
   const explorerTarget = explorerOpen ? explorerWidth : RAIL;
-  const inspectorTarget = inspectorOpen ? inspectorWidth : RAIL;
+  // Con pestaña, abierto = panel + pestaña: el panel conserva su ancho.
+  const inspectorTarget = inspectorOpen ? inspectorWidth + (tabControl ? RAIL : 0) : RAIL;
   const grid = useMemo(() => {
     const names: string[] = [];
     if (has.navigation && !navigationDrawer) names.push('nav');
     if (has.explorer) names.push('explorer');
     names.push('canvas');
-    if (has.inspector && !inspectorOverlay) names.push('inspector');
+    // Con pestaña, la columna existe siempre: en superposición sólo mide la pestaña.
+    if (has.inspector && (!inspectorOverlay || tabControl)) names.push('inspector');
     const px = (v: number) => `${Math.round(v * 10) / 10}px`;
-    const cols = (ex: number, ins: number) => names.map((n) => (n === 'nav' ? `${navigationWidth}px` : n === 'explorer' ? px(ex) : n === 'inspector' ? px(ins) : 'minmax(0, 1fr)')).join(' ');
+    const cols = (ex: number, ins: number) => names.map((n) => (n === 'nav' ? `${navigationWidth}px` : n === 'explorer' ? px(ex) : n === 'inspector' ? px(tabControl && inspectorOverlay ? RAIL : ins) : 'minmax(0, 1fr)')).join(' ');
     const row = (center: string) => names.map((n) => (n === 'canvas' ? center : n)).join(' ');
     const top = names.map((n) => (n === 'nav' ? 'nav' : 'top')).join(' ');
     return { cols, areas: `'${top}' '${row('canvas')}' '${row(has.bottom ? 'bottom' : 'canvas')}'` };
-  }, [has.navigation, has.explorer, has.inspector, has.bottom, navigationDrawer, inspectorOverlay, navigationWidth]);
+  }, [has.navigation, has.explorer, has.inspector, has.bottom, navigationDrawer, inspectorOverlay, navigationWidth, tabControl]);
 
   // Transición espacial: los rieles se abren y se cierran como materia, no aparecen.
   // El contenido de la región se queda montado y con su ancho final (no se reescribe
@@ -285,7 +295,7 @@ export function NexFrame({
     el.style.setProperty('--nx-frame-cols', grid.cols(ex!, ins!));
     const reveal = (w: number, full: number) => Math.min(1, Math.max(0, (w - RAIL) / Math.max(1, full - RAIL))).toFixed(3);
     el.style.setProperty('--nx-explorer-reveal', reveal(ex!, explorerWidth));
-    el.style.setProperty('--nx-inspector-reveal', reveal(ins!, inspectorWidth));
+    el.style.setProperty('--nx-inspector-reveal', reveal(ins!, inspectorWidth + (tabControl ? RAIL : 0)));
     if (!tracks.moving) {
       delete el.dataset.nxMorphing;
       setExplorerShown(explorerOpenRef.current);
@@ -386,6 +396,7 @@ export function NexFrame({
         data-navigation-open={navigationOpen && navigationDrawer ? '' : undefined}
         data-inspector-open={has.inspector && inspectorOpen ? '' : undefined}
         data-inspector-overlay={inspectorOverlay ? '' : undefined}
+        data-inspector-control={has.inspector ? inspectorControl : undefined}
         data-nx-space={space}
         onPointerDownCapture={() => { if (root.current) root.current.dataset.nxInput = 'pointer'; }}
         onKeyDownCapture={(e) => {
@@ -465,10 +476,28 @@ export function NexFrame({
             data-closing={has.inspector && !inspectorOpen && inspectorShown ? '' : undefined}
             data-nexframe-region="inspector"
           >
-            <div className="nx-frame__rail">
-              {toggleButton({ region: 'inspector', label: `Mostrar ${inspectorLabel.toLowerCase()}`, icon: 'inspector', expanded: false, controls: `${id}-inspector`, onClick: () => setInspectorOpen(true), inline: true })}
-              <span className="nx-frame__rail-label" aria-hidden="true">{inspectorLabel}</span>
-            </div>
+            {tabControl ? (
+              <div className="nx-frame__rail" data-tab="">
+                <button
+                  ref={inspectorToggleRef}
+                  type="button"
+                  className="nx-frame__tab"
+                  aria-expanded={inspectorOpen}
+                  aria-controls={`${id}-inspector-panel`}
+                  aria-label={`${inspectorOpen ? 'Ocultar' : 'Mostrar'} ${inspectorLabel.toLowerCase()}`}
+                  title={`${inspectorOpen ? 'Ocultar' : 'Mostrar'} ${inspectorLabel.toLowerCase()}`}
+                  onClick={() => setInspectorOpen(!inspectorOpen)}
+                >
+                  <NexIcon name="inspector" />
+                  <span className="nx-frame__rail-label" aria-hidden="true">{inspectorLabel}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="nx-frame__rail">
+                {toggleButton({ region: 'inspector', label: `Mostrar ${inspectorLabel.toLowerCase()}`, icon: 'inspector', expanded: false, controls: `${id}-inspector`, onClick: () => setInspectorOpen(true), inline: true })}
+                <span className="nx-frame__rail-label" aria-hidden="true">{inspectorLabel}</span>
+              </div>
+            )}
             {inspectorResizable && !inspectorOverlay && inspectorOpen && (
               <div
                 className="nx-frame__separator"
@@ -488,7 +517,7 @@ export function NexFrame({
                 onPointerCancel={() => { drag.current = null; }}
               />
             )}
-            <div className="nx-frame__inspector-scroll" inert={!inspectorOpen ? true : undefined}>
+            <div id={`${id}-inspector-panel`} className="nx-frame__inspector-scroll" inert={!inspectorOpen ? true : undefined}>
               <div ref={refs.inspector} className="nx-frame__slot">{inspector}</div>
             </div>
           </InspectorTag>
