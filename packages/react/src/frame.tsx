@@ -5,7 +5,7 @@ import {
   type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { cx, toDomId, type NexDensity, type NexMotion } from '@nexfluid/components';
+import { columnsToFold, cx, toDomId, type NexDensity, type NexMotion, type NexSpace } from '@nexfluid/components';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { NexIcon } from './icon.tsx';
 import { morphSpring, useSprings } from './springs.ts';
@@ -98,6 +98,12 @@ export interface NexFrameProps {
   inspectorMaxWidth?: number;
   navigationWidth?: number;
   explorerWidth?: number;
+  /**
+   * Ancho mínimo útil del lienzo (px). Si explorador e inspector no caben junto
+   * a él, el marco cambia de composición en lugar de comprimirlo: primero el
+   * inspector pasa a hoja lateral superpuesta y después el explorador a riel.
+   */
+  canvasMinWidth?: number;
   className?: string;
   style?: CSSProperties;
 }
@@ -128,7 +134,7 @@ export function NexFrame({
   explorerOpen: explorerOpenProp, defaultExplorerOpen = layout !== 'focus', onExplorerOpenChange, inspectorToggle,
   inspectorWidth: inspectorWidthProp, defaultInspectorWidth = 300, onInspectorWidthChange,
   inspectorResizable = false, inspectorMinWidth = 220, inspectorMaxWidth = 480, navigationWidth = 248, explorerWidth = 240,
-  className, style,
+  canvasMinWidth = 420, className, style,
 }: NexFrameProps) {
   const defaults = useNex();
   const level = motion ?? defaults.motion;
@@ -173,16 +179,37 @@ export function NexFrame({
     if (explorerOpenProp === undefined) setExplorerInner(layout !== 'focus');
   }, [layout, inspectorOpenProp, explorerOpenProp, setInspectorInner, setExplorerInner]);
 
-  // El marco responde a su propio ancho (igual que sus container queries).
+  // El marco responde a su propio ancho (igual que sus container queries) y al
+  // espacio que de verdad le queda al lienzo: las regiones laterales se pliegan
+  // antes de que el lienzo baje de `canvasMinWidth`.
+  const [fold, setFold] = useState(0);
+  const sizing = useRef({ explorer: false, inspector: false, navigation: false, explorerWidth, inspectorWidth: defaultInspectorWidth, navigationWidth, canvasMinWidth });
+  const measureRef = useRef<() => void>(() => {});
+  measureRef.current = () => {
+    const el = root.current;
+    const grid = layoutEl.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return; // sin medir (servidor, jsdom, marco oculto): se conserva la composición
+    const tier = w < 760 ? 'narrow' : w < 1080 ? 'medium' : 'wide';
+    setCompact(tier);
+    if (tier === 'narrow' || !grid) {
+      setFold(0);
+      return;
+    }
+    const cs = getComputedStyle(grid);
+    const pad = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+    const gap = parseFloat(cs.columnGap) || 0;
+    const z = sizing.current;
+    const nav = z.navigation && tier === 'wide' ? z.navigationWidth + gap : 0;
+    const sides = [z.inspector ? z.inspectorWidth : 0, z.explorer ? z.explorerWidth : 0];
+    setFold(columnsToFold({ available: w - pad - nav, sides, gap, mainMin: z.canvasMinWidth }));
+  };
   useIsoLayoutEffect(() => {
     const el = root.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
-    const measure = () => {
-      const w = el.clientWidth;
-      setCompact(w < 760 ? 'narrow' : w < 1080 ? 'medium' : 'wide');
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
+    measureRef.current();
+    const observer = new ResizeObserver(() => measureRef.current());
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -202,7 +229,31 @@ export function NexFrame({
     ([['identity', identity], ['heading', heading], ['actions', actions], ['tools', tools], ['filters', filters], ['navigation', navigation], ['explorer', explorer], ['inspector', inspector], ['bottom', bottom]] as const).map(([r, p]) => [r, filled(r, p)]),
   ) as Record<NexFrameRegionName, boolean>;
   const empty = (r: NexFrameRegionName) => (has[r] ? undefined : '');
-  const inspectorOverlay = compact === 'narrow';
+  sizing.current = { explorer: has.explorer, inspector: has.inspector, navigation: has.navigation, explorerWidth, inspectorWidth, navigationWidth, canvasMinWidth };
+  useIsoLayoutEffect(() => measureRef.current(), [has.explorer, has.inspector, has.navigation, explorerWidth, inspectorWidth, navigationWidth, canvasMinWidth]);
+  const inspectorOverlay = compact === 'narrow' || fold >= 1;
+  const explorerFolded = compact !== 'narrow' && fold >= 2;
+  const space: NexSpace = compact === 'narrow' ? 'constrained' : fold > 0 ? 'compact' : 'expanded';
+  // Al plegarse por falta de espacio, las regiones no controladas se recogen; al
+  // recuperar el espacio, vuelven a abrirse las que se recogieron solas.
+  const autoFolded = useRef({ inspector: false, explorer: false });
+  useEffect(() => {
+    const auto = autoFolded.current;
+    if (inspectorOverlay && compact !== 'narrow' && inspectorOpenProp === undefined && inspectorOpen && !auto.inspector) {
+      auto.inspector = true;
+      setInspectorInner(false);
+    } else if (!inspectorOverlay && auto.inspector) {
+      auto.inspector = false;
+      if (inspectorOpenProp === undefined && layout !== 'focus') setInspectorInner(true);
+    }
+    if (explorerFolded && explorerOpenProp === undefined && explorerOpen && !auto.explorer) {
+      auto.explorer = true;
+      setExplorerInner(false);
+    } else if (!explorerFolded && auto.explorer) {
+      auto.explorer = false;
+      if (explorerOpenProp === undefined && layout !== 'focus' && compact !== 'narrow') setExplorerInner(true);
+    }
+  }, [inspectorOverlay, explorerFolded]); // eslint-disable-line react-hooks/exhaustive-deps
   const showInspectorToggle = has.inspector && (inspectorToggle ?? true);
   const navigationDrawer = compact !== 'wide';
 
@@ -335,6 +386,7 @@ export function NexFrame({
         data-navigation-open={navigationOpen && navigationDrawer ? '' : undefined}
         data-inspector-open={has.inspector && inspectorOpen ? '' : undefined}
         data-inspector-overlay={inspectorOverlay ? '' : undefined}
+        data-nx-space={space}
         onPointerDownCapture={() => { if (root.current) root.current.dataset.nxInput = 'pointer'; }}
         onKeyDownCapture={(e) => {
           if (root.current) root.current.dataset.nxInput = 'keyboard';

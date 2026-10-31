@@ -24,6 +24,8 @@ export interface ComponentDoc {
   code: (v: Values) => string;
   /** Si la vista previa necesita todo el ancho (layouts). */
   wide?: boolean;
+  /** Demostraciones adicionales en la vista previa (antes de las variantes). */
+  showcases?: ReadonlyArray<{ title: string; lead?: ReactNode; render: () => ReactNode }>;
   variants?: () => ReactNode;
   states?: () => ReactNode;
   api: ReadonlyArray<{ component: string; rows: readonly PropRow[] }>;
@@ -77,7 +79,7 @@ export function ComponentPage({ doc, tab }: { doc: ComponentDoc; tab: string | n
         </NexFrameRegion>
       )}
       <NexTabs value={active} onValueChange={(t) => { setActive(t); replaceTab(doc.path, t); }} className="doc-page-tabs">
-        <NexTabsList aria-label={`Documentación de ${doc.name}`}>
+        <NexTabsList overflow="wrap" aria-label={`Documentación de ${doc.name}`}>
           {TABS.map(([id, label]) => <NexTab key={id} value={id}>{label}</NexTab>)}
         </NexTabsList>
 
@@ -85,6 +87,7 @@ export function ComponentPage({ doc, tab }: { doc: ComponentDoc; tab: string | n
           <h2 className="nx-visually-hidden">Vista previa</h2>
           <Stage label={`Vista previa de ${doc.name}`} padded={!doc.wide}>{doc.render(values)}</Stage>
           {doc.controls.length > 0 && <p className="doc-hint">Cambia las propiedades en el panel <strong>Propiedades</strong>; la pestaña Código se actualiza con ellas.</p>}
+          {doc.showcases?.map((x) => <Section key={x.title} title={x.title} lead={x.lead}>{x.render()}</Section>)}
           {doc.variants && <Section title="Variantes">{doc.variants()}</Section>}
           {doc.states && <Section title="Estados">{doc.states()}</Section>}
         </NexTabsPanel>

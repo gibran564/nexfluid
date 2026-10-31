@@ -1,6 +1,5 @@
 import { NexCodeBlock } from '@nexfluid/react';
-import { NexMarkdown } from '@nexfluid/react/markdown';
-import { NexMarkdownWidget, NexPropertiesWidget } from '@nexfluid/react/widgets';
+import { NexMarkdownEditor, NexMarkdownWidget, NexPropertiesWidget } from '@nexfluid/react/widgets';
 import { FluidBlob } from '@nexfluid/react/motion';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
@@ -131,11 +130,11 @@ export const markdownDoc: ComponentDoc = {
   ],
 };
 
+/** Escribe a la izquierda: NexMarkdown pinta a la derecha en cada pulsación (las propiedades del panel se aplican en vivo). */
 function MarkdownPlayground(props: { density: 'compact' | 'comfortable'; measure: boolean; images: 'link' | 'https'; headingOffset: 0 | 1 | 2 }) {
   return (
     <div className="doc-md-playground">
-      <NexCodeBlock code={MD} language="markdown" title="entrada.md" wrap maxHeight={420} />
-      <NexMarkdown source={MD} {...props} />
+      <NexMarkdownEditor label="entrada.md" defaultValue={MD} markdown={props} rows={18} />
     </div>
   );
 }
@@ -153,17 +152,19 @@ export const markdownWidgetDoc: ComponentDoc = {
     { kind: 'select', name: 'defaultMode', label: 'Modo inicial', options: ['preview', 'source', 'split'], initial: 'preview' },
     { kind: 'boolean', name: 'split', label: 'Ofrecer «Dividido»', initial: true },
     { kind: 'select', name: 'appearance', label: 'Apariencia', options: ['outlined', 'filled', 'editorial'], initial: 'outlined' },
+    { kind: 'boolean', name: 'editable', label: 'Editable', initial: true },
   ],
   render: (v) => (
     <div style={{ width: '100%' }}>
-      <NexMarkdownWidget key={String(v.defaultMode)} title={String(v.title)} eyebrow="Widget" source={MD} defaultMode={v.defaultMode as never} modes={v.split ? ['preview', 'source', 'split'] : ['preview', 'source']} appearance={v.appearance as never} />
+      <NexMarkdownWidget key={`${String(v.defaultMode)}-${String(v.editable)}`} title={String(v.title)} eyebrow="Widget" source={MD} editable={Boolean(v.editable)} defaultMode={v.defaultMode as never} modes={v.split ? ['preview', 'source', 'split'] : ['preview', 'source']} appearance={v.appearance as never} />
     </div>
   ),
-  code: (v) => jsx('NexMarkdownWidget', { title: String(v.title), source: { code: 'markdown' }, defaultMode: v.defaultMode as string, modes: v.split ? { code: "['preview', 'source', 'split']" } : undefined, appearance: v.appearance as string }, undefined, { defaultMode: 'preview', appearance: 'outlined' }),
+  code: (v) => jsx('NexMarkdownWidget', { title: String(v.title), source: { code: 'markdown' }, editable: Boolean(v.editable) || undefined, onSourceChange: v.editable ? { code: 'setMarkdown' } : undefined, defaultMode: v.defaultMode as string, modes: v.split ? { code: "['preview', 'source', 'split']" } : undefined, appearance: v.appearance as string }, undefined, { defaultMode: 'preview', appearance: 'outlined' }),
   api: [{
     component: 'NexMarkdownWidget',
     rows: [
       { name: 'title · eyebrow · description', type: 'string', description: 'Cabecera de la tarjeta.' },
+      { name: 'editable · onSourceChange', type: 'boolean · (source) => void', default: 'false', description: '«Fuente» pasa a ser un campo de texto y «Dividido», texto + vista previa en vivo. Sin onSourceChange, source es el valor inicial.' },
       { name: 'source', type: 'string', description: 'Markdown.' },
       { name: 'mode / defaultMode / onModeChange', type: "'preview' | 'source' | 'split'", default: "'preview'", description: 'Controlado o no.' },
       { name: 'modes', type: 'readonly Mode[]', default: "['preview', 'source']", description: 'Pestañas disponibles; con una sola no hay pestañas.' },

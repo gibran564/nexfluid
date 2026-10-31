@@ -4,3 +4,5 @@
  */
 export { NexMarkdown } from './markdown.tsx';
 export type { NexMarkdownProps } from './markdown.tsx';
+export { markdownOutline } from './outline.ts';
+export type { MarkdownHeading } from './outline.ts';

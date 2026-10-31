@@ -1,0 +1,19 @@
+{
+  "name": "@nexfluid/sheets",
+  "version": "0.2.0",
+  "description": "NexSheets Core: framework-free spreadsheet model (workbooks, cells, ranges, selection, history, formulas, CSV/TSV/JSON)",
+  "license": "MIT",
+  "author": "gibran564",
+  "homepage": "https://gibran564.github.io/nexfluid/",
+  "repository": { "type": "git", "url": "git+https://github.com/gibran564/nexfluid.git", "directory": "packages/sheets" },
+  "bugs": { "url": "https://github.com/gibran564/nexfluid/issues" },
+  "keywords": ["nexfluid", "spreadsheet", "formulas", "csv"],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": { "nexfluid-source": "./src/index.ts", "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "publishConfig": { "access": "public" },
+  "scripts": { "build": "tsc -p tsconfig.build.json" }
+}

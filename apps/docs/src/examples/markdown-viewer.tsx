@@ -1,4 +1,3 @@
-import { NexButton } from '@nexfluid/react';
 import { NexMarkdownWidget } from '@nexfluid/react/widgets';
 
 const SOURCE = `# Práctica 3 · Colas
@@ -29,7 +28,8 @@ export default function MarkdownViewerExample() {
       description="Markdown con GFM, sanitizado y con bloques de código de NexFluidUI."
       source={SOURCE}
       modes={['preview', 'source', 'split']}
-      actions={<NexButton appearance="ghost" density="compact">Editar</NexButton>}
+      defaultMode="split"
+      editable
     />
   );
 }

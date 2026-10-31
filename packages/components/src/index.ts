@@ -10,3 +10,5 @@ export { tokenize, splitLines, normalizeLanguage, isSupportedLanguage, SUPPORTED
 export type { Token, TokenType } from './highlight.ts';
 export { APPEARANCES, DENSITIES, MOTIONS, TONES, CLASS, variantAttributes } from './contract.ts';
 export type { NexAppearance, NexDensity, NexMotion, NexTone } from './contract.ts';
+export { resolveSpace, columnsToFold, SPACES, DEFAULT_SPACE_THRESHOLDS } from './space.ts';
+export type { NexSpace, SpaceThresholds, ColumnFit } from './space.ts';

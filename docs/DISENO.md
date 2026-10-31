@@ -136,14 +136,50 @@ El panel destino se monta **una vez en su lugar final**: su contenido nunca se r
 * En `NexFrame` las columnas laterales se animan con layout real (el lienzo central se recompone en cada fotograma); el contenido de las regiones conserva su ancho final y no se recompone.
 * La expansión modal no bloquea el desplazamiento de la página (la transformación sigue al origen si se desplaza).
 
-## 7. Limitaciones
+## 7. Integridad espacial y NexScroll
+
+**Integridad espacial.** Las composiciones responden a su contenedor, no a la ventana. `resolveSpace`
+(`@nexfluid/components`) da `expanded · compact · constrained`; `NexPreviewBoundary` lo mide con
+ResizeObserver y lo publica por contexto, atributo y container query. `NexFrame` pliega sus regiones
+antes de comprimir el lienzo bajo `canvasMinWidth` (inspector → hoja lateral, explorador → riel). No
+se escala la interfaz ni se oculta el desbordamiento: cambia la estructura.
+
+**NexScroll 2.0.** Un carril de lectura sobre el desplazamiento nativo. Composición en rejilla:
+`[cabecera de capítulo]` / `[área | carril]`; el carril es una columna propia y el riel y los
+marcadores viven en ella, nunca sobre el texto. Una sola autoridad: el área desplaza el navegador; la
+barra nativa sólo se oculta cuando el carril está medido (`data-nx-scroll-ready`) y se conserva si el
+contenido desborda en el otro eje. El pulgar es exacto (las deformaciones sólo añaden material); el
+arrastre no tiene inercia. `ScrollTracker` (core) es el motor; las rejillas de dos ejes usan un tracker
+por eje sobre el mismo elemento (`crossAxisFallback: false`).
+
+## 8. NexSheets
+
+Cuatro capas: **Core** (`@nexfluid/sheets`: libro, celdas, rangos, selección, historial, fórmulas,
+autollenado, CSV/TSV/JSON, ejes virtuales; sin framework ni estilos), **React**
+(`@nexfluid/react/sheets`), **capa fluida** (selección como superficie con resortes por borde, barra de
+fórmulas que se tiñe al editar, carriles NexScroll) y **adaptadores** (contrato de hoja idéntico al de
+NexBook; XLSX pendiente).
+
+El motor de fórmulas, las direcciones, las ediciones y el CSV proceden del editor de hojas de
+Nextudio, portados sin cambiar su comportamiento (sus 30 pruebas pasan aquí). Fórmulas soportadas:
+aritmética, comparaciones, `&`, referencias y rangos de una hoja y las funciones de `FORMULA_NAMES`.
+No soportado: referencias entre hojas, matrices, fechas, formato condicional, compatibilidad completa
+con Excel.
+
+Rendimiento: la rejilla sólo pinta la ventana visible; la selección vive en un almacén externo y no
+vuelve a pintar celdas; la evaluación se cachea por hoja inmutable. Las cifras se miden en NexDocs
+(Widgets → NexSheets → Rendimiento) en el navegador de quien mira; no se publican cifras de referencia.
+
+## 9. Limitaciones
 
 * Fluidez no medida aún en un equipo modesto (NexDocs → Accesibilidad y rendimiento incluye el medidor).
 * `corner-shape` sólo en Chromium reciente; en otros navegadores el modo estático usa `border-radius` (el modo vivo SVG es igual en todos).
 * La versión publicada de Bricolage Grotesque no trae eje de anchura: `--nx-display-stretch` sólo actúa con fuentes que lo tengan.
 * La expansión tarjeta → panel (NexMorph) atrapa el foco en modo modal y no bloquea el desplazamiento de la página.
 * Probado en Chromium y jsdom; sin Safari ni Firefox.
+* NexSheets: sin XLSX, formato de celdas, inmovilizar paneles, desplazamiento automático al arrastrar fuera de la rejilla ni edición de filas/columnas desde la interfaz. Evalúa la hoja completa en cada cambio (adecuado a decenas de miles de celdas con fórmulas; medir antes de más).
+* NexScroll: el pulgar no es enfocable (el área ya se desplaza con teclado); el carril horizontal de una rejilla no reenvía la rueda vertical.
 
-## 8. Pendiente
+## 10. Pendiente
 
 Medición de fps en equipos modestos; pruebas visuales de regresión por tema/dirección; NexInput/NexSelect/NexDialog/NexMenu; fusión de más de dos superficies con metaballs; generación de tablas de API desde los tipos.

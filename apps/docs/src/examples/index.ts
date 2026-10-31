@@ -8,7 +8,7 @@ import type { ComponentType } from 'react';
 const modules = import.meta.glob<{ default: ComponentType }>('./*.tsx', { eager: true });
 const sources = import.meta.glob<string>('./*.tsx', { eager: true, query: '?raw', import: 'default' });
 
-export type ExampleId = 'project-card' | 'tab-navigation' | 'inspector-layout' | 'markdown-viewer' | 'tools-panel' | 'frame-region' | 'settings-tabs' | 'code-snippet' | 'card-expansion';
+export type ExampleId = 'project-card' | 'tab-navigation' | 'inspector-layout' | 'markdown-viewer' | 'tools-panel' | 'frame-region' | 'settings-tabs' | 'code-snippet' | 'card-expansion' | 'scroll-editorial' | 'scroll-workspace' | 'scroll-horizontal' | 'sheets-basic' | 'sheets-composed';
 
 export function example(id: ExampleId): { Component: ComponentType; source: string } {
   const file = `./${id}.tsx`;

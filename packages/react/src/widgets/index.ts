@@ -1,6 +1,8 @@
 /** @nexfluid/react/widgets — NexWidgets, compuestos sólo con componentes públicos. */
 export { NexMarkdownWidget } from './markdown-widget.tsx';
 export type { NexMarkdownWidgetProps, NexMarkdownWidgetMode } from './markdown-widget.tsx';
+export { NexMarkdownEditor } from './markdown-editor.tsx';
+export type { NexMarkdownEditorProps } from './markdown-editor.tsx';
 export { NexPropertiesWidget, NexPropertyList } from './properties-widget.tsx';
 export type { NexPropertiesWidgetProps, NexProperty, NexPropertyGroup } from './properties-widget.tsx';
 export { NexInspectorWidget } from './inspector-widget.tsx';

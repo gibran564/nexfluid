@@ -92,9 +92,14 @@ function TabsRoot({
 export interface NexTabsListProps extends HTMLAttributes<HTMLDivElement> {
   /** Nombre del grupo. Obligatorio salvo que se use `aria-labelledby`. */
   'aria-label'?: string;
+  /**
+   * Qué hacer cuando las pestañas no caben: `scroll` (desplazamiento horizontal,
+   * la activa siempre a la vista) o `wrap` (pasan a otra fila; la gota viaja entre filas).
+   */
+  overflow?: 'scroll' | 'wrap';
 }
 
-export function NexTabsList({ className, children, onKeyDown, onPointerDown, onPointerOver, onPointerLeave, ...rest }: NexTabsListProps) {
+export function NexTabsList({ overflow = 'scroll', className, children, onKeyDown, onPointerDown, onPointerOver, onPointerLeave, ...rest }: NexTabsListProps) {
   const ctx = useTabs('NexTabs.List');
   const list = useRef<HTMLDivElement>(null);
   const tabs = () => Array.from(list.current?.querySelectorAll<HTMLElement>(':scope > [role="tab"]') ?? []);
@@ -144,6 +149,7 @@ export function NexTabsList({ className, children, onKeyDown, onPointerDown, onP
       aria-orientation={ctx.orientation}
       data-orientation={ctx.orientation}
       data-nx-appearance={ctx.appearance}
+      data-nx-overflow={overflow}
       className={cx('nx-tabs__list', className)}
       onKeyDown={onKey}
       onPointerDown={(e) => { ctx.origin.current = 'pointer'; onPointerDown?.(e); }}

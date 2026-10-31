@@ -119,7 +119,8 @@ describe('contrato CSS', () => {
     // Locales: declarados en la propia hoja o fijados en línea por el componente (alto del marco, ancho del inspector…).
     const local = new Set([...(css.match(/--nx-[a-z0-9-]+(?=:)/g) ?? []), '--nx-frame-height', '--nx-frame-inspector-w', '--nx-frame-navigation-w', '--nx-frame-explorer-w', '--nx-code-max-height',
       // Fijadas por los componentes en tiempo de ejecución (puntero, columnas, nivel…).
-      '--nx-zone-x', '--nx-zone-y', '--nx-emerge-x', '--nx-nav-level', '--nx-frame-cols', '--nx-frame-areas', '--nx-preview-w', '--nx-morph-p', '--nx-morph-in', '--nx-morph-i', '--nx-explorer-w', '--nx-explorer-reveal', '--nx-inspector-w', '--nx-inspector-reveal']);
+      '--nx-zone-x', '--nx-zone-y', '--nx-emerge-x', '--nx-nav-level', '--nx-frame-cols', '--nx-frame-areas', '--nx-preview-w', '--nx-morph-p', '--nx-morph-in', '--nx-morph-i', '--nx-explorer-w', '--nx-explorer-reveal', '--nx-inspector-w', '--nx-inspector-reveal',
+      '--nx-scroll-max', '--nx-scroll-fill', '--nx-scroll-at', '--nx-scroll-marker', '--nx-near', '--nx-sheets-height', '--nx-sheet-rowhead', '--nx-font-serif', '--nx-danger']);
     const used = new Set(css.match(/var\(--nx-[a-z0-9-]+/g)?.map((v) => v.slice(4)));
     const unknown = [...used].filter((v) => !defined.has(v) && !local.has(v));
     assert.deepEqual(unknown, []);
@@ -131,4 +132,22 @@ describe('contrato CSS', () => {
     assert.deepEqual(foreign, []);
   });
   it('respeta prefers-reduced-motion', () => assert.match(css, /@media \(prefers-reduced-motion: reduce\)/));
+});
+
+describe('integridad espacial', () => {
+  it('el modo depende del ancho del contenedor', async () => {
+    const { resolveSpace } = await import('../src/space.ts');
+    assert.equal(resolveSpace(1200), 'expanded');
+    assert.equal(resolveSpace(700), 'compact');
+    assert.equal(resolveSpace(375), 'constrained');
+    assert.equal(resolveSpace(0), 'expanded'); // sin medir (servidor): composición completa
+    assert.equal(resolveSpace(700, { compactBelow: 600, constrainedBelow: 400 }), 'expanded');
+  });
+  it('las columnas laterales se pliegan antes de comprimir la principal', async () => {
+    const { columnsToFold } = await import('../src/space.ts');
+    // 933 px: inspector 300 + explorador 240 dejarían 353 px al lienzo (< 420).
+    assert.equal(columnsToFold({ available: 913, sides: [300, 240], gap: 10, mainMin: 420 }), 1);
+    assert.equal(columnsToFold({ available: 1400, sides: [300, 240], gap: 10, mainMin: 420 }), 0);
+    assert.equal(columnsToFold({ available: 500, sides: [300, 240], gap: 10, mainMin: 420 }), 2);
+  });
 });

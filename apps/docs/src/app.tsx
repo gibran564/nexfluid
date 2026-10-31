@@ -136,6 +136,7 @@ export function App() {
         navigation={<Navigation current={route.path} query={query} />}
         navigationLabel="Índice"
         navigationRole="complementary"
+        canvasMinWidth={560}
         inspectorLabel="Propiedades"
         canvasLabel={page?.title ?? 'Contenido'}
       >

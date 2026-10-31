@@ -48,3 +48,11 @@ export { NexActionButton } from './action-button.tsx';
 export type { NexActionButtonProps, NexActionStatus } from './action-button.tsx';
 export { NexDock } from './dock.tsx';
 export type { NexDockProps, NexDockItem } from './dock.tsx';
+export { NexPreviewBoundary, useNexBoundary } from './boundary.tsx';
+export type { NexPreviewBoundaryProps, NexBoundaryState } from './boundary.tsx';
+export type { NexSpace } from '@nexfluid/components';
+export {
+  NexScroll, NexScrollArea, NexScrollRoot, NexScrollViewport, NexScrollRail, NexScrollThumb, NexScrollProgress, NexScrollLabel, NexScrollMarkers, NexScrollPercent, NexScrollChapter, NexScrollLane,
+} from './scroll.tsx';
+export type { NexScrollAreaProps, NexScrollRootProps, NexScrollViewportProps, NexScrollController, NexScrollVariant, NexScrollSection } from './scroll.tsx';
+export type { ScrollState as NexScrollState } from '@nexfluid/core';

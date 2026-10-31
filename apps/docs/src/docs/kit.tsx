@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from 'react';
-import { NexBadge, NexCodeBlock } from '@nexfluid/react';
+import { Fragment } from 'react';
+import { NexBadge, NexCodeBlock, NexPreviewBoundary } from '@nexfluid/react';
 
 // ------------------------------------------------------------------ controles
 
@@ -86,11 +87,22 @@ export function importLine(names: readonly string[], from: string): string {
 
 // --------------------------------------------------------------- piezas de página
 
+/**
+ * Un identificador largo (NexMarkdownWidget) se parte por sus palabras y no
+ * por cualquier letra: <wbr> antes de cada mayúscula interior.
+ */
+function breakableTitle(title: string): ReactNode {
+  if (!/^[A-Za-z]{11,}$/.test(title)) return title;
+  const parts = title.split(/(?=[A-Z])/);
+  return parts.map((p, i) => <Fragment key={i}>{i > 0 && <wbr />}{p}</Fragment>);
+}
+
 export function PageHeader({ eyebrow, title, lead, meta }: { eyebrow: string; title: string; lead: ReactNode; meta?: ReactNode }) {
+  const long = title.split(/\s+/).some((w) => w.length > 11);
   return (
     <header className="doc-page-header">
       <p className="nx-index">{eyebrow}</p>
-      <h1 className="nx-type-display">{title}</h1>
+      <h1 className="nx-type-display" data-long={long || undefined}>{breakableTitle(title)}</h1>
       <p className="doc-lead">{lead}</p>
       {meta && <div className="doc-meta">{meta}</div>}
     </header>
@@ -112,9 +124,11 @@ export function Section({ title, id, children, lead, index }: { title: string; i
 
 export function Stage({ children, label, padded = true }: { children: ReactNode; label?: string; padded?: boolean }) {
   return (
-    <div className="doc-stage" data-padded={padded || undefined} role={label ? 'group' : undefined} aria-label={label}>
-      {children}
-    </div>
+    <NexPreviewBoundary className="doc-stage-boundary">
+      <div className="doc-stage" data-padded={padded || undefined} role={label ? 'group' : undefined} aria-label={label}>
+        {children}
+      </div>
+    </NexPreviewBoundary>
   );
 }
 

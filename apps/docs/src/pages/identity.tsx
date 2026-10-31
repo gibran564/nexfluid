@@ -37,7 +37,7 @@ function Specimen({ compact = false, tag = '' }: { compact?: boolean; tag?: stri
             <NexNav.Item href="#/identidad/direcciones" current icon={<NexIcon name="file" />}>Mi estudio</NexNav.Item>
             <NexNav.Item href="#/identidad/direcciones" icon={<NexIcon name="grid" />}>Explorar</NexNav.Item>
           </NexNav>
-          <NexMarkdownWidget title={`Enunciado${tag ? ` · ${tag}` : ''}`} source={MD} />
+          <NexMarkdownWidget title={`Enunciado${tag ? ` · ${tag}` : ''}`} source={MD} editable modes={['preview', 'source', 'split']} />
         </>
       )}
     </div>

@@ -14,6 +14,8 @@ import { MorphStudioPage } from './pages/morph-studio.tsx';
 import { PatternsPage, PlaygroundPage } from './pages/patterns.tsx';
 import { CompositionLabPage } from './pages/composition-lab.tsx';
 import { QualityPage } from './pages/quality.tsx';
+import { scrollDoc } from './pages/docs-scroll.tsx';
+import { sheetsDoc } from './pages/docs-sheets.tsx';
 
 export interface PageDef {
   path: string;
@@ -25,8 +27,8 @@ export interface PageDef {
 }
 
 export const COMPONENT_DOCS: readonly ComponentDoc[] = [
-  surfaceDoc, buttonDoc, segmentedDoc, badgeDoc, cardDoc, panelDoc, tabsDoc, navDoc, codeBlockDoc, markdownDoc, frameDoc,
-  markdownWidgetDoc, propertiesWidgetDoc, inspectorDoc, explorerDoc, previewDoc, fluidBlobDoc,
+  surfaceDoc, buttonDoc, segmentedDoc, badgeDoc, cardDoc, panelDoc, tabsDoc, navDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
+  markdownWidgetDoc, propertiesWidgetDoc, inspectorDoc, explorerDoc, previewDoc, sheetsDoc, fluidBlobDoc,
 ];
 
 const component = (doc: ComponentDoc, section: string, group?: string, keywords?: string): PageDef => ({
@@ -63,6 +65,7 @@ export const PAGES: readonly PageDef[] = [
   component(panelDoc, 'Componentes', 'Superficies', 'panel plegable'),
   component(tabsDoc, 'Componentes', 'Navegación', 'pestañas tablist gota'),
   component(navDoc, 'Componentes', 'Navegación', 'navegacion sidebar'),
+  component(scrollDoc, 'Componentes', 'Navegación', 'scroll desplazamiento barra progreso secciones lectura'),
   component(codeBlockDoc, 'Componentes', 'Contenido', 'codigo resaltado copiar'),
   component(markdownDoc, 'Componentes', 'Contenido', 'markdown gfm avisos'),
 
@@ -73,6 +76,7 @@ export const PAGES: readonly PageDef[] = [
   component(inspectorDoc, 'Widgets', undefined, 'inspector secciones'),
   component(explorerDoc, 'Widgets', undefined, 'explorador arbol archivos'),
   component(previewDoc, 'Widgets', undefined, 'vista previa dispositivo'),
+  component(sheetsDoc, 'Widgets', undefined, 'hoja de calculo spreadsheet formulas celdas excel csv'),
 
   { path: 'motion', title: 'NexFluid', section: 'Movimiento', keywords: 'motor resortes presets', render: () => <MotionOverviewPage /> },
   { path: 'motion/nexmorph', title: 'NexMorph Studio', section: 'Movimiento', keywords: 'morph transformacion tarjeta panel dock boton marco fisica', render: () => <MorphStudioPage /> },

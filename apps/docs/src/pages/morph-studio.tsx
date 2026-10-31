@@ -142,19 +142,37 @@ function TabsDemo({ step }: { step: number }) {
   );
 }
 
-function ButtonDemo({ status, outcome, onOutcome }: { status?: NexActionStatus; outcome: 'ok' | 'error'; onOutcome: (o: 'ok' | 'error') => void }) {
+/**
+ * La acción es real: valida el texto, calcula su huella SHA-256 (Web Crypto,
+ * asíncrona) y lo añade a la lista publicada. Un texto vacío o demasiado largo
+ * rechaza la promesa y el botón pasa a error. Nada se simula con temporizadores.
+ */
+function ButtonDemo({ status }: { status?: NexActionStatus }) {
+  const [text, setText] = useState('Práctica 3 · Colas que esperan menos');
+  const [published, setPublished] = useState<Array<{ text: string; hash: string }>>([]);
+  const [problem, setProblem] = useState('');
+  const publish = async () => {
+    const value = text.trim();
+    if (!value) { setProblem('Escribe algo antes de publicar.'); throw new Error('vacío'); }
+    if (value.length > 120) { setProblem('Máximo 120 caracteres.'); throw new Error('largo'); }
+    setProblem('');
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+    const hash = Array.from(new Uint8Array(digest), (x) => x.toString(16).padStart(2, '0')).join('').slice(0, 12);
+    setPublished((list) => [{ text: value, hash }, ...list].slice(0, 4));
+  };
   return (
     <div className="studio-button">
-      <NexActionButton
-        status={status}
-        action={() => new Promise((resolve, reject) => setTimeout(() => (outcome === 'ok' ? resolve(null) : reject(new Error('fallo'))), 1400))}
-        successLabel="Publicado"
-        errorLabel="Sin conexión"
-        icon={<NexIcon name="drop" />}
-      >
+      <label className="studio-publish">
+        <span>Título a publicar</span>
+        <input value={text} onChange={(e) => setText(e.target.value)} maxLength={200} aria-describedby="studio-publish-help" />
+      </label>
+      <NexActionButton status={status} action={publish} successLabel="Publicado" errorLabel="No válido" icon={<NexIcon name="drop" />}>
         Publicar práctica
       </NexActionButton>
-      <NexSegmented aria-label="Resultado de la operación simulada" value={outcome} onValueChange={(v) => onOutcome(v as 'ok' | 'error')} options={[{ value: 'ok', label: 'Resolverá' }, { value: 'error', label: 'Fallará' }]} density="compact" />
+      <p id="studio-publish-help" className="doc-hint" role="status">{problem || 'Vacío o más de 120 caracteres → error. Si no, se publica con su huella SHA-256.'}</p>
+      {published.length > 0 && (
+        <ol className="studio-published">{published.map((p) => <li key={p.hash}><code>{p.hash}</code> {p.text}</li>)}</ol>
+      )}
     </div>
   );
 }
@@ -293,7 +311,6 @@ export function MorphStudioPage() {
   const [step, setStep] = useState(0);
   const [dock, setDock] = useState<string | null>(null);
   const [frameMode, setFrameMode] = useState(3);
-  const [outcome, setOutcome] = useState<'ok' | 'error'>('ok');
   const [buttonStatus, setButtonStatus] = useState<NexActionStatus | undefined>(undefined);
   const controller = useRef<NexMorphController>(null);
   const readout = useRef<HTMLDListElement>(null);
@@ -410,7 +427,7 @@ export function MorphStudioPage() {
           <NexProvider reducedMotion={reduced ? 'reduce' : 'system'} motion="fluid" className="studio__stage">
             {demo === 'card' && <CardFrameDemo controller={controller} physics={physics} onFrame={onFrame} />}
             {demo === 'tabs' && <TabsDemo step={step} />}
-            {demo === 'button' && <ButtonDemo status={buttonStatus} outcome={outcome} onOutcome={setOutcome} />}
+            {demo === 'button' && <ButtonDemo status={buttonStatus} />}
             {demo === 'dock' && <DockDemo value={dock} onValue={setDock} />}
             {demo === 'frame' && <FrameDemo mode={frameMode} onMode={setFrameMode} />}
           </NexProvider>

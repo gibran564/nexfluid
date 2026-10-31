@@ -27,17 +27,20 @@ function imports(file: string): string[] {
   );
 }
 
-const PACKAGES = ['foundation', 'core', 'components', 'react'] as const;
+const PACKAGES = ['foundation', 'core', 'components', 'sheets', 'react'] as const;
 const ALLOWED: Record<string, readonly string[]> = {
   foundation: [],
   core: [],
   components: ['foundation'],
-  react: ['foundation', 'core', 'components'],
+  // NexSheets Core: modelo puro, sin estilos ni motor visual.
+  sheets: [],
+  react: ['foundation', 'core', 'components', 'sheets'],
 };
 const EXTERNAL: Record<string, readonly string[]> = {
   foundation: [],
   core: [],
   components: [],
+  sheets: [],
   react: ['react', 'react-dom', 'react/jsx-runtime', 'react-markdown', 'remark-gfm'],
 };
 

@@ -1,11 +1,12 @@
 'use client';
 
-import { Children, isValidElement, useId, type ReactElement, type ReactNode } from 'react';
+import { Children, isValidElement, useId, useMemo, type ReactElement, type ReactNode } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { cx, isExternalUrl, safeUrl, slugify, toDomId, type NexDensity } from '@nexfluid/components';
 import { NexCodeBlock } from '../code-block.tsx';
 import { NexIcon } from '../icon.tsx';
+import { markdownOutline } from './outline.ts';
 
 const ALERTS = {
   note: { label: 'Nota', icon: 'info' },
@@ -61,15 +62,16 @@ export function NexMarkdown({
 }: NexMarkdownProps) {
   const instance = toDomId('md', useId());
   const prefix = idPrefix ?? `${instance}-`;
-  const seen = new Map<string, number>();
+  // Los id se calculan del texto fuente (por línea), no con un contador durante el render:
+  // un render repetido (StrictMode, concurrencia) no puede cambiarlos, y coinciden con markdownOutline.
+  const ids = useMemo(() => new Map(markdownOutline(source, prefix).map((h) => [h.line, h.id])), [source, prefix]);
   const heading = (level: 1 | 2 | 3 | 4 | 5 | 6) =>
-    function Heading({ children }: { children?: ReactNode }) {
+    function Heading({ children, node }: { children?: ReactNode; node?: { position?: { start?: { line?: number } } } }) {
       const Tag = `h${Math.min(6, level + headingOffset)}` as 'h1';
       if (!headingIds) return <Tag>{children}</Tag>;
-      const base = slugify(textOf(children)) || 'seccion';
-      const n = seen.get(base) ?? 0;
-      seen.set(base, n + 1);
-      return <Tag id={`${prefix}${n ? `${base}-${n}` : base}`}>{children}</Tag>;
+      const line = node?.position?.start?.line;
+      const id = (line !== undefined && ids.get(line)) || `${prefix}${slugify(textOf(children)) || 'seccion'}`;
+      return <Tag id={id}>{children}</Tag>;
     };
 
   const base: Partial<Components> = {

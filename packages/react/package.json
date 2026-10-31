@@ -42,6 +42,11 @@
       "nexfluid-source": "./src/motion/index.ts",
       "types": "./dist/motion/index.d.ts",
       "default": "./dist/motion/index.js"
+    },
+    "./sheets": {
+      "nexfluid-source": "./src/sheets/index.ts",
+      "types": "./dist/sheets/index.d.ts",
+      "default": "./dist/sheets/index.js"
     }
   },
   "files": [
@@ -61,7 +66,8 @@
     "@nexfluid/core": "0.2.0",
     "@nexfluid/foundation": "0.2.0",
     "react-markdown": "10.1.0",
-    "remark-gfm": "4.0.1"
+    "remark-gfm": "4.0.1",
+    "@nexfluid/sheets": "0.2.0"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json"

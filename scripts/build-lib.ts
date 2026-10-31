@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const tsc = createRequire(import.meta.url).resolve('typescript/bin/tsc');
-const ORDER = ['foundation', 'core', 'components', 'react'] as const;
+const ORDER = ['foundation', 'core', 'components', 'sheets', 'react'] as const;
 const CSS: Record<string, string[]> = { foundation: ['tokens.css', 'compat/nextudio.css'], components: ['styles.css'] };
 
 for (const pkg of ORDER) {

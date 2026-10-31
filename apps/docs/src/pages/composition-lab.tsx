@@ -1,47 +1,139 @@
-import { useState } from 'react';
-import { NexBadge, NexButton, NexCard, NexCodeBlock, NexFrame, NexIcon, NexIconButton, NexSegmented, NexTab, NexTabs } from '@nexfluid/react';
+import { useMemo, useState } from 'react';
+import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexPreviewBoundary, NexScroll, NexSegmented, NexTab, NexTabs } from '@nexfluid/react';
 import { NexMarkdown } from '@nexfluid/react/markdown';
-import { NexExplorerWidget, NexInspectorWidget, NexPreviewWidget } from '@nexfluid/react/widgets';
+import { NexExplorerWidget, NexInspectorWidget, NexMarkdownEditor, NexPreviewWidget } from '@nexfluid/react/widgets';
+import { NexSheets, cellKey, columnName, createSheet, createWorkbook, csvToSheet, type Workbook } from '@nexfluid/react/sheets';
 import { FluidBlob } from '@nexfluid/react/motion';
 import { PageHeader } from '../docs/kit.tsx';
 
-const FILES = {
-  'enunciado.md': { language: 'markdown', size: '1.2 KB', code: `# Colas que esperan menos\n\nModela una cola **M/M/1** con λ = 0.5 y μ = 0.75.\n\n1. Calcula la espera media teórica.\n2. Simula 1 000 clientes.\n3. Explica la diferencia.\n\n> [!TIP]\n> La fórmula de Little relaciona espera, llegadas y longitud de la cola.\n\n| Métrica | Teórica | Simulada |\n|---|---|---|\n| Espera (min) | 4.0 | — |` },
-  'colas.py': { language: 'python', size: '0.6 KB', code: `import random\n\ndef espera_media(lam: float, mu: float) -> float:\n    """Espera media en cola de un sistema M/M/1."""\n    return lam / (mu * (mu - lam))\n\ndef simula(n: int, lam: float, mu: float) -> float:\n    t = salida = total = 0.0\n    for _ in range(n):\n        t += random.expovariate(lam)\n        inicio = max(t, salida)\n        total += inicio - t\n        salida = inicio + random.expovariate(mu)\n    return total / n\n\nprint(espera_media(0.5, 0.75), simula(1000, 0.5, 0.75))` },
-  'llegadas.csv': { language: 'plaintext', size: '14 KB', code: `cliente,llegada,servicio\n1,0.00,1.21\n2,1.84,0.96\n3,2.10,2.40` },
+const INITIAL = {
+  'enunciado.md': `# Colas que esperan menos
+
+Modela una cola **M/M/1** con λ = 0.5 y μ = 0.75.
+
+1. Calcula la espera media teórica.
+2. Calcula la espera de cada cliente con los datos de \`llegadas.csv\`.
+3. Explica la diferencia.
+
+> [!TIP]
+> La fórmula de Little relaciona espera, llegadas y longitud de la cola.
+
+| Métrica | Teórica | Con datos |
+|---|---|---|
+| Espera (min) | 4.0 | ver Resultados |`,
+  'informe.md': `# Informe
+
+La espera media **teórica** es 4.0 min.
+
+Con los datos de \`llegadas.csv\` (pestaña *Resultados*), la espera media sale de la última fila de la hoja.
+
+- Las primeras llegadas encuentran la cola vacía.
+- Edita las llegadas y mira cómo cambia la media.`,
+  'colas.py': `import random
+
+def espera_media(lam: float, mu: float) -> float:
+    """Espera media en cola de un sistema M/M/1."""
+    return lam / (mu * (mu - lam))
+
+print(espera_media(0.5, 0.75))`,
+  'llegadas.csv': `cliente,llegada,servicio
+1,0.00,1.21
+2,1.84,0.96
+3,2.10,2.40
+4,2.95,1.10
+5,5.60,0.80
+6,6.02,2.25
+7,6.70,1.40
+8,9.85,0.65
+9,10.10,1.95
+10,10.40,1.30`,
 } as const;
-type FileName = keyof typeof FILES;
+type FileName = keyof typeof INITIAL;
+const KIND: Record<FileName, { language: string; icon: 'file' | 'code' | 'grid' }> = {
+  'enunciado.md': { language: 'markdown', icon: 'file' },
+  'informe.md': { language: 'markdown', icon: 'file' },
+  'colas.py': { language: 'python (texto)', icon: 'code' },
+  'llegadas.csv': { language: 'csv', icon: 'grid' },
+};
+const DOC_SECTIONS = [
+  { id: 'lab-enunciado', label: 'Enunciado' },
+  { id: 'lab-pasos', label: 'Pasos' },
+];
+
+/**
+ * La hoja de resultados: los datos de `llegadas.csv` + columnas con fórmulas
+ * del motor de NexSheets (inicio = MAX(llegada; salida anterior), salida,
+ * espera y su media). Es un cálculo real sobre lo que escribas; no se ejecuta
+ * Python.
+ */
+function resultsWorkbook(csv: string): { workbook: Workbook; error: string | null } {
+  try {
+    const { sheet } = csvToSheet(csv, { headers: true });
+    const rows = sheet.rows;
+    const cells = { ...sheet.cells };
+    const put = (r: number, c: number, input: string) => { cells[cellKey(r, c)] = { input }; };
+    put(0, 3, 'inicio'); put(0, 4, 'salida'); put(0, 5, 'espera');
+    for (let r = 1; r < rows; r++) {
+      const n = r + 1;
+      put(r, 3, r === 1 ? `=B${n}` : `=MAX(B${n};E${n - 1})`);
+      put(r, 4, `=D${n}+C${n}`);
+      put(r, 5, `=REDONDEAR(D${n}-B${n};2)`);
+    }
+    put(rows, 0, 'Espera media');
+    put(rows, 5, `=REDONDEAR(PROMEDIO(F2:F${rows});2)`);
+    put(rows + 1, 0, 'Máxima');
+    put(rows + 1, 5, `=MAX(F2:F${rows})`);
+    const result = createSheet('Resultados', { rows: rows + 6, columns: 8, cells, headers: ['cliente', 'llegada', 'servicio', 'inicio', 'salida', 'espera'] }, 'lab-results');
+    result.columnWidths = { 0: 120 };
+    return { workbook: createWorkbook([result]), error: null };
+  } catch (e) {
+    return { workbook: createWorkbook([createSheet('Resultados', {}, 'lab-results')]), error: e instanceof Error ? e.message : 'CSV no válido' };
+  }
+}
+
+const bytes = (text: string) => new TextEncoder().encode(text).length;
+const size = (text: string) => (bytes(text) < 1024 ? `${bytes(text)} B` : `${(bytes(text) / 1024).toFixed(1)} KB`);
 
 /**
  * Nex Composition Lab: un espacio de trabajo hecho sólo con componentes públicos.
  * NexTabs envuelve el marco: la lista vive en la membrana superior y los paneles en el lienzo.
+ *
+ * Todo es editable de verdad: los archivos son texto, los .md se pintan con
+ * NexMarkdown en cada pulsación y los resultados son una hoja NexSheets que
+ * calcula con los datos del CSV. No hay ejecución simulada.
+ *
+ * Integridad espacial: NexPreviewBoundary mide el ancho real de la demostración y
+ * NexFrame pliega sus regiones antes de comprimir el lienzo por debajo de
+ * `canvasMinWidth` (inspector → hoja lateral, explorador → riel; en estrecho, una
+ * columna con hoja inferior). Cada panel tiene una sola área de desplazamiento.
  */
 export function CompositionLabPage() {
+  const [files, setFiles] = useState<Record<FileName, string>>({ ...INITIAL });
   const [file, setFile] = useState<FileName>('enunciado.md');
-  const [running, setRunning] = useState(false);
-  const [output, setOutput] = useState<string | null>(null);
   const [view, setView] = useState('document');
   const [layout, setLayout] = useState<'split' | 'focus'>('split');
-
-  const run = () => {
-    setRunning(true);
-    setTimeout(() => {
-      setRunning(false);
-      setOutput('$ python colas.py\n4.0 4.18\n\nProceso terminado en 1.4 s');
-    }, 1200);
-  };
+  const results = useMemo(() => resultsWorkbook(files['llegadas.csv']), [files['llegadas.csv']]); // eslint-disable-line react-hooks/exhaustive-deps
+  const edited = (Object.keys(INITIAL) as FileName[]).filter((f) => files[f] !== INITIAL[f]);
+  const write = (name: FileName, text: string) => setFiles((old) => ({ ...old, [name]: text }));
+  const text = files[file];
+  const lines = text.split('\n').length;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
 
   return (
     <article className="doc-page doc-page--wide">
       <PageHeader
         eyebrow="Patrones · composición"
         title="Nex Composition Lab"
-        lead="Un espacio de trabajo completo: NexFrame con disposición dividida o de foco, explorador en árbol, pestañas líquidas, tarjetas que se amplían a panel, Markdown con avisos, código, vista previa por dispositivo e inspector plegable. Ninguna pieza es una copia: todo se importa de @nexfluid/*."
+        lead="Un espacio de trabajo completo y editable: NexFrame con disposición dividida o de foco, explorador, pestañas líquidas, Markdown que se pinta mientras escribes, una hoja NexSheets que calcula con tus datos, vista previa por dispositivo e inspector. Ninguna pieza es una copia: todo se importa de @nexfluid/*."
       />
       <h2 className="nx-visually-hidden">Espacio de trabajo</h2>
+      <NexPreviewBoundary compactBelow={1000} constrainedBelow={620}>
+      {({ space }) => (
       <NexTabs value={view} onValueChange={setView}>
         <NexFrame
-          height={760}
+          nested
+          height={space === 'constrained' ? 680 : 760}
+          canvasMinWidth={440}
           canvasAs="div"
           layout={layout}
           canvasLabel="Lienzo del espacio de trabajo"
@@ -52,23 +144,22 @@ export function CompositionLabPage() {
             </span>
           }
           heading={
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap' }}>
-              Práctica 3 · Colas <NexBadge tone={output ? 'success' : 'neutral'} dot density="compact">{output ? 'Ejecutado' : 'Borrador'}</NexBadge>
+            <span style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 10px' }}>
+              <span>Práctica 3 · Colas</span> <NexBadge tone={edited.length ? 'accent' : 'neutral'} dot density="compact">{edited.length ? `${edited.length} editado${edited.length > 1 ? 's' : ''}` : 'Sin cambios'}</NexBadge>
             </span>
           }
           actions={
             <>
               <NexSegmented aria-label="Disposición" density="compact" value={layout} onValueChange={(v) => setLayout(v as 'split' | 'focus')} options={[{ value: 'split', label: 'Dividido' }, { value: 'focus', label: 'Foco' }]} />
-              <NexIconButton label="Compartir" icon={<NexIcon name="external" />} density="compact" />
-              <NexButton appearance="filled" density="compact" loading={running} loadingLabel="Ejecutando" onClick={run} iconStart={<NexIcon name="play" />}>Ejecutar</NexButton>
+              <NexButton appearance="ghost" density="compact" disabled={!edited.length} onClick={() => setFiles({ ...INITIAL })}>Restablecer</NexButton>
             </>
           }
           tools={
             <NexTabs.List aria-label="Vista del trabajo">
               <NexTab value="document" icon={<NexIcon name="file" />}>Documento</NexTab>
-              <NexTab value="code" icon={<NexIcon name="code" />}>Código</NexTab>
+              <NexTab value="code" icon={<NexIcon name="code" />}>Editor</NexTab>
               <NexTab value="preview" icon={<NexIcon name="eye" />}>Vista previa</NexTab>
-              <NexTab value="results" icon={<NexIcon name="grid" />} textValue="Resultados" trailing={output ? <NexBadge density="compact" tone="accent">1</NexBadge> : undefined}>Resultados</NexTab>
+              <NexTab value="results" icon={<NexIcon name="grid" />}>Resultados</NexTab>
             </NexTabs.List>
           }
           explorer={
@@ -76,9 +167,9 @@ export function CompositionLabPage() {
               <NexExplorerWidget
                 aria-label="Archivos del proyecto"
                 selected={file}
-                onSelect={(id) => { setFile(id as FileName); setView(id === 'enunciado.md' ? 'document' : 'code'); }}
+                onSelect={(id) => { if (id in INITIAL) { setFile(id as FileName); setView('code'); } }}
                 defaultExpanded={['practica']}
-                nodes={[{ id: 'practica', label: 'práctica-3', icon: <NexIcon name="folder" />, children: (Object.keys(FILES) as FileName[]).map((f) => ({ id: f, label: f, icon: <NexIcon name={f.endsWith('.md') ? 'file' : f.endsWith('.py') ? 'code' : 'grid'} /> })) }]}
+                nodes={[{ id: 'practica', label: 'práctica-3', icon: <NexIcon name="folder" />, children: (Object.keys(INITIAL) as FileName[]).map((f) => ({ id: f, label: edited.includes(f) ? `${f} •` : f, icon: <NexIcon name={KIND[f].icon} /> })) }]}
               />
             </div>
           }
@@ -86,26 +177,33 @@ export function CompositionLabPage() {
             <div style={{ padding: 8 }}>
               <NexInspectorWidget
                 sections={[
-                  { id: 'file', title: 'Archivo', groups: [{ items: [{ label: 'Nombre', value: file }, { label: 'Tipo', value: FILES[file].language }, { label: 'Tamaño', value: FILES[file].size }] }] },
-                  { id: 'env', title: 'Entorno', groups: [{ items: [{ label: 'Runtime', value: 'Python 3.12' }, { label: 'Estado', value: <NexBadge tone={running ? 'warning' : 'success'} dot density="compact">{running ? 'Ocupado' : 'Listo'}</NexBadge> }] }] },
-                  { id: 'act', title: 'Actividad', defaultOpen: false, content: <p className="nx-type-small" style={{ margin: 0 }}>Entrega el 4 de noviembre · 3 de 5 compañeros han empezado.</p> },
+                  { id: 'file', title: 'Archivo', groups: [{ items: [
+                    { label: 'Nombre', value: file }, { label: 'Tipo', value: KIND[file].language }, { label: 'Tamaño', value: size(text) },
+                    { label: 'Líneas', value: String(lines) }, { label: 'Palabras', value: String(words) },
+                    { label: 'Estado', value: <NexBadge tone={edited.includes(file) ? 'accent' : 'success'} dot density="compact">{edited.includes(file) ? 'Editado' : 'Original'}</NexBadge> },
+                  ] }] },
+                  { id: 'data', title: 'Datos', groups: [{ items: [
+                    { label: 'Clientes', value: String(Math.max(0, files['llegadas.csv'].trim().split('\n').length - 1)) },
+                    { label: 'Hoja', value: results.error ? <NexBadge tone="danger" density="compact">CSV no válido</NexBadge> : 'Resultados' },
+                  ] }] },
+                  { id: 'act', title: 'Ayuda', defaultOpen: false, content: <p className="nx-type-small" style={{ margin: 0 }}>Elige un archivo en el explorador para editarlo. Los .md se pintan en Documento y Vista previa; llegadas.csv alimenta la hoja de Resultados. colas.py es texto: no se ejecuta.</p> },
                 ]}
               />
             </div>
           }
           inspectorResizable
-          bottom={output ? <NexCodeBlock code={output} language="shell" title="Consola" copyable={false} /> : undefined}
-          bottomLabel="Consola"
         >
           <div className="doc-lab-canvas">
-            <NexTabs.Panel value="document">
+            <NexTabs.Panel value="document" className="doc-lab-panel">
+              <NexScroll.Area variant="editorial" label="Enunciado de la práctica" sections={DOC_SECTIONS} className="doc-lab-scroll">
               <div className="doc-lab-doc">
-                <NexMarkdown source={FILES['enunciado.md'].code} measure headingOffset={2} />
+                <div id="lab-enunciado"><NexMarkdown source={files['enunciado.md']} measure headingOffset={2} /></div>
+                <h3 id="lab-pasos" className="nx-type-heading" style={{ margin: 0 }}>Pasos</h3>
                 <div className="doc-card-grid">
                   {[
                     ['Paso 1', 'Espera teórica', 'Fórmula de Little sobre M/M/1.', 'Con λ = 0.5 y μ = 0.75 la espera media en cola es 4 minutos.'],
-                    ['Paso 2', 'Simulación', 'Mil clientes con llegadas exponenciales.', 'La simulación converge a ±5 % del valor teórico.'],
-                    ['Paso 3', 'Conclusión', 'Compara y explica la diferencia.', 'Las primeras llegadas, con la cola vacía, sesgan la media.'],
+                    ['Paso 2', 'Espera con datos', 'Una hoja que calcula cliente a cliente.', 'Resultados calcula inicio, salida y espera de cada cliente con fórmulas.'],
+                    ['Paso 3', 'Conclusión', 'Compara y explica la diferencia.', 'Escríbela en informe.md: la vista previa la pinta al instante.'],
                   ].map(([e, t, d, x]) => (
                     <NexCard key={t} interactive density="compact" expansion={<p className="nx-type-subhead" style={{ margin: 0 }}>{x}</p>}>
                       <NexCard.Header>
@@ -117,32 +215,43 @@ export function CompositionLabPage() {
                   ))}
                 </div>
               </div>
+              </NexScroll.Area>
             </NexTabs.Panel>
-            <NexTabs.Panel value="code">
-              <NexCodeBlock code={FILES[file].code} language={FILES[file].language} title={file} showLineNumbers highlightLines={file === 'colas.py' ? [3, 4, 5] : undefined} />
-            </NexTabs.Panel>
-            <NexTabs.Panel value="preview">
-              <NexPreviewWidget title="Informe publicado">
-                <div style={{ padding: 24 }}><NexMarkdown source={'# Colas que esperan menos\n\nLa espera media teórica es **4.0 min**; la simulada, **4.18 min**.'} headingOffset={2} /></div>
-              </NexPreviewWidget>
-            </NexTabs.Panel>
-            <NexTabs.Panel value="results">
-              {output ? (
-                <div className="doc-card-grid">
-                  <NexCard appearance="editorial"><NexCard.Eyebrow>Teórica</NexCard.Eyebrow><NexCard.Title>4.0 min</NexCard.Title></NexCard>
-                  <NexCard appearance="editorial"><NexCard.Eyebrow>Simulada</NexCard.Eyebrow><NexCard.Title>4.18 min</NexCard.Title><NexCard.Description>+4.5 % por las primeras llegadas.</NexCard.Description></NexCard>
+            <NexTabs.Panel value="code" className="doc-lab-panel">
+              <NexScroll.Area variant="fluid" label={`Editor de ${file}`} className="doc-lab-scroll">
+                <div className="doc-lab-pad">
+                  <NexMarkdownEditor
+                    key={file}
+                    label={file}
+                    value={text}
+                    onChange={(t) => write(file, t)}
+                    layout={file.endsWith('.md') ? 'split' : 'editor'}
+                    rows={16}
+                    markdown={{ headingOffset: 2 }}
+                    aside={file === 'llegadas.csv' ? (
+                      <p className="doc-hint" style={{ margin: 0 }}>{results.error ? `No se pudo leer: ${results.error}` : `Columnas ${['A', 'B', 'C'].map((c, i) => `${c} ${['cliente', 'llegada', 'servicio'][i]}`).join(' · ')}. Resultados añade ${['D', 'E', 'F'].join(', ')} con fórmulas (hasta ${columnName(5)}).`}</p>
+                    ) : file === 'colas.py' ? <p className="doc-hint" style={{ margin: 0 }}>Texto plano: el laboratorio no ejecuta código.</p> : undefined}
+                  />
                 </div>
-              ) : (
-                <NexCard appearance="filled">
-                  <NexCard.Title>Aún no hay resultados</NexCard.Title>
-                  <NexCard.Description>Ejecuta el proyecto para ver la comparación.</NexCard.Description>
-                  <NexCard.Footer><NexButton onClick={run} loading={running} iconStart={<NexIcon name="play" />}>Ejecutar ahora</NexButton></NexCard.Footer>
-                </NexCard>
-              )}
+              </NexScroll.Area>
+            </NexTabs.Panel>
+            <NexTabs.Panel value="preview" className="doc-lab-panel">
+              <NexScroll.Area variant="fluid" label="Vista previa del informe" className="doc-lab-scroll">
+                <div className="doc-lab-pad">
+                  <NexPreviewWidget title="informe.md publicado" actions={<NexButton appearance="ghost" density="compact" onClick={() => { setFile('informe.md'); setView('code'); }}>Editar</NexButton>}>
+                    <div style={{ padding: 24 }}><NexMarkdown source={files['informe.md']} headingOffset={2} /></div>
+                  </NexPreviewWidget>
+                </div>
+              </NexScroll.Area>
+            </NexTabs.Panel>
+            <NexTabs.Panel value="results" className="doc-lab-panel doc-lab-pad">
+              <NexSheets key={files['llegadas.csv']} defaultWorkbook={results.workbook} height="100%" tabs={false} toolbar={false} label="Resultados de la cola" />
             </NexTabs.Panel>
           </div>
         </NexFrame>
       </NexTabs>
+      )}
+      </NexPreviewBoundary>
     </article>
   );
 }

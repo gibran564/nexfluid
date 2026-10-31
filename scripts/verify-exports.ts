@@ -10,15 +10,17 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const EXPECTED: Record<string, string[]> = {
   '@nexfluid/foundation': ['THEMES', 'TYPE_SCALE', 'SPACE', 'DENSITY', 'MOTION', 'ICONS', 'contrastRatio', 'renderTokensCss'],
   '@nexfluid/core': ['stepSpring', 'FluidValue', 'MOTION_PRESETS', 'sharedClock', 'createFluidBlob', 'sampleContour'],
-  '@nexfluid/components': ['cx', 'rovingIndex', 'safeUrl', 'tokenize', 'CLASS'],
+  '@nexfluid/components': ['cx', 'rovingIndex', 'safeUrl', 'tokenize', 'CLASS', 'resolveSpace'],
+  '@nexfluid/sheets': ['createWorkbook', 'evaluateSheet', 'pasteGrid', 'csvToSheet', 'toCsv', 'createHistory', 'moveSelection', 'fillRange', 'createAxis', 'parseWorkbook'],
   '@nexfluid/react': ['NexProvider', 'NexButton', 'NexIconButton', 'NexBadge', 'NexCard', 'NexCardTitle', 'NexTabs', 'NexTab', 'NexTabsList', 'NexTabsPanel', 'NexFrame', 'NexFrameRegion', 'NexCodeBlock', 'NexIcon'],
   '@nexfluid/react/markdown': ['NexMarkdown'],
   '@nexfluid/react/widgets': ['NexMarkdownWidget', 'NexPropertiesWidget'],
   '@nexfluid/react/motion': ['FluidBlob'],
+  '@nexfluid/react/sheets': ['NexSheets', 'NexSheetGrid', 'NexFormulaBar', 'NexSheetTabs', 'useNexSheets', 'createWorkbook'],
 };
 
 let files = 0;
-for (const pkg of ['foundation', 'core', 'components', 'react']) {
+for (const pkg of ['foundation', 'core', 'components', 'sheets', 'react']) {
   const manifest = JSON.parse(readFileSync(`${root}packages/${pkg}/package.json`, 'utf8'));
   for (const [entry, target] of Object.entries<Record<string, string>>(manifest.exports)) {
     for (const [condition, file] of Object.entries(target)) {

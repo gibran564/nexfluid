@@ -1,5 +1,6 @@
-import { NexBadge, NexButton, NexIcon, NexNav, NexPanel, NexSegmented, NexSurface } from '@nexfluid/react';
-import { NexExplorerWidget, NexInspectorWidget, NexPreviewWidget } from '@nexfluid/react/widgets';
+import { NexBadge, NexIcon, NexNav, NexPanel, NexSegmented, NexSurface } from '@nexfluid/react';
+import { NexExplorerWidget, NexInspectorWidget } from '@nexfluid/react/widgets';
+import { PreviewPlayground } from './preview-playground.tsx';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 
@@ -197,17 +198,7 @@ export const previewDoc: ComponentDoc = {
   origin: <>vistas previas de NexWeb y proyectos</>,
   wide: true,
   controls: [],
-  render: () => (
-    <div style={{ padding: 16, width: '100%' }}>
-      <NexPreviewWidget title="Página publicada" actions={<NexButton appearance="ghost" density="compact" iconStart={<NexIcon name="external" />}>Abrir</NexButton>}>
-        <div style={{ padding: 24 }}>
-          <p className="nx-index">Vista</p>
-          <h3 className="nx-type-title">Colas que esperan menos</h3>
-          <p className="doc-muted">El visor cambia de ancho con física viscosa al elegir dispositivo.</p>
-        </div>
-      </NexPreviewWidget>
-    </div>
-  ),
+  render: () => <PreviewPlayground />,
   code: () => jsx('NexPreviewWidget', { title: 'Página publicada' }, '<PublishedPage />'),
   api: [{ component: 'NexPreviewWidget', rows: [{ name: 'title · children · actions', type: '…', description: 'Cabecera y contenido.' }, { name: 'devices · defaultDevice', type: '{ value; label; width }[]', description: 'Dispositivos (por defecto Fluido, Tableta 768, Móvil 375).' }] }],
   a11y: ['Section con nombre; el selector de dispositivo es un radiogroup.'],

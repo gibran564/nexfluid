@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: { conditions: ['nexfluid-source', ...defaultClientConditions] },
   test: {
     environment: 'jsdom',
-    include: ['packages/react/tests/**/*.test.tsx', 'apps/docs/tests/**/*.test.tsx'],
+    include: ['packages/react/tests/**/*.test.tsx', 'packages/sheets/tests/**/*.test.ts', 'apps/docs/tests/**/*.test.tsx'],
     css: false,
   },
 });

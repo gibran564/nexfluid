@@ -26,3 +26,7 @@ export type {
 } from './morph.ts';
 export { createFluidBlob } from './fluid-blob.ts';
 export type { FluidBlobOptions, FluidBlobHandle } from './fluid-blob.ts';
+export { scrollThumb, offsetForThumb, markerPosition, activeSection, scrollThumbPath, ScrollTracker } from './scroll.ts';
+export type {
+  ScrollOrientation, ScrollMetrics, ThumbGeometry, ThumbPathOptions, ScrollSection, ScrollParts, ScrollState, ScrollTrackerOptions,
+} from './scroll.ts';
