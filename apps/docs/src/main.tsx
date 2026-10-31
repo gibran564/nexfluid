@@ -13,6 +13,7 @@ import '@fontsource-variable/jetbrains-mono';
 // Contrato de estilos de NexFluidUI: tokens, compatibilidad opcional y componentes.
 import '@nexfluid/foundation/tokens.css';
 import '@nexfluid/foundation/compat/nextudio.css';
+import 'katex/dist/katex.min.css';
 import '@nexfluid/components/styles.css';
 import './reference.css';
 import './docs.css';

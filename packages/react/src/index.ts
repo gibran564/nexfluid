@@ -56,3 +56,7 @@ export {
 } from './scroll.tsx';
 export type { NexScrollAreaProps, NexScrollRootProps, NexScrollViewportProps, NexScrollController, NexScrollVariant, NexScrollSection } from './scroll.tsx';
 export type { ScrollState as NexScrollState } from '@nexfluid/core';
+export { NexInput, NexCheckbox } from './fields.tsx';
+export type { NexInputProps, NexCheckboxProps } from './fields.tsx';
+export { NexSelect } from './select.tsx';
+export type { NexSelectProps, NexSelectOption } from './select.tsx';

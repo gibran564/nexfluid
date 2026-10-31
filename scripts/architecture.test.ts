@@ -41,7 +41,7 @@ const EXTERNAL: Record<string, readonly string[]> = {
   core: [],
   components: [],
   sheets: [],
-  react: ['react', 'react-dom', 'react/jsx-runtime', 'react-markdown', 'remark-gfm'],
+  react: ['react', 'react-dom', 'react/jsx-runtime', 'react-markdown', 'remark-gfm', 'remark-math', 'rehype-katex'],
 };
 
 describe('arquitectura', () => {

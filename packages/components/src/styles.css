@@ -967,10 +967,126 @@
 @container nx-md-editor (max-width: 620px) { .nx-md-editor { grid-template-columns: minmax(0, 1fr); } }
 @supports not (container-type: inline-size) { .nx-md-editor { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); } }
 
+/* ---- Formularios: NexInput · NexCheckbox · NexSelect ----------------------- */
+/* Controles nativos con membrana: hundidos en reposo, el foco los tiñe desde
+   dentro (un anillo de acento que crece), el error se dice en texto y en color. */
+.nx-field { display: grid; gap: 6px; min-width: 0; font-family: var(--nx-font-body); }
+.nx-field__label { color: var(--nx-fg); font: 550 var(--nx-text-small) / 1.3 var(--nx-font-body); }
+.nx-field__required { color: var(--nx-danger); }
+.nx-field__description { margin: 0; color: var(--nx-fg-muted); font-size: var(--nx-text-micro); line-height: 1.45; }
+.nx-field__error { margin: 0; color: var(--nx-danger); font: 550 var(--nx-text-micro) / 1.45 var(--nx-font-body); }
+
+.nx-input {
+  display: flex; align-items: center; gap: 8px; min-width: 0; min-height: var(--nx-density-control); padding: 0 14px;
+  border-radius: calc(var(--nx-density-control) / 2); background: var(--nx-surface-sunken); color: var(--nx-fg);
+  box-shadow: inset 0 0 0 1px var(--nx-border);
+  transition: box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing), background var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-input:hover { box-shadow: inset 0 0 0 1px var(--nx-border-strong); }
+.nx-input:focus-within { background: var(--nx-surface); box-shadow: inset 0 0 0 2px var(--nx-accent), 0 0 0 4px var(--nx-accent-soft); }
+.nx-field[data-invalid] .nx-input { box-shadow: inset 0 0 0 1.5px var(--nx-danger); }
+.nx-field[data-disabled] .nx-input { opacity: 0.55; }
+.nx-input__control { flex: 1; min-width: 0; height: 100%; min-height: calc(var(--nx-density-control) - 4px); padding: 0; border: 0; background: transparent; color: inherit; font: 450 var(--nx-density-font) / 1.2 var(--nx-font-body); outline: none; }
+.nx-input__control::placeholder { color: var(--nx-fg-subtle); }
+/*
+ * Un solo indicador de foco: el de la membrana (.nx-input:focus-within). El
+ * <input> interno sólo escribe. Antes bastaba `outline: none` en la clase del
+ * control, pero una regla global de la aplicación con el mismo peso
+ * (p. ej. `:where(.app) :focus-visible { outline: … }`, cargada después)
+ * volvía a pintar un rectángulo dentro del campo, junto al anillo redondeado.
+ * El selector compuesto (0,3,0) gana a esas reglas genéricas sin !important.
+ */
+.nx-input > .nx-input__control:is(:focus, :focus-visible) { outline: none; box-shadow: none; }
+/* type="search": sin la caja nativa (Safari la redondea aparte, Chromium añade decoración). */
+.nx-input > .nx-input__control[type='search'] { appearance: none; -webkit-appearance: none; }
+.nx-input > .nx-input__control[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
+.nx-input__adorn { display: inline-flex; align-items: center; color: var(--nx-fg-muted); font-size: var(--nx-text-small); white-space: nowrap; }
+
+.nx-checkbox { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; font-family: var(--nx-font-body); }
+.nx-checkbox__box { position: relative; width: 20px; height: 20px; margin-top: 1px; }
+.nx-checkbox__control {
+  appearance: none; position: absolute; inset: 0; width: 20px; height: 20px; margin: 0; border-radius: 7px; cursor: pointer;
+  background: var(--nx-surface-sunken); box-shadow: inset 0 0 0 1.5px var(--nx-border-strong);
+  transition: background var(--nx-motion-state-duration) var(--nx-motion-state-easing), box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing), border-radius var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+}
+.nx-checkbox__control:checked, .nx-checkbox__control:indeterminate { background: var(--nx-accent); box-shadow: inset 0 0 0 1.5px var(--nx-accent); border-radius: 9999px 7px 9999px 7px; }
+.nx-checkbox__control:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 2px; }
+.nx-checkbox__control:disabled { cursor: not-allowed; opacity: 0.55; }
+.nx-checkbox[data-invalid] .nx-checkbox__control { box-shadow: inset 0 0 0 1.5px var(--nx-danger); }
+.nx-checkbox__mark { position: absolute; inset: 2px; width: 16px; height: 16px; pointer-events: none; fill: none; stroke: var(--nx-accent-fg); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nx-checkbox__check, .nx-checkbox__dash { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset var(--nx-motion-surface-duration) var(--nx-motion-surface-easing); }
+.nx-checkbox__control:checked:not(:indeterminate) + .nx-checkbox__mark .nx-checkbox__check { stroke-dashoffset: 0; }
+.nx-checkbox__control:indeterminate + .nx-checkbox__mark .nx-checkbox__dash { stroke-dashoffset: 0; }
+.nx-checkbox__text { display: grid; gap: 2px; min-width: 0; }
+.nx-checkbox__label { color: var(--nx-fg); font: 500 var(--nx-density-font) / 1.4 var(--nx-font-body); cursor: pointer; }
+.nx-checkbox[data-disabled] .nx-checkbox__label { color: var(--nx-fg-muted); cursor: not-allowed; }
+
+.nx-select { position: relative; }
+.nx-select__trigger {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; min-height: var(--nx-density-control); padding: 4px 12px 4px 14px;
+  border: 0; border-radius: calc(var(--nx-density-control) / 2); background: var(--nx-surface-sunken); color: var(--nx-fg); text-align: left; cursor: pointer;
+  font: 500 var(--nx-density-font) / 1.2 var(--nx-font-body); box-shadow: inset 0 0 0 1px var(--nx-border);
+  transition: box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing), background var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-select__trigger:hover { box-shadow: inset 0 0 0 1px var(--nx-border-strong); }
+.nx-select__trigger:focus-visible, .nx-select[data-open] .nx-select__trigger { outline: none; background: var(--nx-surface); box-shadow: inset 0 0 0 2px var(--nx-accent), 0 0 0 4px var(--nx-accent-soft); }
+.nx-select[data-invalid] .nx-select__trigger { box-shadow: inset 0 0 0 1.5px var(--nx-danger); }
+.nx-select__trigger:disabled { opacity: 0.55; cursor: not-allowed; }
+.nx-select__value { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.nx-select__value[data-placeholder] .nx-select__label { color: var(--nx-fg-subtle); }
+.nx-select__chevron { display: inline-flex; color: var(--nx-fg-muted); transition: transform var(--nx-motion-state-duration) var(--nx-motion-state-easing); }
+.nx-select[data-open] .nx-select__chevron { transform: rotate(180deg); }
+.nx-select__text { display: grid; gap: 1px; min-width: 0; }
+.nx-select__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nx-select__description { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.35 var(--nx-font-body); }
+.nx-select__media { display: inline-flex; align-items: center; justify-content: center; flex: none; min-width: 20px; color: var(--nx-fg-muted); }
+.nx-select__media img, .nx-select__description img { display: block; height: 16px; width: auto; }
+
+.nx-select__popup {
+  position: absolute; z-index: var(--nx-layer-popover); left: 0; right: 0; top: calc(100% + 6px); display: grid; gap: 6px; padding: 6px;
+  min-width: min(100%, 220px); border-radius: 20px; background: var(--nx-surface-raised);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--nx-fg) 16%, transparent), inset 0 0 0 1px var(--nx-border);
+  transform-origin: 50% 0; animation: nx-select-in var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+}
+.nx-select__popup[data-placement='top'] { top: auto; bottom: calc(100% + 6px); transform-origin: 50% 100%; }
+/* El campo de ayuda y el error quedan bajo la lista: la lista se ancla al disparador. */
+.nx-select:has(.nx-field__description, .nx-field__error) .nx-select__popup[data-placement='bottom'] { top: calc(var(--nx-density-control) + 30px); }
+@keyframes nx-select-in { from { opacity: 0; transform: translateY(-4px) scale(0.98); } }
+.nx-select__search { min-height: 34px; padding: 0 12px; border: 0; border-radius: 9999px; background: var(--nx-surface-sunken); color: var(--nx-fg); font: 450 var(--nx-text-small) var(--nx-font-body); outline: none; box-shadow: inset 0 0 0 1px var(--nx-border); }
+.nx-select__search:focus { box-shadow: inset 0 0 0 1.5px var(--nx-accent); }
+.nx-select__list { position: relative; max-height: 300px; overflow: auto; overscroll-behavior: contain; outline: none; scrollbar-width: thin; }
+.nx-select__list > .nx-liquid { --nx-liquid-fill: var(--nx-accent-soft); --nx-liquid-edge: transparent; }
+.nx-select__group { padding: 8px 10px 4px; color: var(--nx-fg-muted); font: 500 var(--nx-text-micro) / 1.2 var(--nx-font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.nx-select__option {
+  position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 6px 10px; border-radius: 12px; cursor: pointer;
+  color: var(--nx-fg); font: 500 var(--nx-text-small) / 1.25 var(--nx-font-body);
+}
+.nx-select__list:not([data-nx-ready]) .nx-select__option[data-active] { background: var(--nx-accent-soft); }
+.nx-select__option[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
+.nx-select__option .nx-select__text { flex: 1; }
+.nx-select__check { display: inline-flex; width: 16px; color: var(--nx-accent); }
+.nx-select__empty { margin: 0; padding: 10px; color: var(--nx-fg-muted); font-size: var(--nx-text-small); }
+
+/* En la capa superior (Popover API): posición fija junto al disparador, sin estilos de popover del navegador. */
+.nx-select__popup[data-layer='top'] { position: fixed; inset: auto; margin: 0; border: 0; color: var(--nx-fg); overflow: visible; }
+.nx-select__popup[data-layer='top']::backdrop { display: none; }
+
+/* Campos que dibujan su propio anillo (búsqueda de NexSelect, barra de fórmulas,
+   editor de celda, editor Markdown): ningún outline global se superpone. */
+.nx-select__popup > .nx-select__search:is(:focus, :focus-visible),
+.nx-formula-bar > .nx-formula-bar__input:is(:focus, :focus-visible),
+.nx-sheet__content > .nx-sheet__editor:is(:focus, :focus-visible),
+.nx-md-editor__source > .nx-md-editor__input:is(:focus, :focus-visible) { outline: none; }
+
+/* ---- Fórmulas (KaTeX) dentro de NexMarkdown ---------------------------------- */
+.nx-markdown .katex { font-size: 1.08em; }
+.nx-markdown .katex-display { margin: 1.1em 0; padding: 14px 16px; overflow-x: auto; overflow-y: hidden; border-radius: 16px; background: var(--nx-surface-sunken); }
+.nx-markdown .katex-error { color: var(--nx-danger); font-family: var(--nx-font-mono); font-size: 0.9em; }
+
 /* ---- Política de movimiento ---------------------------------------------- */
 [data-nx-motion='none'], [data-nx-motion='none'] * { transition: none !important; animation: none !important; }
 [data-nx-input='keyboard'] :is(.nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-surface__zone, .nx-panel__body-wrap) { transition: none !important; animation: none !important; }
-[data-nx-motion-pref='reduce'] :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill) { transition: none !important; animation: none !important; }
+[data-nx-motion-pref='reduce'] :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill, .nx-input, .nx-checkbox__control, .nx-checkbox__check, .nx-checkbox__dash, .nx-select__trigger, .nx-select__popup, .nx-select__chevron) { transition: none !important; animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
-  :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
+  :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill, .nx-input, .nx-checkbox__control, .nx-checkbox__check, .nx-checkbox__dash, .nx-select__trigger, .nx-select__popup, .nx-select__chevron):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
 }

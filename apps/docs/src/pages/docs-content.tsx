@@ -82,6 +82,16 @@ import { NexCard } from '@nexfluid/react';
 | \`@nexfluid/core\` | Motor |
 | \`@nexfluid/react\` | Puente React |
 
+## Fórmulas
+
+La espera media de una cola M/M/1 es $W_q = \\dfrac{\\lambda}{\\mu(\\mu - \\lambda)}$, y con $\\lambda = 0.5$ y $\\mu = 0.75$ sale $W_q = 4$.
+
+$$
+L_q = \\lambda \\, W_q = \\frac{\\lambda^2}{\\mu(\\mu - \\lambda)}
+$$
+
+Un precio no es una fórmula: cuesta $5 y luego $10.
+
 > Prueba a escribir <script>alert(1)</script> o un [enlace peligroso](javascript:alert(1)): no se interpretan.
 `;
 
@@ -113,6 +123,7 @@ export const markdownDoc: ComponentDoc = {
       { name: 'headingOffset', type: '0 | 1 | 2', default: '0', description: 'Con 1, # se pinta como h2 (dentro de tarjetas).' },
       { name: 'images', type: "'link' | 'https'", default: "'link'", description: 'link: la imagen se muestra como enlace. https: se pinta si es https.' },
       { name: 'externalLinksInNewTab', type: 'boolean', default: 'true', description: 'rel="noopener noreferrer" siempre; se anuncia la pestaña nueva.' },
+      { name: 'math', type: 'boolean', default: 'true', description: 'Fórmulas $…$ y $$…$$ con KaTeX (motor de NexBook). Requiere katex/dist/katex.min.css. Un $ suelto de precio sigue siendo texto.' },
       { name: 'renderCode', type: '(code, language) => ReactNode', description: 'Sustituye a NexCodeBlock en bloques cercados.' },
       { name: 'components', type: 'Partial<Components>', description: 'Extensiones de react-markdown (van detrás y pueden sustituir).' },
     ],
@@ -123,6 +134,7 @@ export const markdownDoc: ComponentDoc = {
     'Las tablas anchas son regiones desplazables con nombre y foco.',
     'Las casillas de tareas de GFM llegan sin nombre; NexMarkdown las nombra («Tarea hecha/pendiente»). Hallazgo de axe en este trabajo.',
     'Los enlaces externos anuncian que se abren en otra pestaña.',
+    'Las fórmulas ($…$ y $$…$$) se pintan con KaTeX en HTML y MathML: los lectores de pantalla leen la expresión. trust: false impide enlaces, imágenes o atributos desde TeX.',
   ],
   requires: [
     <>Entrada aparte <code>@nexfluid/react/markdown</code>: añade <code>react-markdown</code> 10.1.0 y <code>remark-gfm</code> 4.0.1, las mismas versiones que Nextudio. La entrada principal no los carga.</>,

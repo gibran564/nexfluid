@@ -9,7 +9,11 @@ import { PageHeader } from '../docs/kit.tsx';
 const INITIAL = {
   'enunciado.md': `# Colas que esperan menos
 
-Modela una cola **M/M/1** con λ = 0.5 y μ = 0.75.
+Modela una cola **M/M/1** con $\\lambda = 0.5$ y $\\mu = 0.75$. La espera media en cola es
+
+$$
+W_q = \\frac{\\lambda}{\\mu(\\mu - \\lambda)}
+$$
 
 1. Calcula la espera media teórica.
 2. Calcula la espera de cada cliente con los datos de \`llegadas.csv\`.

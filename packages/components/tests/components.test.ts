@@ -128,7 +128,7 @@ describe('contrato CSS', () => {
   });
   it('todas las clases usan el prefijo nx-', () => {
     const classes = new Set(css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/url\([^)]*\)/g, '').match(/\.[a-z][\w-]*/g));
-    const foreign = [...classes].filter((c) => !c.startsWith('.nx-') && !c.startsWith('.nf-blob'));
+    const foreign = [...classes].filter((c) => !c.startsWith('.nx-') && !c.startsWith('.nf-blob') && !c.startsWith('.katex'));
     assert.deepEqual(foreign, []);
   });
   it('respeta prefers-reduced-motion', () => assert.match(css, /@media \(prefers-reduced-motion: reduce\)/));
@@ -149,5 +149,40 @@ describe('integridad espacial', () => {
     assert.equal(columnsToFold({ available: 913, sides: [300, 240], gap: 10, mainMin: 420 }), 1);
     assert.equal(columnsToFold({ available: 1400, sides: [300, 240], gap: 10, mainMin: 420 }), 0);
     assert.equal(columnsToFold({ available: 500, sides: [300, 240], gap: 10, mainMin: 420 }), 2);
+  });
+});
+
+describe('foco: un solo indicador en campos compuestos', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  /** Especificidad (a, b, c) de un selector simple de esta hoja (clases, atributos, pseudo-clases; :is cuenta su argumento más fuerte). */
+  const specificity = (sel: string): [number, number, number] => {
+    let s = sel.replace(/:is\(([^)]*)\)/g, (_, inner: string) => {
+      const best = inner.split(',').map((x) => specificity(x.trim())).sort((x, y) => y[1] - x[1] || y[2] - x[2])[0]!;
+      return ' .__x'.repeat(best[1]);
+    }).replace(/:where\([^)]*\)/g, '').replace(/::[\w-]+/g, '');
+    const b = (s.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+/g) ?? []).length;
+    s = s.replace(/\.[\w-]+|\[[^\]]+\]|:[\w-]+/g, ' ');
+    const c = (s.match(/(^|[\s>+~])[a-z][\w-]*/gi) ?? []).length;
+    return [(sel.match(/#[\w-]+/g) ?? []).length, b, c];
+  };
+  const beats = (x: [number, number, number], y: [number, number, number]) => x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+  // Reglas genéricas típicas de una aplicación que NO deben volver a pintar un rectángulo dentro del campo.
+  const HOSTILE = [':where(.app) :focus-visible', 'input:focus-visible', '.app input:focus'];
+  const rules = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)].map((m) => ({ selectors: m[1]!.split(/,(?![^(]*\))/).map((s) => s.trim()), body: m[2]! }));
+  const winner = (control: string) => rules.filter((r) => /outline:\s*none/.test(r.body)).flatMap((r) => r.selectors).filter((s) => s.includes(control) && /:focus/.test(s));
+
+  for (const control of ['.nx-input__control', '.nx-select__search', '.nx-formula-bar__input', '.nx-sheet__editor', '.nx-md-editor__input']) {
+    it(`${control}: outline none al enfocar, más fuerte que las reglas globales`, () => {
+      const candidates = winner(control);
+      assert.ok(candidates.length, `falta una regla :focus con outline: none para ${control}`);
+      const best = candidates.map(specificity).sort((x, y) => -beats(x, y))[0]!;
+      for (const hostile of HOSTILE) assert.ok(beats(best, specificity(hostile)) > 0, `${control} pierde frente a «${hostile}»`);
+    });
+  }
+
+  it('el foco de NexInput lo pinta el contenedor redondeado (:focus-within), no el input', () => {
+    assert.match(css, /\.nx-input:focus-within\s*\{[^}]*box-shadow:[^}]*var\(--nx-accent\)/);
+    const own = rules.filter((r) => r.selectors.some((s) => /\.nx-input__control/.test(s)) && /(?:^|;)\s*(?:border|box-shadow)\s*:\s*(?!\s|none\b|0\b)/.test(r.body));
+    assert.deepEqual(own.map((r) => r.selectors.join(', ')), [], 'el input interno no debe tener borde ni sombra propios');
   });
 });

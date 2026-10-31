@@ -29,6 +29,7 @@ export function markdownOutline(source: string, idPrefix = ''): MarkdownHeading[
   const out: MarkdownHeading[] = [];
   const seen = new Map<string, number>();
   let fence: string | null = null;
+  let mathBlock = false;
   const lines = source.split(/\r?\n/);
   for (let index = 0; index < lines.length; index++) {
     const line = lines[index]!;
@@ -39,6 +40,9 @@ export function markdownOutline(source: string, idPrefix = ''): MarkdownHeading[
       continue;
     }
     if (fence) continue;
+    // Bloques de fórmula `$$` en su propia línea: su contenido no son títulos.
+    if (/^\s{0,3}\$\$\s*$/.test(line)) { mathBlock = !mathBlock; continue; }
+    if (mathBlock) continue;
     const m = /^\s{0,3}(#{1,6})\s+(.*)$/.exec(line);
     if (!m) continue;
     const text = inline(m[2]!);

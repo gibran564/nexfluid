@@ -347,3 +347,9 @@ kbd { display: inline-flex; align-items: center; min-height: 20px; padding: 0 7p
 .studio-publish input { min-height: 38px; padding: 0 14px; border: 0; border-radius: 9999px; background: var(--nx-surface-sunken); color: var(--nx-fg); font: inherit; }
 .studio-publish input:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 1px; }
 .studio-published { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; font-size: var(--nx-text-small); }
+
+/* ---- Formularios (páginas) ---------------------------------------------------- */
+.doc-forms { display: grid; gap: 18px; width: min(100%, 460px); margin: 0 auto; padding: clamp(14px, 3cqi, 28px); text-align: left; }
+.doc-forms__set { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
+.doc-forms__set legend { margin-bottom: 8px; font: 600 var(--nx-text-small) var(--nx-font-body); }
+.doc-forms__nested { display: grid; gap: 8px; padding-left: 30px; }

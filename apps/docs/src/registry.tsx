@@ -16,6 +16,7 @@ import { CompositionLabPage } from './pages/composition-lab.tsx';
 import { QualityPage } from './pages/quality.tsx';
 import { scrollDoc } from './pages/docs-scroll.tsx';
 import { sheetsDoc } from './pages/docs-sheets.tsx';
+import { checkboxDoc, inputDoc, selectDoc } from './pages/docs-forms.tsx';
 
 export interface PageDef {
   path: string;
@@ -27,7 +28,7 @@ export interface PageDef {
 }
 
 export const COMPONENT_DOCS: readonly ComponentDoc[] = [
-  surfaceDoc, buttonDoc, segmentedDoc, badgeDoc, cardDoc, panelDoc, tabsDoc, navDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
+  surfaceDoc, buttonDoc, segmentedDoc, inputDoc, selectDoc, checkboxDoc, badgeDoc, cardDoc, panelDoc, tabsDoc, navDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
   markdownWidgetDoc, propertiesWidgetDoc, inspectorDoc, explorerDoc, previewDoc, sheetsDoc, fluidBlobDoc,
 ];
 
@@ -60,6 +61,9 @@ export const PAGES: readonly PageDef[] = [
   component(surfaceDoc, 'Componentes', 'Primitiva', 'membrana superficie'),
   component(buttonDoc, 'Componentes', 'Acciones', 'boton icon button'),
   component(segmentedDoc, 'Componentes', 'Acciones', 'selector radio segmentos'),
+  component(inputDoc, 'Componentes', 'Formularios', 'campo texto input entrada'),
+  component(selectDoc, 'Componentes', 'Formularios', 'select lista desplegable lenguaje combobox'),
+  component(checkboxDoc, 'Componentes', 'Formularios', 'casilla checkbox marcar tareas'),
   component(badgeDoc, 'Componentes', 'Superficies', 'insignia etiqueta estado'),
   component(cardDoc, 'Componentes', 'Superficies', 'tarjeta expandir panel'),
   component(panelDoc, 'Componentes', 'Superficies', 'panel plegable'),

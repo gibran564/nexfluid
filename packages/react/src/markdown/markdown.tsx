@@ -7,6 +7,7 @@ import { cx, isExternalUrl, safeUrl, slugify, toDomId, type NexDensity } from '@
 import { NexCodeBlock } from '../code-block.tsx';
 import { NexIcon } from '../icon.tsx';
 import { markdownOutline } from './outline.ts';
+import { MATH_REHYPE_PLUGINS, MATH_REMARK_PLUGINS } from './math.ts';
 
 const ALERTS = {
   note: { label: 'Nota', icon: 'info' },
@@ -28,6 +29,11 @@ export interface NexMarkdownProps {
   headingIds?: boolean;
   /** Prefijo de los `id` de títulos; por defecto, uno único por instancia. */
   idPrefix?: string;
+  /**
+   * Fórmulas: `$…$` en línea y `$$…$$` en bloque (KaTeX, sin HTML de la persona).
+   * Requiere `katex/dist/katex.min.css` en la aplicación. Por defecto, activas.
+   */
+  math?: boolean;
   /** Desplaza los niveles: con 1, `#` se pinta como `<h2>`. Útil dentro de tarjetas. */
   headingOffset?: 0 | 1 | 2;
   /** `link` (por defecto): una imagen se muestra como enlace a su URL. `https`: se pinta si es https. */
@@ -58,7 +64,7 @@ function textOf(node: ReactNode): string {
  */
 export function NexMarkdown({
   source, density, measure, numbered, headingIds = true, idPrefix, headingOffset = 0, images = 'link',
-  externalLinksInNewTab = true, renderCode, components, className,
+  externalLinksInNewTab = true, renderCode, components, math = true, className,
 }: NexMarkdownProps) {
   const instance = toDomId('md', useId());
   const prefix = idPrefix ?? `${instance}-`;
@@ -140,7 +146,8 @@ export function NexMarkdown({
   return (
     <div className={cx('nx-markdown', className)} data-nx-density={density} data-nx-measure={measure ? '' : undefined} data-nx-numbered={numbered ? '' : undefined}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={math ? [remarkGfm, ...MATH_REMARK_PLUGINS] : [remarkGfm]}
+        rehypePlugins={math ? MATH_REHYPE_PLUGINS : undefined}
         skipHtml
         urlTransform={(url) => safeUrl(url) ?? ''}
         components={{ ...base, ...components }}

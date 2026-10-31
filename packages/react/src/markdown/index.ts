@@ -6,3 +6,4 @@ export { NexMarkdown } from './markdown.tsx';
 export type { NexMarkdownProps } from './markdown.tsx';
 export { markdownOutline } from './outline.ts';
 export type { MarkdownHeading } from './outline.ts';
+export { MARKDOWN_MATH_KATEX_OPTIONS, remarkMathDollarGuard, rehypeKatexCached } from './math.ts';
