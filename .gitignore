@@ -1,0 +1,4 @@
+node_modules/
+dist/
+# Notas internas de la auditoría de Nextudio (rutas, ramas, worktrees): no se publican.
+docs/internal/

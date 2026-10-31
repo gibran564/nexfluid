@@ -1,0 +1,47 @@
+{
+  "name": "nexfluid-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Nextudio Labs - NexFluidUI: Fluid Editorial Design system (foundation, motion engine, components, React bridge, NexDocs). Not production code.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "workspaces": [
+    "packages/core",
+    "packages/foundation",
+    "packages/components",
+    "packages/react",
+    "apps/docs",
+    "apps/playground"
+  ],
+  "scripts": {
+    "test": "npm run test:node && npm run test:react",
+    "test:node": "node --conditions=nexfluid-source --test \"packages/*/tests/*.test.ts\" \"scripts/*.test.ts\"",
+    "test:react": "vitest run",
+    "typecheck": "tsc -p tsconfig.json",
+    "tokens": "node packages/foundation/gen-tokens.ts",
+    "presets": "node packages/core/preset-table.ts",
+    "build:lib": "node scripts/build-lib.ts",
+    "build:docs": "vite build apps/docs",
+    "build:playground": "vite build apps/playground",
+    "build": "npm run build:lib && npm run verify:exports && npm run build:docs && npm run build:playground",
+    "verify:exports": "node scripts/verify-exports.ts",
+    "dev": "vite apps/docs",
+    "dev:playground": "vite apps/playground"
+  },
+  "devDependencies": {
+    "@types/jsdom": "27.0.0",
+    "@types/node": "24.19.2",
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7",
+    "@vitejs/plugin-react": "5.0.4",
+    "axe-core": "4.10.3",
+    "jsdom": "27.4.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "typescript": "5.9.3",
+    "vite": "7.3.7",
+    "vitest": "3.2.4"
+  }
+}

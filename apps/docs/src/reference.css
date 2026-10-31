@@ -1,0 +1,51 @@
+/* NexDocs · referencia «biblioteca tradicional» para la comparación antes/después.
+   NO forma parte de NexFluidUI: es un juego de tokens genérico (gris, azul, radio
+   8 px, fuente del sistema) aplicado a los MISMOS componentes, para mostrar qué
+   aporta la gramática nativa. */
+[data-nx-theme='reference'] {
+  color-scheme: light;
+  --nx-bg: #f4f5f7;
+  --nx-surface: #ffffff;
+  --nx-surface-raised: #ffffff;
+  --nx-surface-sunken: #eef0f3;
+  --nx-fg: #111827;
+  --nx-fg-muted: #4b5563;
+  --nx-fg-subtle: #6b7280;
+  --nx-border: #e5e7eb;
+  --nx-border-strong: #d1d5db;
+  --nx-accent: #2563eb;
+  --nx-accent-hover: #1d4ed8;
+  --nx-accent-fg: #ffffff;
+  --nx-accent-soft: #e8efff;
+  --nx-accent-line: #bfd0fb;
+  --nx-success: #15803d;
+  --nx-success-soft: #dcfce7;
+  --nx-warning: #a16207;
+  --nx-warning-soft: #fef3c7;
+  --nx-danger: #b91c1c;
+  --nx-danger-soft: #fee2e2;
+  --nx-fluid: #2563eb;
+  --nx-fluid-soft: #bfd0fb;
+  --nx-fluid-fg: #ffffff;
+  --nx-zone: transparent;
+  --nx-depth: rgb(17 24 39 / 0.08);
+  --nx-code-keyword: #1d4ed8;
+  --nx-code-string: #15803d;
+  --nx-code-number: #a16207;
+  --nx-code-comment: #6b7280;
+  --nx-code-type: #7e22ce;
+}
+[data-nx-direction='reference'] {
+  --nx-font-heading: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --nx-font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --nx-font-mono: ui-monospace, Consolas, monospace;
+  --nx-font-serif: system-ui, sans-serif;
+  --nx-display-weight: 600;
+  --nx-display-stretch: 100%;
+  --nx-display-tracking: -0.01em;
+  --nx-surface-radius: 8px; --nx-surface-smoothing: 0; --nx-surface-corner: round; --nx-surface-attract: 0; --nx-surface-press: 0;
+  --nx-control-radius: 6px; --nx-control-smoothing: 0; --nx-control-corner: round; --nx-control-attract: 0; --nx-control-press: 0;
+  --nx-content-radius: 8px; --nx-content-smoothing: 0; --nx-content-corner: round; --nx-content-attract: 0; --nx-content-press: 0;
+  --nx-edge: 1px; --nx-edge-active: 1px; --nx-meniscus: 0; --nx-glow: 0.25; --nx-zone-strength: 0;
+  --nx-gap: 12px; --nx-pinch: 0; --nx-amplitude: 0;
+}

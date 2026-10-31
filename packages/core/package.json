@@ -1,0 +1,20 @@
+{
+  "name": "@nexfluid/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NexFluid: framework-free organic motion engine (springs, viscosity, organic geometry, shared clock)",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "nexfluid-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "presets": "node preset-table.ts"
+  }
+}

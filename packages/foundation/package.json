@@ -1,0 +1,32 @@
+{
+  "name": "@nexfluid/foundation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NexFoundation: NexFluid Native tokens (themes, directions, shapes, materials, type, motion) plus an optional Nextudio compatibility sheet",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "nexfluid-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./tokens.css": {
+      "nexfluid-source": "./src/tokens.css",
+      "default": "./dist/tokens.css"
+    },
+    "./compat/nextudio.css": {
+      "nexfluid-source": "./src/compat/nextudio.css",
+      "default": "./dist/compat/nextudio.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node ../../scripts/copy-assets.ts foundation",
+    "tokens": "node gen-tokens.ts"
+  }
+}

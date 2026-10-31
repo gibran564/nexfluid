@@ -1,0 +1,45 @@
+{
+  "name": "@nexfluid/react",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NexBridge for React 19: typed NexComponents and NexWidgets over @nexfluid/components, optional NexFluid motion",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "nexfluid-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./markdown": {
+      "nexfluid-source": "./src/markdown/index.ts",
+      "types": "./dist/markdown/index.d.ts",
+      "default": "./dist/markdown/index.js"
+    },
+    "./widgets": {
+      "nexfluid-source": "./src/widgets/index.ts",
+      "types": "./dist/widgets/index.d.ts",
+      "default": "./dist/widgets/index.js"
+    },
+    "./motion": {
+      "nexfluid-source": "./src/motion/index.ts",
+      "types": "./dist/motion/index.d.ts",
+      "default": "./dist/motion/index.js"
+    }
+  },
+  "files": ["dist"],
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@nexfluid/components": "0.1.0",
+    "@nexfluid/core": "0.1.0",
+    "@nexfluid/foundation": "0.1.0",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  }
+}

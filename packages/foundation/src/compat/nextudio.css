@@ -1,0 +1,75 @@
+/* @nexfluid/foundation/compat/nextudio.css — Nextudio Compatibility (opcional). GENERADO desde src/compat.ts. */
+/* Lee los tokens de Nextudio; fuera de la aplicación cae a NEX Origen claro. No es la identidad de NexFluidUI. */
+
+[data-nx-theme='nextudio'] {
+  --nx-bg: var(--bg, #f3f1ea);
+  --nx-surface: var(--surface, #fbfaf6);
+  --nx-surface-raised: var(--surface-raised, #ffffff);
+  --nx-surface-sunken: var(--surface-sunken, #eceadf);
+  --nx-fg: var(--fg, #191a1c);
+  --nx-fg-muted: var(--fg-muted, #56585f);
+  --nx-fg-subtle: var(--fg-subtle, #6b6d75);
+  --nx-border: var(--border, #ded9cc);
+  --nx-border-strong: var(--border-strong, #c3bcaa);
+  --nx-accent: var(--accent, #ad3f1c);
+  --nx-accent-hover: var(--accent-hover, #8c3013);
+  --nx-accent-fg: var(--accent-fg, #fffaf7);
+  --nx-accent-soft: var(--accent-soft, #f4e3da);
+  --nx-accent-line: var(--accent-line, #e2c3b4);
+  --nx-success: var(--success, #1c6b46);
+  --nx-success-soft: var(--success-soft, #dcece3);
+  --nx-warning: var(--warning, #8a5c07);
+  --nx-warning-soft: var(--warning-soft, #f5e9cf);
+  --nx-danger: var(--danger, #a52418);
+  --nx-danger-soft: var(--danger-soft, #f6dedb);
+  --nx-fluid: var(--accent, #ad3f1c);
+  --nx-fluid-soft: var(--accent-line, #e2c3b4);
+  --nx-fluid-fg: var(--accent-fg, #fffaf7);
+  --nx-zone: transparent;
+  --nx-depth: rgb(25 26 28 / 0.12);
+  --nx-code-keyword: var(--accent, #ad3f1c);
+  --nx-code-string: var(--success, #1c6b46);
+  --nx-code-number: var(--warning, #8a5c07);
+  --nx-code-comment: var(--fg-muted, #56585f);
+  --nx-code-type: var(--accent-hover, #8c3013);
+}
+[data-nx-direction='nextudio'] {
+  --nx-font-display: var(--font-space-grotesk, 'Space Grotesk'), ui-sans-serif, system-ui, sans-serif;
+  --nx-font-text: var(--font-inter, Inter), ui-sans-serif, system-ui, sans-serif;
+  --nx-font-mono: var(--font-jetbrains-mono, 'JetBrains Mono'), ui-monospace, monospace;
+  --nx-font-heading: var(--font-space-grotesk, 'Space Grotesk'), ui-sans-serif, system-ui, sans-serif;
+  --nx-font-body: var(--font-inter, Inter), ui-sans-serif, system-ui, sans-serif;
+  --nx-display-weight: 600;
+  --nx-display-stretch: 100%;
+  --nx-display-tracking: -0.02em;
+  --nx-surface-family: editorial;
+  --nx-surface-radius: 6px;
+  --nx-surface-smoothing: 0.3;
+  --nx-surface-corner: round;
+  --nx-surface-attract: 0;
+  --nx-surface-press: 0;
+  --nx-control-family: editorial;
+  --nx-control-radius: 6px;
+  --nx-control-smoothing: 0.3;
+  --nx-control-corner: round;
+  --nx-control-attract: 0;
+  --nx-control-press: 0;
+  --nx-content-family: editorial;
+  --nx-content-radius: 6px;
+  --nx-content-smoothing: 0.3;
+  --nx-content-corner: round;
+  --nx-content-attract: 0;
+  --nx-content-press: 0;
+  --nx-edge: 1px;
+  --nx-edge-active: 1px;
+  --nx-meniscus: 0;
+  --nx-glow: 0;
+  --nx-zone-strength: 0;
+  --nx-gap: 0px;
+  --nx-indicator: thread;
+  --nx-pinch: 0;
+  --nx-amplitude: 0.5;
+  --nx-surface-radius: 6px;
+  --nx-control-radius: 4px;
+  --nx-content-radius: 6px;
+}

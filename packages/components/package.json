@@ -1,0 +1,26 @@
+{
+  "name": "@nexfluid/components",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NexComponents: framework-free component contract (CSS classes nx-*) and pure behaviour helpers",
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": {
+      "nexfluid-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": {
+      "nexfluid-source": "./src/styles.css",
+      "default": "./dist/styles.css"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@nexfluid/foundation": "0.1.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  }
+}

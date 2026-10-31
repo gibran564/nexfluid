@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NexFluid Lab</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#controls">Ir a los controles</a>
+    <header class="masthead">
+      <p class="kicker">NexFluid Lab · Fase 1 · motor + FluidBlob</p>
+      <h1 class="title">Interfaces that <span class="title-accent">feel alive.</span></h1>
+      <p class="lede">Nada se mueve sin propósito. Todo se transforma con continuidad. Mueve el puntero sobre la materia, presiónala y suéltala; cambia sus parámetros a la derecha.</p>
+    </header>
+
+    <main class="layout">
+      <section class="stage-col" aria-labelledby="stage-title">
+        <h2 id="stage-title" class="section-label"><span>01</span> Materia</h2>
+        <div class="stage" id="stage"></div>
+        <p class="caption" id="intent"></p>
+
+        <h2 class="section-label"><span>02</span> Comparar presets</h2>
+        <div class="compare" id="compare"></div>
+        <button type="button" class="btn" id="pulse">Pulsar todos</button>
+
+        <h2 class="section-label"><span>03</span> Respuesta medida</h2>
+        <figure class="response">
+          <svg id="response" viewBox="0 0 400 160" role="img" aria-labelledby="response-cap"></svg>
+          <figcaption id="response-cap" class="metrics"></figcaption>
+        </figure>
+      </section>
+
+      <aside class="controls" id="controls" aria-label="Controles">
+        <form id="form" autocomplete="off">
+          <fieldset>
+            <legend>Aspecto</legend>
+            <label>Tema <select name="theme"></select></label>
+            <label>Geometría base
+              <select name="base">
+                <option value="circle">Círculo</option>
+                <option value="squircle">Superelipse (n = 4)</option>
+                <option value="ellipse">Elipse 1.4 : 1</option>
+              </select>
+            </label>
+            <label>Suavidad <output name="pointsOut"></output><input type="range" name="points" min="10" max="48" step="2" value="24" /></label>
+            <label>Semilla <input type="number" name="seed" min="1" max="9999" value="7" /></label>
+          </fieldset>
+          <fieldset>
+            <legend>Movimiento</legend>
+            <label>Preset <select name="preset"></select></label>
+            <label>Intensidad <output name="intensityOut"></output><input type="range" name="intensity" min="0" max="1" step="0.05" value="0.5" /></label>
+            <label>Amortiguación ζ <output name="zetaOut"></output><input type="range" name="zeta" min="0.2" max="1.6" step="0.01" /></label>
+            <label>Viscosidad τ <output name="tauOut"></output><input type="range" name="tau" min="0" max="0.4" step="0.01" /></label>
+            <label>Velocidad global <output name="speedOut"></output><input type="range" name="speed" min="0.25" max="2" step="0.05" value="1" /></label>
+            <label class="check"><input type="checkbox" name="ambient" checked /> Movimiento ambiental</label>
+            <label>Movimiento reducido
+              <select name="motionMode">
+                <option value="system">Seguir al sistema</option>
+                <option value="reduce">Reducido</option>
+                <option value="full">Completo</option>
+              </select>
+            </label>
+            <button type="button" class="btn btn-quiet" id="reset">Restablecer el preset</button>
+          </fieldset>
+          <fieldset>
+            <legend>Integración</legend>
+            <pre class="code"><code id="code"></code></pre>
+          </fieldset>
+          <fieldset>
+            <legend>Rendimiento</legend>
+            <p class="hint">Mide intervalos de <code>requestAnimationFrame</code> en este navegador durante 5 s con las animaciones activas. No es una garantía para otros equipos.</p>
+            <button type="button" class="btn btn-quiet" id="measure">Medir 5 s</button>
+            <p class="metrics" id="perf" aria-live="polite"></p>
+          </fieldset>
+        </form>
+      </aside>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
