@@ -1,10 +1,29 @@
 {
   "name": "@nexfluid/components",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
   "description": "NexComponents: framework-free component contract (CSS classes nx-*) and pure behaviour helpers",
+  "license": "MIT",
+  "author": "gibran564",
+  "homepage": "https://gibran564.github.io/nexfluid/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gibran564/nexfluid.git",
+    "directory": "packages/components"
+  },
+  "bugs": {
+    "url": "https://github.com/gibran564/nexfluid/issues"
+  },
+  "keywords": [
+    "nexfluid",
+    "design-system",
+    "react",
+    "motion",
+    "ui"
+  ],
   "type": "module",
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": {
       "nexfluid-source": "./src/index.ts",
@@ -16,9 +35,16 @@
       "default": "./dist/styles.css"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
-    "@nexfluid/foundation": "0.1.0"
+    "@nexfluid/foundation": "0.2.0"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json"

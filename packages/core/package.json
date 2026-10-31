@@ -1,8 +1,25 @@
 {
   "name": "@nexfluid/core",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
   "description": "NexFluid: framework-free organic motion engine (springs, viscosity, organic geometry, shared clock)",
+  "license": "MIT",
+  "author": "gibran564",
+  "homepage": "https://gibran564.github.io/nexfluid/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gibran564/nexfluid.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/gibran564/nexfluid/issues"
+  },
+  "keywords": [
+    "nexfluid",
+    "design-system",
+    "react",
+    "motion",
+    "ui"
+  ],
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -12,7 +29,14 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "presets": "node preset-table.ts"

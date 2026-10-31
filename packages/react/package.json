@@ -1,8 +1,25 @@
 {
   "name": "@nexfluid/react",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
   "description": "NexBridge for React 19: typed NexComponents and NexWidgets over @nexfluid/components, optional NexFluid motion",
+  "license": "MIT",
+  "author": "gibran564",
+  "homepage": "https://gibran564.github.io/nexfluid/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gibran564/nexfluid.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/gibran564/nexfluid/issues"
+  },
+  "keywords": [
+    "nexfluid",
+    "design-system",
+    "react",
+    "motion",
+    "ui"
+  ],
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -27,15 +44,22 @@
       "default": "./dist/motion/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@nexfluid/components": "0.1.0",
-    "@nexfluid/core": "0.1.0",
-    "@nexfluid/foundation": "0.1.0",
+    "@nexfluid/components": "0.2.0",
+    "@nexfluid/core": "0.2.0",
+    "@nexfluid/foundation": "0.2.0",
     "react-markdown": "10.1.0",
     "remark-gfm": "4.0.1"
   },

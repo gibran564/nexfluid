@@ -1,8 +1,25 @@
 {
   "name": "@nexfluid/foundation",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
   "description": "NexFoundation: NexFluid Native tokens (themes, directions, shapes, materials, type, motion) plus an optional Nextudio compatibility sheet",
+  "license": "MIT",
+  "author": "gibran564",
+  "homepage": "https://gibran564.github.io/nexfluid/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gibran564/nexfluid.git",
+    "directory": "packages/foundation"
+  },
+  "bugs": {
+    "url": "https://github.com/gibran564/nexfluid/issues"
+  },
+  "keywords": [
+    "nexfluid",
+    "design-system",
+    "react",
+    "motion",
+    "ui"
+  ],
   "type": "module",
   "sideEffects": [
     "*.css"
@@ -23,10 +40,15 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node ../../scripts/copy-assets.ts foundation",
+    "build": "tsc -p tsconfig.build.json",
     "tokens": "node gen-tokens.ts"
   }
 }
