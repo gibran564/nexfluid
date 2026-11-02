@@ -11,8 +11,8 @@
  * forma y sale antes de que se encoja.
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
-import { morphPath } from '@nexfluid/core';
-import { cx, type NexDensity, type NexMotion } from '@nexfluid/components';
+import { morphPath } from '@eclipsis/core';
+import { cx, type NexDensity, type NexMotion } from '@eclipsis/components';
 import { NexIcon } from './icon.tsx';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { morphSpring, useSprings } from './springs.ts';

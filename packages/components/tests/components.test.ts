@@ -63,9 +63,9 @@ describe('utilidades', () => {
 
 describe('tokenize (resaltado ligero)', () => {
   const samples: Record<string, string> = {
-    ts: "import { NexCard } from '@nexfluid/react';\nconst n: number = 42; // nota\nexport function A() { return <NexCard appearance=\"editorial\" />; }",
+    ts: "import { NexCard } from '@eclipsis/react';\nconst n: number = 42; // nota\nexport function A() { return <NexCard appearance=\"editorial\" />; }",
     python: 'def total(xs):\n    """Suma."""\n    return sum(xs)  # fin\nprint(True, None, 3.5)',
-    json: '{ "name": "@nexfluid/react", "version": 1, "ok": true }',
+    json: '{ "name": "@eclipsis/react", "version": 1, "ok": true }',
     css: '.nx-card { border: 1px solid var(--nx-border); color: #191a1c; }',
     html: '<a href="https://x.y" class=\'z\'>Hola</a><!-- c -->',
     bash: 'npm run dev -- --port 5290 # docs\nexport NODE_ENV="test"',
@@ -82,7 +82,7 @@ describe('tokenize (resaltado ligero)', () => {
     const t = tokenize(samples.ts!, 'tsx');
     const of = (type: string) => t.filter((x) => x.type === type).map((x) => x.text.trim());
     assert.ok(of('keyword').includes('import'));
-    assert.ok(of('string').some((s) => s.includes('@nexfluid/react')));
+    assert.ok(of('string').some((s) => s.includes('@eclipsis/react')));
     assert.ok(of('comment').some((s) => s.includes('nota')));
     assert.ok(of('number').includes('42'));
     assert.ok(of('tag').some((s) => s.startsWith('<NexCard')));
@@ -120,7 +120,7 @@ describe('contrato CSS', () => {
     const local = new Set([...(css.match(/--nx-[a-z0-9-]+(?=:)/g) ?? []), '--nx-frame-height', '--nx-frame-inspector-w', '--nx-frame-navigation-w', '--nx-frame-explorer-w', '--nx-code-max-height',
       // Fijadas por los componentes en tiempo de ejecución (puntero, columnas, nivel…).
       '--nx-zone-x', '--nx-zone-y', '--nx-emerge-x', '--nx-nav-level', '--nx-frame-cols', '--nx-frame-areas', '--nx-preview-w', '--nx-morph-p', '--nx-morph-in', '--nx-morph-i', '--nx-explorer-w', '--nx-explorer-reveal', '--nx-inspector-w', '--nx-inspector-reveal',
-      '--nx-scroll-max', '--nx-scroll-fill', '--nx-scroll-at', '--nx-scroll-marker', '--nx-near', '--nx-sheets-height', '--nx-sheet-rowhead', '--nx-font-serif', '--nx-danger']);
+      '--nx-scroll-max', '--nx-scroll-fill', '--nx-scroll-at', '--nx-scroll-marker', '--nx-near', '--nx-sheets-height', '--nx-aspect', '--nx-sheet-rowhead', '--nx-font-serif', '--nx-danger']);
     const used = new Set(css.match(/var\(--nx-[a-z0-9-]+/g)?.map((v) => v.slice(4)));
     const unknown = [...used].filter((v) => !defined.has(v) && !local.has(v));
     assert.deepEqual(unknown, []);

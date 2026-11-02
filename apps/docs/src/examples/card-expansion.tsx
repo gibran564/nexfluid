@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { NexBadge, NexCard } from '@nexfluid/react';
-import { NexMarkdown } from '@nexfluid/react/markdown';
-import { NexMarkdownEditor } from '@nexfluid/react/widgets';
+import { NexBadge, NexCard } from '@eclipsis/react';
+import { NexMarkdown } from '@eclipsis/react/markdown';
+import { NexMarkdownEditor } from '@eclipsis/react/widgets';
 
 /**
  * Tarjeta → panel: «Ampliar» transforma la membrana de la tarjeta en un panel.

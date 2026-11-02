@@ -1,8 +1,8 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
-import { createMotionPreference, sharedMotionPreference, type MotionMode, type MotionPreference } from '@nexfluid/core';
-import type { NexDensity, NexMotion } from '@nexfluid/components';
+import { createMotionPreference, sharedMotionPreference, type MotionMode, type MotionPreference } from '@eclipsis/core';
+import type { NexDensity, NexMotion } from '@eclipsis/components';
 
 export interface NexContextValue {
   density: NexDensity;
@@ -37,7 +37,7 @@ export function canAnimate(level: NexMotion, preference: MotionPreference | null
 }
 
 export interface NexProviderProps {
-  /** Tema de color de @nexfluid/foundation, `auto`, `nextudio` (adaptador) o uno propio declarado en CSS. */
+  /** Tema de color de @eclipsis/foundation, `auto`, `nextudio` (adaptador) o uno propio declarado en CSS. */
   theme?: string;
   /** Dirección (ADN no cromático): `native` (por defecto), `fluid-editorial`, `living-matter`, `kinetic-minimal` o `nextudio`. */
   direction?: string;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { cx, normalizeLanguage, splitLines, tokenize, type NexDensity, type Token } from '@nexfluid/components';
+import { cx, normalizeLanguage, splitLines, tokenize, type NexDensity, type Token } from '@eclipsis/components';
 import { NexButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';
 

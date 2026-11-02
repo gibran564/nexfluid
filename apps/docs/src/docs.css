@@ -1,5 +1,5 @@
 /* NexDocs — estilos propios del sitio (composición de páginas). Sólo tokens --nx-*.
-   Toda superficie, control e indicador viene de @nexfluid/components. */
+   Toda superficie, control e indicador viene de @eclipsis/components. */
 
 html, body { margin: 0; background: var(--nx-bg); }
 body { min-height: 100dvh; }
@@ -353,3 +353,51 @@ kbd { display: inline-flex; align-items: center; min-height: 20px; padding: 0 7p
 .doc-forms__set { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
 .doc-forms__set legend { margin-bottom: 8px; font: 600 var(--nx-text-small) var(--nx-font-body); }
 .doc-forms__nested { display: grid; gap: 8px; padding-left: 30px; }
+
+/* ---- Documento editorial (demo de NexFlow) -------------------------------------- */
+.editorial-doc { width: 100%; padding: clamp(12px, 3cqi, 40px) 0 48px; text-align: left; }
+.editorial-doc__bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; max-width: calc(var(--nx-measure) + 152px); margin: 0 auto 28px; padding: 6px 16px; border-radius: 9999px; background: color-mix(in srgb, var(--nx-bg) 86%, transparent); backdrop-filter: blur(12px); }
+.editorial-doc__history { display: inline-flex; gap: 2px; }
+.editorial-doc h1 { font-size: var(--nx-text-display); line-height: var(--nx-text-display-leading); letter-spacing: var(--nx-display-tracking); margin-bottom: 0.5em; }
+.editorial-doc h1 + p, .editorial-doc .nx-flow-item[data-nx-kind='title'] + .nx-flow-item > p { font-size: var(--nx-text-subhead); line-height: var(--nx-text-subhead-leading); color: var(--nx-fg-muted); }
+.editorial-cite { margin-top: 0.6em; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.4 var(--nx-font-mono); font-style: normal; }
+.editorial-output { margin: 0.6em 0 1.4em; color: var(--nx-fg-muted); font: 450 var(--nx-text-small) / 1.5 var(--nx-font-mono); }
+.editorial-output span { color: var(--nx-accent); }
+.editorial-chart { display: block; width: 100%; height: auto; margin: 0.4em 0 1.2em; }
+.editorial-chart__label { fill: var(--nx-fg); font: 500 14px var(--nx-font-body); }
+.editorial-chart__value { fill: var(--nx-fg-muted); font: 450 12px var(--nx-font-mono); }
+.editorial-chart__peak { fill: var(--nx-accent); }
+.editorial-chart__rest { fill: var(--nx-border-strong); }
+.editorial-swap { animation: editorial-swap var(--nx-motion-content-duration) var(--nx-motion-content-easing); }
+@keyframes editorial-swap { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .editorial-swap { animation: none; } }
+.editorial-sim { display: grid; gap: 10px; font-size: var(--nx-text-small); }
+.editorial-sim__control { display: grid; gap: 6px; }
+.editorial-sim__control span { display: flex; justify-content: space-between; color: var(--nx-fg-muted); }
+.editorial-sim__control b { color: var(--nx-fg); font: 500 var(--nx-text-small) var(--nx-font-mono); }
+.editorial-sim input[type='range'] { width: 100%; accent-color: var(--nx-accent); }
+.editorial-sim__result { margin: 0; color: var(--nx-fg-muted); }
+.editorial-sim__result span { color: var(--nx-fg); font: 500 var(--nx-text-heading) / 1 var(--nx-font-heading); letter-spacing: var(--nx-text-heading-tracking); margin-right: 6px; }
+.editorial-sim__bar { height: 4px; border-radius: 4px; background: var(--nx-border); overflow: hidden; }
+.editorial-sim__bar span { display: block; height: 100%; background: var(--nx-accent); transition: width var(--nx-motion-control-duration) var(--nx-motion-control-easing); }
+/* NexFlow pega su barra del pie al contenedor que desplaza: 'clip' recorta igual que 'hidden' sin crear otro. */
+.doc-stage:has(.nx-flow) { overflow: clip; }
+/* Superficies de ejecución: su alto lo pone el contenido; el escenario no las centra en una caja de 240 px. */
+.doc-stage:has(.nx-console) { align-items: stretch; min-height: 0; padding: clamp(12px, 3vw, 28px); }
+.editorial-output--error { color: var(--nx-danger); }
+.editorial-output--error span { color: inherit; font-weight: 700; }
+
+/* ---- Demos de NexConsole ------------------------------------------------------- */
+.console-demo { display: grid; gap: var(--nx-space-3); width: 100%; max-width: 760px; margin-inline: auto; text-align: left; }
+.console-demo__head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.console-demo__note { margin: 0; color: var(--nx-fg-muted); font-size: var(--nx-text-small); }
+.console-demo__chart { display: block; width: 100%; max-width: 280px; height: auto; }
+.console-demo__chart rect { fill: var(--nx-accent); }
+
+/* ---- Casos de composición de NexView -------------------------------------------- */
+.view-cases { display: grid; gap: var(--nx-space-4); width: 100%; max-width: 980px; margin-inline: auto; text-align: left; }
+.view-cases__controls { display: flex; flex-wrap: wrap; align-items: end; gap: var(--nx-space-4) var(--nx-space-6); }
+.view-cases__controls > :first-child { min-width: min(100%, 280px); }
+.view-cases__width { display: grid; gap: 6px; color: var(--nx-fg-muted); font-size: var(--nx-text-small); }
+.view-cases__width input { accent-color: var(--nx-accent); }
+.view-case__chart rect { fill: var(--nx-accent); }

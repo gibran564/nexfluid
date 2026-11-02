@@ -1,8 +1,8 @@
 'use client';
 
 import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
-import type { Material } from '@nexfluid/foundation';
-import { cx, type NexAppearance, type NexDensity, type NexMotion } from '@nexfluid/components';
+import type { Material } from '@eclipsis/foundation';
+import { cx, type NexAppearance, type NexDensity, type NexMotion } from '@eclipsis/components';
 import { useNex } from './provider.tsx';
 import { NexSurface } from './surface.tsx';
 

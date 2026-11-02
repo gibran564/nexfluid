@@ -1,11 +1,11 @@
 {
-  "name": "@nexfluid/playground",
+  "name": "@eclipsis/playground",
   "version": "0.2.0",
   "private": true,
-  "description": "NexFluid engine lab (Phase 1). Consumes @nexfluid/core and @nexfluid/foundation.",
+  "description": "NexFluid engine lab (Phase 1). Consumes @eclipsis/core and @eclipsis/foundation.",
   "type": "module",
   "dependencies": {
-    "@nexfluid/core": "0.2.0",
-    "@nexfluid/foundation": "0.2.0"
+    "@eclipsis/core": "0.3.0",
+    "@eclipsis/foundation": "0.3.0"
   }
 }

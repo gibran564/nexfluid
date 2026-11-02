@@ -1,4 +1,4 @@
-import { NexBadge, NexTab, NexTabs } from '@nexfluid/react';
+import { NexBadge, NexTab, NexTabs } from '@eclipsis/react';
 
 /** Pestañas verticales con activación manual: un panel de configuración. */
 export default function SettingsTabsExample() {

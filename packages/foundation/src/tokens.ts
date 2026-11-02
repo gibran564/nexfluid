@@ -217,7 +217,7 @@ export type Density = keyof typeof DENSITY;
 
 /**
  * Familias de interacción: cada una comparte una física. Los presets son los
- * de @nexfluid/core; las duraciones CSS se usan en el nivel `subtle`.
+ * de @eclipsis/core; las duraciones CSS se usan en el nivel `subtle`.
  */
 export const MOTION_FAMILIES = {
   /** Superficies (tarjetas, paneles, regiones): viscosas, nunca rebotan. */

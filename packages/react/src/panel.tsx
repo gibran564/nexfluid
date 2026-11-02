@@ -1,8 +1,8 @@
 'use client';
 
 import { useId, useState, type HTMLAttributes, type ReactNode } from 'react';
-import type { Material, ShapeFamily } from '@nexfluid/foundation';
-import { cx, toDomId, type NexDensity, type NexMotion } from '@nexfluid/components';
+import type { Material, ShapeFamily } from '@eclipsis/foundation';
+import { cx, toDomId, type NexDensity, type NexMotion } from '@eclipsis/components';
 import { NexIconButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';
 import { useNex } from './provider.tsx';

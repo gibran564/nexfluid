@@ -56,7 +56,7 @@ function directionLines(d: Direction, fonts: { display: string; text: string } =
 }
 
 export function renderTokensCss(): string {
-  const out = ['/* @nexfluid/foundation — NexFluid Native. GENERADO por `npm run tokens` desde src/tokens.ts. No editar a mano. */', ''];
+  const out = ['/* @eclipsis/foundation — NexFluid Native. GENERADO por `npm run tokens` desde src/tokens.ts. No editar a mano. */', ''];
 
   const scale: string[] = [];
   for (const [k, v] of Object.entries(FONTS)) scale.push(`--nx-font-${k}: ${v};`);
@@ -97,7 +97,7 @@ export function renderTokensCss(): string {
 /** Hoja opcional del adaptador de Nextudio. */
 export function renderCompatCss(): string {
   return [
-    '/* @nexfluid/foundation/compat/nextudio.css — Nextudio Compatibility (opcional). GENERADO desde src/compat.ts. */',
+    '/* @eclipsis/foundation/compat/nextudio.css — Nextudio Compatibility (opcional). GENERADO desde src/compat.ts. */',
     '/* Lee los tokens de Nextudio; fuera de la aplicación cae a NEX Origen claro. No es la identidad de NexFluidUI. */',
     '',
     block("[data-nx-theme='nextudio']", colorLines(NEXTUDIO_BRIDGE)),

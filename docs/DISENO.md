@@ -91,8 +91,8 @@ Una superficie se convierte en otra cambiando posición, tamaño, contorno y fun
 
 ### Arquitectura
 
-* **Núcleo (`@nexfluid/core`, sin DOM ni React):** `MorphTransition` (controlador interrumpible: `open`, `close`, `pause`, `seek`, `resume`), familias de física `MORPH_PHYSICS`, `morphTimeline`/`morphTiming` (simulación exacta), `morphRect`, `morphPath`, `deformContour` (estiramiento por velocidad con área constante), `resampleContour` y `alignContours` (correspondencia de puntos), `metaballPath`.
-* **React (`@nexfluid/react`):** `NexMorph` (`.Source`, `.Target`, `.Trigger`, `.Title`, `.Close`, `.Incoming`, `.Shared`), `useNexMorph`, `useNexMorphSource` y un controlador imperativo para herramientas. Sobre él: la expansión de `NexCard` (misma API, más `expansionContainer`, `expansionPhysics`, `expansionChrome`, `expanded`), `NexDock`, y con las mismas familias `NexActionButton` y las transiciones espaciales de `NexFrame` (`motion`).
+* **Núcleo (`@eclipsis/core`, sin DOM ni React):** `MorphTransition` (controlador interrumpible: `open`, `close`, `pause`, `seek`, `resume`), familias de física `MORPH_PHYSICS`, `morphTimeline`/`morphTiming` (simulación exacta), `morphRect`, `morphPath`, `deformContour` (estiramiento por velocidad con área constante), `resampleContour` y `alignContours` (correspondencia de puntos), `metaballPath`.
+* **React (`@eclipsis/react`):** `NexMorph` (`.Source`, `.Target`, `.Trigger`, `.Title`, `.Close`, `.Incoming`, `.Shared`), `useNexMorph`, `useNexMorphSource` y un controlador imperativo para herramientas. Sobre él: la expansión de `NexCard` (misma API, más `expansionContainer`, `expansionPhysics`, `expansionChrome`, `expanded`), `NexDock`, y con las mismas familias `NexActionButton` y las transiciones espaciales de `NexFrame` (`motion`).
 
 ### Canales y coreografía
 
@@ -139,7 +139,7 @@ El panel destino se monta **una vez en su lugar final**: su contenido nunca se r
 ## 7. Integridad espacial y NexScroll
 
 **Integridad espacial.** Las composiciones responden a su contenedor, no a la ventana. `resolveSpace`
-(`@nexfluid/components`) da `expanded · compact · constrained`; `NexPreviewBoundary` lo mide con
+(`@eclipsis/components`) da `expanded · compact · constrained`; `NexPreviewBoundary` lo mide con
 ResizeObserver y lo publica por contexto, atributo y container query. `NexFrame` pliega sus regiones
 antes de comprimir el lienzo bajo `canvasMinWidth` (inspector → hoja lateral, explorador → riel). No
 se escala la interfaz ni se oculta el desbordamiento: cambia la estructura.
@@ -154,9 +154,9 @@ por eje sobre el mismo elemento (`crossAxisFallback: false`).
 
 ## 8. NexSheets
 
-Cuatro capas: **Core** (`@nexfluid/sheets`: libro, celdas, rangos, selección, historial, fórmulas,
+Cuatro capas: **Core** (`@eclipsis/sheets`: libro, celdas, rangos, selección, historial, fórmulas,
 autollenado, CSV/TSV/JSON, ejes virtuales; sin framework ni estilos), **React**
-(`@nexfluid/react/sheets`), **capa fluida** (selección como superficie con resortes por borde, barra de
+(`@eclipsis/react/sheets`), **capa fluida** (selección como superficie con resortes por borde, barra de
 fórmulas que se tiñe al editar, carriles NexScroll) y **adaptadores** (contrato de hoja idéntico al de
 NexBook; XLSX pendiente).
 

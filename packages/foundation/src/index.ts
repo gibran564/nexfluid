@@ -1,8 +1,8 @@
 /**
- * @nexfluid/foundation — NexFoundation (NexFluid Native).
+ * @eclipsis/foundation — NexFoundation (NexFluid Native).
  *
- * Contrato público: estos tokens en TS, la hoja `@nexfluid/foundation/tokens.css`
- * y, opcionalmente, el adaptador `@nexfluid/foundation/compat/nextudio.css`.
+ * Contrato público: estos tokens en TS, la hoja `@eclipsis/foundation/tokens.css`
+ * y, opcionalmente, el adaptador `@eclipsis/foundation/compat/nextudio.css`.
  */
 export {
   THEMES, COLOR_ROLES, FONTS, TYPE_SCALE, SPACE, SHAPES, MATERIALS, BREAKPOINTS, LAYERS, LAYOUT, DENSITY, MOTION,

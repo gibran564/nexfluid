@@ -34,6 +34,10 @@ export const ICONS = {
   info: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M12 11v5', 'M12 7.5v.5'],
   alert: ['M12 3.5L21.5 20h-19z', 'M12 10v4.5', 'M12 17v.5'],
   drop: ['M12 3.5C9 8 6.5 10.8 6.5 14a5.5 5.5 0 0 0 11 0c0-3.2-2.5-6-5.5-10.5z'],
+  /** Asa de reordenamiento: seis puntos. */
+  grip: ['M9 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M9 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M9 19a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 19a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'],
+  /** Más acciones. */
+  more: ['M6 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M18 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type IconName = keyof typeof ICONS;

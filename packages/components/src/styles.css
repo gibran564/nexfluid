@@ -1,12 +1,12 @@
 /* ==========================================================================
-   @nexfluid/components — NexFluid Native · Living Editorial Interfaces
+   @eclipsis/components — NexFluid Native · Living Editorial Interfaces
 
    Gramática (no estilos sueltos):
    · Membrana: única primitiva de superficie. Rol (surface · control · content)
      → familia geométrica de la dirección; material (base · raised · sunken ·
      clear · accent · solid · ink · fluid) → relleno y borde. Modo estático
      (CSS: superelipse con corner-shape) y modo vivo (SVG dibujado por
-     @nexfluid/core, que se deforma).
+     @eclipsis/core, que se deforma).
    · Estados: rest → attract → deform → activate → morph → settle.
    · Gota líquida: indicador compartido por pestañas, navegación y selectores.
    · Tipografía como estructura: clases nx-type-* compartidas.
@@ -1124,6 +1124,430 @@
 .nx-formula-bar > .nx-formula-bar__input:is(:focus, :focus-visible),
 .nx-sheet__content > .nx-sheet__editor:is(:focus, :focus-visible),
 .nx-md-editor__source > .nx-md-editor__input:is(:focus, :focus-visible) { outline: none; }
+
+/* ---- NexMenu: acciones desde un botón -------------------------------------- */
+.nx-menu { position: relative; display: inline-flex; }
+.nx-menu__popup {
+  position: absolute; z-index: var(--nx-layer-popover); left: 0; top: calc(100% + 6px); display: grid; gap: 2px; padding: 6px;
+  min-width: 220px; max-width: min(320px, calc(100vw - 16px)); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin;
+  border-radius: 18px; background: var(--nx-surface-raised); color: var(--nx-fg);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--nx-fg) 16%, transparent), inset 0 0 0 1px var(--nx-border);
+  transform-origin: 0 0; animation: nx-menu-in var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+}
+.nx-menu__popup[data-align='end'] { left: auto; right: 0; transform-origin: 100% 0; }
+.nx-menu__popup[data-placement='top'] { transform-origin: 0 100%; }
+.nx-menu__popup[data-layer='top'] { position: fixed; inset: auto; margin: 0; border: 0; }
+.nx-menu__popup[data-layer='top']::backdrop { display: none; }
+@keyframes nx-menu-in { from { opacity: 0; transform: translateY(-4px) scale(0.98); } }
+.nx-menu__group + .nx-menu__group { margin-top: 4px; padding-top: 4px; box-shadow: inset 0 1px 0 var(--nx-border); }
+.nx-menu__heading { padding: 8px 10px 4px; color: var(--nx-fg-muted); font: 500 var(--nx-text-micro) / 1.2 var(--nx-font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.nx-menu__item {
+  display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 36px; padding: 6px 10px;
+  border-radius: 12px; cursor: pointer; color: var(--nx-fg); font: 500 var(--nx-text-small) / 1.25 var(--nx-font-body); outline: none;
+}
+.nx-menu__item[data-active] { background: var(--nx-accent-soft); }
+.nx-menu__item:focus-visible { box-shadow: inset 0 0 0 2px var(--nx-accent); }
+.nx-menu__item[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
+.nx-menu__item[data-nx-tone='danger'] { color: var(--nx-danger); }
+.nx-menu__item[data-nx-tone='danger'][data-active] { background: var(--nx-danger-soft); }
+.nx-menu__icon { display: inline-flex; justify-content: center; color: var(--nx-fg-muted); }
+.nx-menu__item[aria-checked='true'] .nx-menu__icon { color: var(--nx-accent); }
+.nx-menu__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nx-menu__hint { color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.3 var(--nx-font-body); white-space: nowrap; }
+@media (pointer: coarse) { .nx-menu__item { min-height: 44px; } }
+
+/* ---- NexCommandMenu: la paleta de «/» ------------------------------------------ */
+.nx-cmd { min-width: min(280px, calc(100vw - 16px)); }
+.nx-cmd__search {
+  min-height: 36px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--nx-surface-sunken); color: var(--nx-fg);
+  font: 450 var(--nx-text-small) var(--nx-font-body); outline: none; box-shadow: inset 0 0 0 1px var(--nx-border);
+}
+.nx-cmd__search:is(:focus, :focus-visible) { outline: none; box-shadow: inset 0 0 0 1.5px var(--nx-accent); }
+.nx-cmd__list { display: grid; gap: 2px; max-height: 320px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.nx-cmd__empty { margin: 0; padding: 10px; color: var(--nx-fg-muted); font-size: var(--nx-text-small); }
+
+/* ---- NexFlow + NexEditorialBlock: Living Editorial Blocks -------------------------
+   En reposo, el documento es editorial: un bloque es una membrana de contenido
+   transparente y sin borde (NexSurface quiet/clear), así que la hoja se lee de
+   corrido. Al acercarse, la membrana se dibuja y su borde se tensa con la física
+   de la familia «content»; al seleccionar, el límite se vuelve explícito con el
+   acento. Las herramientas viven fuera de la medida del texto: aparecer o
+   desaparecer nunca mueve una línea. */
+.nx-flow { container-type: inline-size; }
+.nx-flow__page {
+  --nx-flow-gutter: 76px;
+  --nx-block-bleed: 14px;
+  position: relative; display: flow-root; box-sizing: border-box; max-width: calc(var(--nx-measure) + 2 * var(--nx-flow-gutter));
+  margin-inline: auto; padding-inline: var(--nx-flow-gutter);
+}
+@container (max-width: 640px) { .nx-flow__page { --nx-flow-gutter: 16px; --nx-block-bleed: 10px; } }
+.nx-flow [contenteditable] { outline: none; }
+.nx-flow [contenteditable]:empty::before { content: attr(data-placeholder); color: var(--nx-fg-subtle); pointer-events: none; }
+.nx-flow figure { margin: 0; }
+.nx-flow figure img { display: block; width: 100%; }
+.nx-flow figcaption { margin-top: 10px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.45 var(--nx-font-mono); letter-spacing: 0.01em; }
+
+/* El bloque: la membrana sale un poco a los márgenes (bleed) para que el
+   contorno rodee el texto sin desplazarlo de la medida. */
+.nx-editorial-block {
+  --nx-block-gap: 4px;
+  margin: var(--nx-block-gap) calc(-1 * var(--nx-block-bleed)); padding: 8px var(--nx-block-bleed);
+  transition: box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing), background-color var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-editorial-block > .nx-surface__zone { display: none; }
+.nx-editorial-block__content { min-width: 0; }
+.nx-editorial-block__content > :first-child { margin-top: 0; }
+.nx-editorial-block__content > :last-child { margin-bottom: 0; }
+/* Ritmo editorial: los títulos abren aire; lo demás respira lo justo. */
+.nx-editorial-block:is([data-nx-kind='heading'], [data-nx-kind='title']):not(:first-child) { margin-top: 1.4em; }
+.nx-editorial-block[data-nx-width] { margin-block: 1.2em; }
+.nx-editorial-block[data-nx-width='wide'] { margin-inline: calc(var(--nx-flow-gutter) * -0.6 - var(--nx-block-bleed)); }
+.nx-editorial-block[data-nx-width='full'] { margin-inline: calc(-1 * var(--nx-flow-gutter)); }
+.nx-flow[data-nx-mode='edit'] .nx-editorial-block { cursor: text; }
+/* Estados del contorno, en una sola escala (misma especificidad, en orden):
+   reposo sutil < puntero/foco < seleccionado < ocupado < error. */
+.nx-editorial-block.nx-surface[data-nx-presence='subtle'] { --nx-edge-color: color-mix(in srgb, var(--nx-border) 70%, transparent); }
+.nx-editorial-block.nx-surface:is([data-nx-state='attract'], [data-nx-state='deform']) { --nx-edge-color: var(--nx-border-strong); --nx-edge-w: var(--nx-edge-active); }
+.nx-editorial-block.nx-surface[data-nx-selected] { --nx-edge-color: var(--nx-accent); --nx-edge-w: var(--nx-edge-active); --nx-fill: color-mix(in srgb, var(--nx-surface) 70%, transparent); }
+/* Ocupado: el contorno respira (no se confunde con la selección: es un pulso, no un borde fijo). */
+.nx-editorial-block.nx-surface[data-nx-block-state='running'] { --nx-edge-color: var(--nx-accent-line); --nx-edge-w: var(--nx-edge-active); }
+.nx-editorial-block[data-nx-block-state='running'] > .nx-surface__shape .nx-surface__edge { stroke-dasharray: 10 14; animation: nx-block-run 1.1s linear infinite; }
+@keyframes nx-block-run { to { stroke-dashoffset: -48; } }
+/* Error: contorno de peligro y una marca «!» en el margen (no sólo color). */
+.nx-editorial-block.nx-surface[data-nx-block-state='error'] { --nx-edge-color: var(--nx-danger); --nx-edge-w: var(--nx-edge-active); }
+.nx-editorial-block__mark {
+  position: absolute; top: 10px; left: calc(100% + 8px); display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--nx-danger); color: var(--nx-bg); font: 700 11px / 1 var(--nx-font-body);
+}
+/* Sólo lectura: el contenido se lee igual; la superficie dice que no se edita. */
+.nx-flow[data-nx-mode='edit'] .nx-editorial-block[data-nx-block-state='readonly'] { --nx-fill: color-mix(in srgb, var(--nx-surface-sunken) 55%, transparent); cursor: default; }
+/* Arrastrando: el bloque se lleva en la mano; sólo entonces tiene sombra. */
+.nx-editorial-block[data-nx-dragging] {
+  z-index: var(--nx-layer-raised); --nx-fill: var(--nx-surface-raised); --nx-edge-color: var(--nx-accent-line);
+  box-shadow: 0 22px 48px color-mix(in srgb, var(--nx-fg) 14%, transparent), inset 0 0 0 1px var(--nx-accent-line);
+}
+.nx-flow[data-nx-dragging] .nx-flow__page { cursor: grabbing; user-select: none; }
+
+/* Herramientas: margen izquierdo para el LUGAR (mover, insertar); cápsula sobre
+   el borde superior para el CONTENIDO (herramientas, Focus, acciones). Emergen
+   con el contorno: puntero, foco dentro o selección. Nunca sólo con hover. */
+.nx-editorial-block__gutter {
+  position: absolute; z-index: var(--nx-layer-raised); top: 6px; right: 100%; display: flex; align-items: center; padding-right: 4px; cursor: default;
+}
+.nx-editorial-block__tools {
+  position: absolute; z-index: var(--nx-layer-raised); top: 0; right: 10px; display: flex; align-items: center; gap: 2px; padding: 2px;
+  border-radius: 9999px; background: var(--nx-surface-raised); cursor: default;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--nx-fg) 10%, transparent), inset 0 0 0 1px var(--nx-border);
+  transform: translateY(-50%);
+}
+.nx-editorial-block__tools .nx-button { --nx-density-control: 26px; }
+:is(.nx-editorial-block__gutter, .nx-editorial-block__tools) {
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing), translate var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+  translate: 0 3px;
+}
+.nx-editorial-block:is([data-nx-state='attract'], [data-nx-state='deform'], [data-nx-state='activate'], [data-nx-selected], :focus-within) > :is(.nx-editorial-block__gutter, .nx-editorial-block__tools) {
+  opacity: 1; pointer-events: auto; translate: 0 0;
+}
+/* El puente invisible del margen: el puntero no pierde el bloque al ir hacia el asa. */
+.nx-editorial-block__gutter { pointer-events: auto; }
+.nx-editorial-block__tool {
+  display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 9999px;
+  background: none; color: var(--nx-fg-muted); cursor: pointer;
+}
+.nx-editorial-block__tool[data-nx-drag-handle] { cursor: grab; touch-action: none; }
+.nx-editorial-block__tool:hover { color: var(--nx-fg); background: var(--nx-surface-sunken); }
+.nx-editorial-block__tool:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 1px; }
+/* «Insertar después» sólo en el seleccionado: con ratón ya está el punto de inserción. */
+.nx-editorial-block:not([data-nx-selected]) > .nx-editorial-block__gutter > .nx-editorial-block__add { display: none; }
+
+.nx-flow__drop {
+  position: absolute; z-index: var(--nx-layer-raised); left: var(--nx-flow-gutter); right: var(--nx-flow-gutter); height: 2px; margin-top: -1px;
+  border-radius: 2px; background: var(--nx-accent); pointer-events: none;
+}
+
+/* Punto de inserción: uno solo, en el hueco más cercano al puntero. */
+.nx-flow__insert {
+  position: absolute; z-index: var(--nx-layer-raised); left: calc(var(--nx-flow-gutter) - 36px); right: var(--nx-flow-gutter); height: 0;
+  display: flex; align-items: center; gap: 12px; pointer-events: none;
+}
+.nx-flow__plus {
+  display: inline-flex; align-items: center; justify-content: center; flex: none; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--nx-surface); color: var(--nx-accent); box-shadow: inset 0 0 0 1px var(--nx-accent-line); cursor: pointer; pointer-events: auto;
+  animation: nx-flow-plus var(--nx-motion-control-duration) var(--nx-motion-control-easing);
+}
+.nx-flow__plus:hover, .nx-flow__insert[data-open] .nx-flow__plus { background: var(--nx-accent); color: var(--nx-accent-fg); }
+.nx-flow__insert-line { flex: 1; height: 1px; background: var(--nx-accent-line); transform-origin: 0 50%; animation: nx-flow-line var(--nx-motion-surface-duration) var(--nx-motion-surface-easing); }
+@keyframes nx-flow-plus { from { opacity: 0; transform: scale(0.6); } }
+@keyframes nx-flow-line { from { transform: scaleX(0); } }
+
+/* Barra del pie: sólo en la hoja estrecha. Sticky y de alto 0: no ocupa sitio en
+   el documento y se queda al pie de la vista mientras la hoja está en pantalla.
+   Requiere que ningún ancestro entre la hoja y su scroll tenga overflow: hidden
+   (overflow: clip sirve). */
+.nx-flow__dock { display: none; }
+.nx-flow__dockbar {
+  position: absolute; bottom: 0; left: 50%; display: flex; align-items: center; gap: 2px; max-width: calc(100% - 8px); padding: 3px;
+  border-radius: 9999px; background: var(--nx-surface-raised); transform: translateX(-50%);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--nx-fg) 16%, transparent), inset 0 0 0 1px var(--nx-border);
+  animation: nx-flow-dock var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+}
+.nx-flow__dock-tools { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; padding-left: 6px; box-shadow: inset 1px 0 var(--nx-border); }
+@keyframes nx-flow-dock { from { opacity: 0; transform: translate(-50%, 8px); } }
+
+@container (max-width: 640px) {
+  .nx-editorial-block__gutter, .nx-editorial-block__tools { display: none; }
+  .nx-flow__dock { position: sticky; z-index: var(--nx-layer-raised); bottom: 12px; display: block; height: 0; }
+  .nx-flow__insert { display: none; }
+  .nx-editorial-block[data-nx-width] { margin-inline: calc(-1 * var(--nx-flow-gutter)); }
+  .nx-editorial-block[data-nx-width] figcaption { padding-inline: var(--nx-flow-gutter); }
+  .nx-editorial-block__mark { left: auto; right: 6px; top: 6px; }
+}
+@media (hover: none) {
+  .nx-editorial-block__tool { width: 44px; height: 44px; }
+  :is(.nx-editorial-block__tools, .nx-flow__dockbar) .nx-button { --nx-density-control: 44px; }
+}
+
+/* Movimiento reducido: los estados cambian en el acto; el contorno sigue
+   apareciendo (color), sólo deja de moverse. */
+[data-nx-motion-pref='reduce'] :is(.nx-menu__popup, .nx-flow__dockbar, .nx-editorial-block, .nx-editorial-block__gutter, .nx-editorial-block__tools, .nx-flow__plus, .nx-flow__insert-line, .nx-surface__edge) { transition: none !important; animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.nx-menu__popup, .nx-flow__dockbar, .nx-editorial-block, .nx-editorial-block__gutter, .nx-editorial-block__tools, .nx-flow__plus, .nx-flow__insert-line, .nx-surface__edge):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
+}
+
+/* Modo enfoque abierto (lo pinta la aplicación): el bloque queda marcado como origen. */
+.nx-editorial-block.nx-surface[data-nx-expanded] { --nx-edge-color: var(--nx-accent-line); --nx-edge-w: var(--nx-edge-active); }
+.nx-editorial-block__tool[aria-expanded='true'] { color: var(--nx-accent); }
+
+/* ---- NexDataView: datos de una hoja como tabla o gráfico ---------------------------
+   Los controles aparecen al acercarse o al enfocar; el cambio de vista es un
+   relevo corto, sin mover lo que hay alrededor más de lo que cambia el alto. */
+.nx-data-view { position: relative; min-width: 0; }
+.nx-data-view table { width: 100%; }
+.nx-data-view td[data-numeric] { font-variant-numeric: tabular-nums; }
+.nx-data-view tbody th { padding: 10px 16px; text-align: left; color: var(--nx-fg); font: 500 var(--nx-text-small) / 1.4 var(--nx-font-body); box-shadow: inset 0 1px var(--nx-border); }
+.nx-data-view__swap, .nx-data-view__table { animation: nx-data-swap var(--nx-motion-content-duration) var(--nx-motion-content-easing); }
+@keyframes nx-data-swap { from { opacity: 0; transform: translateY(4px); } }
+.nx-data-view__chart { margin: 0; }
+.nx-data-view__chart svg { display: block; width: 100%; height: auto; }
+.nx-data-view__label { fill: var(--nx-fg); font: 500 14px var(--nx-font-body); }
+.nx-data-view__value { fill: var(--nx-fg-muted); font: 450 11px var(--nx-font-mono); }
+.nx-data-view__bar, .nx-data-view__legend i { fill: var(--nx-accent); background: var(--nx-accent); }
+.nx-data-view__bar[data-series='1'], .nx-data-view__legend i[data-series='1'] { fill: var(--nx-fluid); background: var(--nx-fluid); }
+.nx-data-view__bar[data-series='2'], .nx-data-view__legend i[data-series='2'] { fill: var(--nx-border-strong); background: var(--nx-border-strong); }
+.nx-data-view__legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.4 var(--nx-font-mono); }
+.nx-data-view__legend span { display: inline-flex; align-items: center; gap: 6px; }
+.nx-data-view__legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.nx-data-view__empty { margin: 0; padding: 16px; color: var(--nx-fg-muted); font-size: var(--nx-text-small); }
+.nx-data-view__controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; opacity: 0;
+  transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-data-view:is(:hover, :focus-within) .nx-data-view__controls,
+.nx-editorial-block[data-nx-selected] .nx-data-view__controls { opacity: 1; }
+@media (hover: none) { .nx-data-view__controls { opacity: 1; } }
+.nx-data-view__open {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 12px; border: 0; border-radius: 9999px;
+  background: none; color: var(--nx-fg); font: 500 var(--nx-text-small) var(--nx-font-body); cursor: pointer; box-shadow: inset 0 0 0 1px var(--nx-border);
+}
+.nx-data-view__open:hover { box-shadow: inset 0 0 0 1px var(--nx-border-strong); }
+.nx-data-view__open:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 2px; }
+.nx-data-view__target { display: grid; gap: 12px; width: min(1100px, calc(100vw - 32px)); padding: 16px; }
+.nx-data-view__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 0 18px; }
+.nx-data-view__title { margin: 0; font: var(--nx-display-weight) var(--nx-text-heading) / var(--nx-text-heading-leading) var(--nx-font-heading); }
+[data-nx-motion-pref='reduce'] :is(.nx-data-view__swap, .nx-data-view__table, .nx-data-view__controls) { transition: none !important; animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.nx-data-view__swap, .nx-data-view__table, .nx-data-view__controls):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
+}
+
+/* ---- NexMarkdownField: escribir Markdown compuesto o en fuente ------------------- */
+.nx-md-field { position: relative; min-width: 0; }
+.nx-md-field__visual { min-height: 1.6em; outline: none; cursor: text; }
+.nx-md-field__visual[data-nx-empty]::before { content: attr(data-placeholder); position: absolute; color: var(--nx-fg-subtle); pointer-events: none; }
+.nx-md-field__island { position: relative; margin: 1em 0; border-radius: 12px; cursor: default; user-select: none; }
+.nx-md-field__island:hover { box-shadow: 0 0 0 6px var(--nx-surface-sunken); background: var(--nx-surface-sunken); }
+.nx-md-field__source {
+  display: block; box-sizing: border-box; width: 100%; min-height: 4.5em; padding: 12px 14px; resize: none; overflow: hidden;
+  border: 0; border-radius: 12px; background: var(--nx-surface-sunken); color: var(--nx-fg);
+  font: 450 var(--nx-text-small) / 1.65 var(--nx-font-mono); outline: none; box-shadow: inset 0 0 0 1px var(--nx-border);
+  animation: nx-data-swap var(--nx-motion-content-duration) var(--nx-motion-content-easing);
+}
+.nx-md-field__source:is(:focus, :focus-visible) { outline: none; box-shadow: inset 0 0 0 1.5px var(--nx-accent); }
+/* Barra de formato: aparece sobre la selección; no ocupa sitio. */
+.nx-md-field__bar {
+  position: absolute; z-index: var(--nx-layer-popover); display: flex; align-items: center; gap: 1px; padding: 3px;
+  border-radius: 9999px; background: var(--nx-fg); color: var(--nx-bg); transform: translate(-50%, calc(-100% - 8px));
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--nx-fg) 22%, transparent);
+  animation: nx-md-bar var(--nx-motion-control-duration) var(--nx-motion-control-easing);
+}
+@keyframes nx-md-bar { from { opacity: 0; transform: translate(-50%, calc(-100% - 2px)) scale(0.96); } }
+.nx-md-field[data-mode='source'] .nx-md-field__bar { transform: translate(-50%, calc(-100% - 6px)); }
+.nx-md-field__cmd {
+  display: inline-grid; place-items: center; min-width: 30px; height: 28px; padding: 0 6px; border: 0; border-radius: 9999px;
+  background: none; color: inherit; font: 600 13px / 1 var(--nx-font-body); cursor: pointer;
+}
+.nx-md-field__cmd code { font: 500 11px var(--nx-font-mono); }
+.nx-md-field__cmd:hover { background: color-mix(in srgb, var(--nx-bg) 18%, transparent); }
+.nx-md-field__cmd:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 1px; }
+.nx-md-field__link input {
+  width: min(240px, 60vw); height: 28px; padding: 0 12px; border: 0; border-radius: 9999px; background: var(--nx-bg); color: var(--nx-fg);
+  font: 450 var(--nx-text-small) var(--nx-font-body); outline: none;
+}
+/* Visual / Markdown: al enfocar o acercarse; siempre en táctil. */
+.nx-md-field__mode { position: absolute; top: -6px; right: 0; transform: translateY(-100%); opacity: 0; pointer-events: none; transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing); }
+.nx-md-field:is(:focus-within, :hover) > .nx-md-field__mode { opacity: 1; pointer-events: auto; }
+@media (hover: none) { .nx-md-field__mode { position: static; transform: none; margin-top: 8px; opacity: 1; pointer-events: auto; } .nx-md-field__cmd { min-width: 40px; height: 40px; } }
+[data-nx-motion-pref='reduce'] :is(.nx-md-field__bar, .nx-md-field__source, .nx-md-field__mode) { transition: none !important; animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.nx-md-field__bar, .nx-md-field__source, .nx-md-field__mode):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
+}
+
+/* ---- NexConsole: la E/S de un programa, en consola o compuesta (NexView) ----------
+   Una superficie hundida y silenciosa: la tipografía monoespaciada sostiene la
+   jerarquía; los estados son un punto y una palabra; la entrada aparece en el
+   propio flujo, detrás del prompt. */
+.nx-console {
+  display: flex; flex-direction: column; min-width: 0; overflow: hidden; container-type: inline-size;
+  border-radius: var(--nx-content-radius); background: var(--nx-surface-sunken); color: var(--nx-fg);
+  box-shadow: inset 0 0 0 1px var(--nx-border);
+}
+.nx-console__log { min-height: 64px; max-height: 420px; overflow: auto; overscroll-behavior: contain; padding: var(--nx-space-4) var(--nx-space-5); scrollbar-width: thin; }
+/* Sin salida todavía: una línea, no una caja vacía. */
+.nx-console[data-nx-empty] .nx-console__log { min-height: 0; padding-block: var(--nx-space-4); }
+.nx-console__body { animation: nx-console-swap var(--nx-motion-content-duration) var(--nx-motion-content-easing); }
+@keyframes nx-console-swap { from { opacity: 0; transform: translateY(3px); } }
+.nx-console__empty, .nx-console__note { margin: 0; color: var(--nx-fg-subtle); font: 450 var(--nx-text-small) / 1.5 var(--nx-font-body); }
+.nx-console__note { margin-top: 10px; font-size: var(--nx-text-micro); }
+.nx-console__text { white-space: pre-wrap; overflow-wrap: anywhere; font: 450 13px / 1.65 var(--nx-font-mono); }
+.nx-console__err { color: var(--nx-danger); }
+.nx-console__answer { color: var(--nx-accent); font-weight: 500; }
+.nx-console__marker { color: var(--nx-fg-subtle); font-style: italic; }
+.nx-console__input {
+  display: inline-block; width: min(40ch, 100%); min-width: 8ch; padding: 0; border: 0; border-bottom: 1.5px solid var(--nx-accent);
+  background: transparent; color: var(--nx-fg); font: 500 13px / 1.65 var(--nx-font-mono); caret-color: var(--nx-accent); vertical-align: baseline;
+  outline: none; animation: nx-console-in var(--nx-motion-control-duration) var(--nx-motion-control-easing);
+}
+.nx-console__input:is(:focus, :focus-visible) { outline: none; border-bottom-width: 2px; }
+@keyframes nx-console-in { from { opacity: 0; } }
+@media (pointer: coarse) { .nx-console__input { font-size: 16px; min-height: 32px; } }
+.nx-console__bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--nx-space-3) var(--nx-space-4); padding: var(--nx-space-3) var(--nx-space-3) var(--nx-space-3) var(--nx-space-4);
+  box-shadow: inset 0 -1px var(--nx-border);
+}
+.nx-console__status { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; margin: 0; font: 500 var(--nx-text-micro) / 1.4 var(--nx-font-mono); color: var(--nx-fg-muted); }
+.nx-console__hint { color: var(--nx-fg-subtle); font-weight: 450; }
+.nx-console__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--nx-fg-subtle); }
+.nx-console:is([data-state='running'], [data-state='starting']) .nx-console__dot { background: var(--nx-accent); animation: nx-flow-pulse 1.2s ease-in-out infinite; }
+.nx-console[data-state='waiting_for_input'] .nx-console__dot { background: var(--nx-accent); }
+.nx-console[data-state='waiting_for_input'] .nx-console__status > span:nth-child(2) { color: var(--nx-accent); }
+.nx-console[data-state='completed'] .nx-console__dot { background: var(--nx-success); }
+.nx-console:is([data-state='failed'], [data-state='timed_out']) .nx-console__dot { background: var(--nx-danger); }
+.nx-console[data-state='cancelled'] .nx-console__dot { background: var(--nx-warning); border-radius: 2px; }
+.nx-console__stop {
+  min-height: 28px; padding: 0 12px; border: 0; border-radius: 9999px; background: none; color: var(--nx-danger);
+  font: 500 var(--nx-text-small) var(--nx-font-body); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--nx-danger) 40%, transparent); cursor: pointer;
+}
+.nx-console__stop:hover { background: var(--nx-danger-soft); }
+.nx-console__stop:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 2px; }
+.nx-console__stdin { padding: 8px 14px; box-shadow: inset 0 -1px var(--nx-border); font: 500 var(--nx-text-micro) var(--nx-font-mono); color: var(--nx-fg-muted); }
+.nx-console__stdin summary { cursor: pointer; }
+.nx-console__stdin textarea {
+  display: block; box-sizing: border-box; width: 100%; margin-top: 8px; padding: 8px 10px; border: 0; border-radius: 10px; resize: vertical;
+  background: var(--nx-surface); color: var(--nx-fg); font: 450 13px / 1.5 var(--nx-font-mono); outline: none; box-shadow: inset 0 0 0 1px var(--nx-border);
+}
+.nx-console__stdin textarea:is(:focus, :focus-visible) { outline: none; box-shadow: inset 0 0 0 1.5px var(--nx-accent); }
+
+.nx-console__views { margin-left: auto; }
+.nx-console__run { flex: none; }
+/* Estrecha: Ejecutar y la vista en la primera línea; el estado, debajo, a lo ancho. */
+@container (max-width: 460px) {
+  .nx-console__status { order: 5; flex-basis: 100%; }
+  .nx-console__again { display: none; }
+  .nx-console__bar { row-gap: var(--nx-space-2); }
+}
+
+/* NexView: la misma ejecución, compuesta. */
+/* NexView compone: anclas a todo el ancho; tramos en filas proporcionales;
+   galerías de altura común. Ninguna caja fija: el contenido manda. */
+.nx-view { display: grid; gap: var(--nx-space-5); min-width: 0; }
+.nx-view__row, .nx-view__gallery { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--nx-space-5) var(--nx-space-6); min-width: 0; }
+.nx-view__item { position: relative; flex-basis: 0; min-width: min(100%, 220px); animation: nx-view-in var(--nx-motion-content-duration) var(--nx-motion-content-easing) both; }
+.nx-view > .nx-view__item { min-width: 0; }
+.nx-view__row > .nx-view__item[data-role='data'] { min-width: min(100%, 180px); }
+/* Una visualización sola no ocupa todo el ancho: tamaño útil, centrado en la lectura. */
+.nx-view__row[data-count="1"] > .nx-view__item[data-role="visual"] { max-width: min(100%, 560px); }
+/* Una tabla sola se integra a su anchura natural. */
+.nx-view__row[data-count='1'] > .nx-view__item[data-role='data'] { flex-grow: 0 !important; flex-basis: auto; max-width: 100%; }
+@keyframes nx-view-in { from { opacity: 0; transform: translateY(4px); } }
+/* Galería: cada imagen crece según su proporción, todas a la misma altura, sin recortes. */
+.nx-view__gallery > .nx-view__item { flex-basis: calc(var(--nx-aspect, 1.4) * 160px); min-width: 120px; }
+.nx-view__gallery img { width: 100%; height: auto; }
+/* Figuras: proporción del programa (o 16:10), nunca más altas que la vista. */
+.nx-view__figure { margin: 0; }
+.nx-view__figure > :first-child:not(img):not(p) { display: block; width: 100%; aspect-ratio: var(--nx-aspect, 1.6); max-height: min(50vh, 320px); }
+.nx-view__figure > :first-child:not(img):not(p) > svg { display: block; width: 100%; height: 100%; }
+.nx-view__figure img { display: block; max-width: 100%; max-height: min(50vh, 360px); width: auto; height: auto; object-fit: contain; border-radius: 12px; }
+/* Tablas grandes: se exploran dentro, con encabezado fijo; las pequeñas, a su tamaño. */
+.nx-view__scroll { max-height: min(55vh, 360px); overflow: auto; }
+.nx-view__scroll table { width: auto; min-width: 100%; }
+.nx-view__row[data-count='1'] > .nx-view__item[data-role='data'] .nx-view__scroll table { min-width: 0; }
+.nx-view__scroll thead th { position: sticky; top: 0; background: var(--nx-surface-sunken); }
+/* Ampliar (Focus): aparece al acercarse o enfocar; nunca tapa contenido de forma permanente. */
+.nx-view__expand {
+  position: absolute; top: 0; right: 0; display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 9999px;
+  background: var(--nx-surface-raised); color: var(--nx-fg-muted); box-shadow: inset 0 0 0 1px var(--nx-border); opacity: 0; cursor: pointer;
+  transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-view__item:is(:hover, :focus-within) > .nx-view__expand { opacity: 1; }
+.nx-view__expand:focus-visible { opacity: 1; outline: 2px solid var(--nx-accent); outline-offset: 2px; }
+@media (hover: none) { .nx-view__expand { opacity: 1; } }
+/* En NexView la ejecución se compone: más alto disponible que la consola de texto. */
+.nx-console[data-view='nexview'] .nx-console__log { max-height: min(80vh, 880px); }
+[data-nx-motion-pref='reduce'] .nx-view__item, [data-nx-motion-pref='reduce'] .nx-view__expand { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .nx-view__item:not([data-nx-motion-pref='full'] *), .nx-view__expand:not([data-nx-motion-pref='full'] *) { animation: none !important; transition: none !important; }
+}
+.nx-view__text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 450 13px / 1.65 var(--nx-font-mono); }
+.nx-view__text[data-stream='stderr'] { color: var(--nx-fg-muted); }
+.nx-view__exchange { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 0; font: 450 13px / 1.65 var(--nx-font-mono); }
+.nx-view__exchange-label { color: var(--nx-fg-subtle); font: 500 var(--nx-text-micro) / 1 var(--nx-font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.nx-view__answer { padding: 2px 10px; border-radius: 9999px; background: var(--nx-accent-soft); color: var(--nx-accent); font-weight: 500; }
+.nx-view__table, .nx-view__figure { margin: 0; min-width: 0; }
+.nx-view__caption { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 6px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.4 var(--nx-font-mono); }
+.nx-view__caption strong { color: var(--nx-fg); font-weight: 600; }
+.nx-view__evidence { padding: 1px 8px; border-radius: 9999px; box-shadow: inset 0 0 0 1px var(--nx-border); }
+.nx-view__table[data-confidence='confirmed'] .nx-view__evidence { color: var(--nx-success); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--nx-success) 40%, transparent); }
+.nx-view__scroll table { width: 100%; border-collapse: collapse; font: 450 var(--nx-text-small) / 1.4 var(--nx-font-body); font-variant-numeric: tabular-nums; }
+.nx-view__scroll th { padding: 8px 12px; text-align: left; color: var(--nx-fg-muted); font: 500 var(--nx-text-micro) var(--nx-font-mono); }
+.nx-view__scroll td { padding: 7px 12px; box-shadow: inset 0 1px var(--nx-border); }
+.nx-view__scroll td[data-numeric] { text-align: right; font-family: var(--nx-font-mono); font-size: 12px; }
+.nx-view__note, .nx-view__missing { margin: 6px 0 0; color: var(--nx-fg-subtle); font: 450 var(--nx-text-micro) var(--nx-font-mono); }
+.nx-view__figure img { display: block; max-width: 100%; height: auto; border-radius: 12px; }
+.nx-view__figure figcaption { margin-top: 6px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) var(--nx-font-mono); }
+.nx-view__json { padding: var(--nx-space-4) var(--nx-space-5); border-radius: 12px; background: var(--nx-surface); font: 450 12.5px / 1.6 var(--nx-font-mono); }
+.nx-view__branch > :not(summary) { margin-left: 16px; }
+.nx-view__branch summary { cursor: pointer; }
+.nx-view__key { color: var(--nx-fg-muted); }
+.nx-view__kind { color: var(--nx-fg-subtle); }
+.nx-view__leaf [data-type='string'] { color: var(--nx-code-string); }
+.nx-view__leaf [data-type='number'] { color: var(--nx-code-number); }
+.nx-view__leaf :is([data-type='boolean'], [data-type='null']) { color: var(--nx-code-keyword); }
+.nx-view__diagnostic { display: grid; gap: 4px; padding: 12px 14px; border-radius: 12px; background: var(--nx-danger-soft); }
+.nx-view__diagnostic[data-severity='warning'] { background: var(--nx-warning-soft); }
+.nx-view__diagnostic:is([data-severity='info'], [data-severity='interrupted']) { background: var(--nx-surface); box-shadow: inset 0 0 0 1px var(--nx-border); }
+.nx-view__diag-title { display: flex; align-items: baseline; gap: 8px; margin: 0; font: 600 var(--nx-text-small) / 1.45 var(--nx-font-body); }
+.nx-view__diag-mark { display: inline-grid; place-items: center; flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--nx-danger); color: var(--nx-bg); font: 700 11px / 1 var(--nx-font-body); }
+.nx-view__diagnostic[data-severity='warning'] .nx-view__diag-mark { background: var(--nx-warning); }
+.nx-view__diagnostic:is([data-severity='info'], [data-severity='interrupted']) .nx-view__diag-mark { background: var(--nx-fg-muted); }
+.nx-view__diag-text { margin: 0 0 0 26px; font: 450 var(--nx-text-small) / 1.5 var(--nx-font-body); color: var(--nx-fg); }
+.nx-view__diag-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 2px 0 0 26px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.5 var(--nx-font-mono); }
+.nx-view__original { margin-left: 26px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) var(--nx-font-mono); }
+.nx-view__original summary { cursor: pointer; }
+.nx-view__original pre { margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+[data-nx-motion-pref='reduce'] :is(.nx-console__body, .nx-console__input, .nx-console__dot) { transition: none !important; animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.nx-console__body, .nx-console__input, .nx-console__dot):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
+}
 
 /* ---- Fórmulas (KaTeX) dentro de NexMarkdown ---------------------------------- */
 .nx-markdown .katex { font-size: 1.08em; }

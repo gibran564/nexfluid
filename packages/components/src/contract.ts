@@ -7,7 +7,7 @@
  * los mismos, y se reflejan en el DOM con atributos `data-nx-*` para que el
  * CSS sea el único dueño de la apariencia.
  */
-import type { Density, MotionLevel } from '@nexfluid/foundation';
+import type { Density, MotionLevel } from '@eclipsis/foundation';
 
 export type NexAppearance = 'default' | 'filled' | 'outlined' | 'ghost' | 'editorial';
 export type NexDensity = Density;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NexSheets, createWorkbook, sheetFromRows } from '@nexfluid/react/sheets';
+import { NexSheets, createWorkbook, sheetFromRows } from '@eclipsis/react/sheets';
 
 const initial = createWorkbook([
   sheetFromRows('Presupuesto', [

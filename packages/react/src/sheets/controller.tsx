@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * El controlador de NexSheets: une el libro (datos, @nexfluid/sheets) con el
+ * El controlador de NexSheets: une el libro (datos, @eclipsis/sheets) con el
  * estado de interacción (selección por hoja, edición, historial) y lo expone
  * por contexto a la rejilla, la barra de fórmulas, las pestañas y la barra de
  * estado.
@@ -16,8 +16,8 @@ import {
   formatReference, getSheet, moveSelection, parseClipboardGrid, pasteGrid, quickFormula, rangeLabel, rangeToText, removeSheet as removeSheetOp,
   renameSheet as renameSheetOp, selectAll, selectionAt, selectionRange, setActiveSheet, setCellInput, setColumnWidth, sheetValueRows, stepInside,
   toCsv, updateSheet, createSheet, type CellAddress, type CellRange, type CellValue, type Selection, type Sheet, type SheetLimits, type Workbook,
-} from '@nexfluid/sheets';
-import type { NexMotion } from '@nexfluid/components';
+} from '@eclipsis/sheets';
+import type { NexMotion } from '@eclipsis/components';
 import { useNex } from '../provider.tsx';
 
 export interface SheetsEditing {

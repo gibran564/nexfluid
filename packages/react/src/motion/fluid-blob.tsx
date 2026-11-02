@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, type CSSProperties } from 'react';
-import { createFluidBlob, type BaseGeometry, type FluidBlobHandle, type MotionOverrides, type MotionPresetName } from '@nexfluid/core';
-import { cx } from '@nexfluid/components';
+import { createFluidBlob, type BaseGeometry, type FluidBlobHandle, type MotionOverrides, type MotionPresetName } from '@eclipsis/core';
+import { cx } from '@eclipsis/components';
 import { useMotionPreference } from '../provider.tsx';
 
 export interface FluidBlobProps {
@@ -22,7 +22,7 @@ export interface FluidBlobProps {
   style?: CSSProperties;
 }
 
-/** Adaptador React de `createFluidBlob` (@nexfluid/core). Sólo en el cliente; en SSR es un contenedor vacío. */
+/** Adaptador React de `createFluidBlob` (@eclipsis/core). Sólo en el cliente; en SSR es un contenedor vacío. */
 export function FluidBlob({
   motion = 'flow', intensity, dampingRatio, viscosity, base, points, seed, ambient = false, interactive = true,
   label, className, style,

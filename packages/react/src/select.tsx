@@ -15,7 +15,7 @@
  * empieza así (sin búsqueda) o filtra (con búsqueda).
  */
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { cx, type NexDensity, type NexMotion } from '@nexfluid/components';
+import { cx, type NexDensity, type NexMotion } from '@eclipsis/components';
 import { useNex } from './provider.tsx';
 import { NexIcon } from './icon.tsx';
 import { LiquidDrop, useLiquid } from './liquid.tsx';

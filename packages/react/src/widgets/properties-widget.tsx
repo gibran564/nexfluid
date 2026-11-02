@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode } from 'react';
-import type { Material } from '@nexfluid/foundation';
-import { cx, type NexDensity } from '@nexfluid/components';
+import type { Material } from '@eclipsis/foundation';
+import { cx, type NexDensity } from '@eclipsis/components';
 import { NexPanel } from '../panel.tsx';
 
 export interface NexProperty {

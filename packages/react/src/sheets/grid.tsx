@@ -16,9 +16,9 @@
  *   aria-activedescendant). El foco se queda en la rejilla o en el editor.
  */
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react';
-import { ScrollTracker } from '@nexfluid/core';
-import { cellKey, columnName, createAxis, fillTarget, formatValue, isFormula, isFormulaError, selectionRange, type Axis, type CellRange, type CellValue, type Sheet } from '@nexfluid/sheets';
-import { cx, toDomId } from '@nexfluid/components';
+import { ScrollTracker } from '@eclipsis/core';
+import { cellKey, columnName, createAxis, fillTarget, formatValue, isFormula, isFormulaError, selectionRange, type Axis, type CellRange, type CellValue, type Sheet } from '@eclipsis/sheets';
+import { cx, toDomId } from '@eclipsis/components';
 import { canAnimate, useMotionPreference } from '../provider.tsx';
 import { morphSpring, useSprings, type SpringPreset } from '../springs.ts';
 import { useNexSheets, useSheetsInteraction } from './controller.tsx';

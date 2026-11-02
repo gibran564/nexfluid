@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState, type ReactNode } from 'react';
-import { cx } from '@nexfluid/components';
+import { cx } from '@eclipsis/components';
 import { NexMarkdown, type NexMarkdownProps } from '../markdown/markdown.tsx';
 
 export interface NexMarkdownEditorProps {

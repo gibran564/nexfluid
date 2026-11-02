@@ -11,10 +11,10 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/space-grotesk';
 import '@fontsource-variable/jetbrains-mono';
 // Contrato de estilos de NexFluidUI: tokens, compatibilidad opcional y componentes.
-import '@nexfluid/foundation/tokens.css';
-import '@nexfluid/foundation/compat/nextudio.css';
+import '@eclipsis/foundation/tokens.css';
+import '@eclipsis/foundation/compat/nextudio.css';
 import 'katex/dist/katex.min.css';
-import '@nexfluid/components/styles.css';
+import '@eclipsis/components/styles.css';
 import './reference.css';
 import './docs.css';
 import { App } from './app.tsx';

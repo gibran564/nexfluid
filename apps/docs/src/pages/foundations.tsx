@@ -1,8 +1,8 @@
 import {
   BREAKPOINTS, COLOR_ROLES, CONTRAST_REQUIREMENTS, contrastRatio, cssVar, DENSITY, DIRECTIONS, FONTS, ICON_NAMES, LAYOUT, MOTION,
   SPACE, THEMES, TYPE_SCALE, type ThemeName,
-} from '@nexfluid/foundation';
-import { NexBadge, NexButton, NexCard, NexCodeBlock, NexIcon, NexProvider, NexTab, NexTabs } from '@nexfluid/react';
+} from '@eclipsis/foundation';
+import { NexBadge, NexButton, NexCard, NexCodeBlock, NexIcon, NexProvider, NexTab, NexTabs } from '@eclipsis/react';
 import { PageHeader, Section } from '../docs/kit.tsx';
 
 const THEME_NAMES = Object.keys(THEMES) as ThemeName[];
@@ -82,7 +82,7 @@ export function TypographyPage() {
           <p className="nx-index"><b>03</b> Índice editorial</p>
         </div>
       </div>
-      <Section index="02" title="Familias" lead="Pilas definidas en @nexfluid/foundation; la aplicación carga las fuentes (por ejemplo, con @fontsource).">
+      <Section index="02" title="Familias" lead="Pilas definidas en @eclipsis/foundation; la aplicación carga las fuentes (por ejemplo, con @fontsource).">
         <NexCodeBlock language="css" title="tokens.css" code={Object.entries(FONTS).map(([k, v]) => `--nx-font-${k}: ${v};`).join('\n')} wrap />
         <p className="doc-hint">Limitación conocida: la versión variable publicada de Bricolage Grotesque incluye los ejes de peso y tamaño óptico, pero no el de anchura; <code>--nx-display-stretch</code> sólo surte efecto con una fuente que lo tenga.</p>
       </Section>
@@ -171,13 +171,13 @@ export function MotionTokensPage() {
 export function IconsPage() {
   return (
     <article className="doc-page">
-      <PageHeader eyebrow="Fundamentos · iconos" title="Iconos" lead="Retícula de 24 px, trazo de 1.6 px, extremos redondos y currentColor. Datos puros en @nexfluid/foundation; NexIcon los pinta." />
+      <PageHeader eyebrow="Fundamentos · iconos" title="Iconos" lead="Retícula de 24 px, trazo de 1.6 px, extremos redondos y currentColor. Datos puros en @eclipsis/foundation; NexIcon los pinta." />
       <div className="doc-icons">
         {ICON_NAMES.map((name) => (
           <figure key={name} className="doc-icon-cell"><NexIcon name={name} size={24} /><figcaption><code>{name}</code></figcaption></figure>
         ))}
       </div>
-      <NexCodeBlock language="tsx" code={`import { NexIcon } from '@nexfluid/react';\n\n<NexIcon name="drop" />                 // decorativo (aria-hidden)\n<NexIcon name="drop" label="Materia" />  // con nombre accesible`} />
+      <NexCodeBlock language="tsx" code={`import { NexIcon } from '@eclipsis/react';\n\n<NexIcon name="drop" />                 // decorativo (aria-hidden)\n<NexIcon name="drop" label="Materia" />  // con nombre accesible`} />
     </article>
   );
 }
@@ -215,7 +215,7 @@ export function ThemesPage() {
         </div>
       </Section>
       <Section index="03" title="Tema de marca y compatibilidad">
-        <NexCodeBlock language="ts" code={`import { customTheme, applyTheme } from '@nexfluid/foundation';\n\nconst brand = customTheme('editorial-light', { name: 'Marca', accent: '#0b5cad', accentHover: '#084a8b', fluid: '#0b5cad' });\napplyTheme(document.documentElement, brand);\n\n// Adaptador opcional para Nextudio (nunca fundacional):\nimport '@nexfluid/foundation/compat/nextudio.css';\n// <html data-nx-theme="nextudio" data-nx-direction="nextudio">`} />
+        <NexCodeBlock language="ts" code={`import { customTheme, applyTheme } from '@eclipsis/foundation';\n\nconst brand = customTheme('editorial-light', { name: 'Marca', accent: '#0b5cad', accentHover: '#084a8b', fluid: '#0b5cad' });\napplyTheme(document.documentElement, brand);\n\n// Adaptador opcional para Nextudio (nunca fundacional):\nimport '@eclipsis/foundation/compat/nextudio.css';\n// <html data-nx-theme="nextudio" data-nx-direction="nextudio">`} />
       </Section>
     </article>
   );

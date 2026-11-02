@@ -1,6 +1,6 @@
-import { dampingRatio, measureStepResponse, MOTION_PRESETS, type MotionPresetName } from '@nexfluid/core';
-import { NexBadge, NexCard } from '@nexfluid/react';
-import { FluidBlob } from '@nexfluid/react/motion';
+import { dampingRatio, measureStepResponse, MOTION_PRESETS, type MotionPresetName } from '@eclipsis/core';
+import { NexBadge, NexCard } from '@eclipsis/react';
+import { FluidBlob } from '@eclipsis/react/motion';
 import { PageHeader, Section } from '../docs/kit.tsx';
 import { href } from '../router.ts';
 

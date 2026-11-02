@@ -23,5 +23,5 @@ for (const pkg of ORDER) {
     mkdirSync(dirname(`${dir}dist/${file}`), { recursive: true });
     copyFileSync(`${dir}src/${file}`, `${dir}dist/${file}`);
   }
-  console.log(`✓ @nexfluid/${pkg}`);
+  console.log(`✓ @eclipsis/${pkg}`);
 }
