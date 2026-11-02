@@ -28,3 +28,8 @@ export { composeNexView, columnsFor } from './console/compose.ts';
 export type { NexViewSection, NexViewItem, NexViewRole, ComposeOptions } from './console/compose.ts';
 export { placeFloating, spaceAround, anchorClipped } from './anchor.ts';
 export type { NexSide, NexAlign, AnchorRect, PlaceFloatingInput, FloatingPlacement } from './anchor.ts';
+export {
+  resolveWebAddress, frameSandbox, sandboxDocument, isPortalMessage, navHistoryStart, navHistoryPush, navHistoryGo,
+  WEB_PAGE_PERMISSIONS, SANDBOX_PERMISSIONS, PORTAL_MESSAGE_MAX,
+} from './web.ts';
+export type { WebAddress, NexWebPermissions, SandboxSource, PortalConsoleMessage, NavHistory } from './web.ts';

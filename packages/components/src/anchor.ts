@@ -1,7 +1,7 @@
 /**
  * Colocar una superficie junto a un ancla: geometría pura, sin DOM.
  *
- * La usan NexPortal, NexMenu, NexSelect y NexInk a través de
+ * La usan NexAnchoredLayer, NexMenu, NexSelect y NexInk a través de
  * `useAnchoredLayer` (@eclipsis/react). Aquí sólo hay rectángulos en
  * coordenadas del viewport VISUAL, así que se prueba con números y el mismo
  * cálculo sirve para un botón, un rango de texto o un punto.

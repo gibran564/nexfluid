@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NexButton, NexInk, NexPortal, type NexAlign, type NexSide } from '@eclipsis/react';
+import { NexButton, NexInk, NexAnchoredLayer, type NexAlign, type NexSide } from '@eclipsis/react';
 import {
   MARKDOWN_INK_COMMANDS, NexMarkdownField, createTextareaInkAdapter, type MarkdownInkCommand,
 } from '@eclipsis/react/markdown';
@@ -7,9 +7,9 @@ import type { NexInkAdapter } from '@eclipsis/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 
-// ---- NexPortal ---------------------------------------------------------------------
+// ---- NexAnchoredLayer ---------------------------------------------------------------------
 
-function PortalPlayground({ side, align, presentation, modal, surface }: { side: NexSide; align: NexAlign; presentation: 'anchored' | 'adaptive'; modal: boolean; surface: 'raised' | 'ink' | 'plain' }) {
+function LayerPlayground({ side, align, presentation, modal, surface }: { side: NexSide; align: NexAlign; presentation: 'anchored' | 'adaptive'; modal: boolean; surface: 'raised' | 'ink' | 'plain' }) {
   const [open, setOpen] = useState(false);
   const [inner, setInner] = useState(false);
   const [reason, setReason] = useState<string | null>(null);
@@ -20,7 +20,7 @@ function PortalPlayground({ side, align, presentation, modal, surface }: { side:
       <NexButton ref={anchor} appearance="outlined" aria-expanded={open} aria-haspopup="dialog" onClick={() => { setReason(null); setOpen(!open); }}>
         {open ? 'Cerrar opciones' : 'Opciones de la figura'}
       </NexButton>
-      <NexPortal
+      <NexAnchoredLayer
         open={open}
         onOpenChange={(next, why) => { setOpen(next); setReason(why); }}
         anchor={anchor}
@@ -38,13 +38,13 @@ function PortalPlayground({ side, align, presentation, modal, surface }: { side:
             <NexButton ref={innerAnchor} density="compact" appearance="ghost" aria-expanded={inner} onClick={() => setInner(!inner)}>Exportar…</NexButton>
             <NexButton density="compact" onClick={() => setOpen(false)}>Listo</NexButton>
           </div>
-          <NexPortal open={inner} onOpenChange={setInner} anchor={innerAnchor} side="right" align="start" label="Exportar figura">
+          <NexAnchoredLayer open={inner} onOpenChange={setInner} anchor={innerAnchor} side="right" align="start" label="Exportar figura">
             <div style={{ display: 'grid', gap: 6 }}>
               {['PNG', 'SVG', 'CSV de datos'].map((f) => <NexButton key={f} density="compact" appearance="ghost" onClick={() => setInner(false)}>{f}</NexButton>)}
             </div>
-          </NexPortal>
+          </NexAnchoredLayer>
         </div>
-      </NexPortal>
+      </NexAnchoredLayer>
       <p className="doc-hint" role="status" style={{ margin: 0 }}>{reason ? `Se cerró por: ${reason}` : 'Ábrela, prueba Escape, un clic fuera o la capa anidada «Exportar…».'}</p>
     </div>
   );
@@ -72,9 +72,9 @@ function CollisionDemo() {
         </div>
       </div>
       {spots.map(([name]) => (
-        <NexPortal key={name} open={open === name} onOpenChange={() => setOpen(null)} anchor={refs.current[name] ?? null} boundary={frame} side="bottom" align="center" label={`Capa de ${name}`} initialFocus="none">
+        <NexAnchoredLayer key={name} open={open === name} onOpenChange={() => setOpen(null)} anchor={refs.current[name] ?? null} boundary={frame} side="bottom" align="center" label={`Capa de ${name}`} initialFocus="none">
           <p className="nx-type-small" style={{ margin: 0, width: 200 }}>Pedí «abajo, centrado» dentro del marco (boundary). Si no cabo, me doy la vuelta; si me salgo por un lado, me deslizo hacia dentro.</p>
-        </NexPortal>
+        </NexAnchoredLayer>
       ))}
     </div>
   );
@@ -92,21 +92,21 @@ function ReanchorDemo() {
       <div ref={list} role="group" aria-label="Pasos" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
         {steps.map((s, i) => <NexButton key={s} density="compact" appearance={i === at ? 'filled' : 'ghost'} aria-pressed={i === at} onClick={() => setAt(i)}>{s}</NexButton>)}
       </div>
-      <NexPortal open={buttons.length > 0} onOpenChange={() => {}} anchor={buttons[at] ?? null} side="bottom" role="group" label="Nota del paso" initialFocus="none" dismiss={{ escape: false, outside: false }} surface="ink">
+      <NexAnchoredLayer open={buttons.length > 0} onOpenChange={() => {}} anchor={buttons[at] ?? null} side="bottom" role="group" label="Nota del paso" initialFocus="none" dismiss={{ escape: false, outside: false }} surface="ink">
         <span className="nx-type-small" style={{ display: 'block', padding: '6px 12px' }}>Paso {at + 1}: {steps[at]}</span>
-      </NexPortal>
+      </NexAnchoredLayer>
       <div style={{ height: 40 }} aria-hidden="true" />
     </div>
   );
 }
 
-export const portalDoc: ComponentDoc = {
-  path: 'componentes/portal',
-  name: 'NexPortal',
+export const anchoredLayerDoc: ComponentDoc = {
+  path: 'componentes/capa-anclada',
+  name: 'NexAnchoredLayer',
   eyebrow: 'Componentes · Capas',
   summary: 'Una superficie contextual junto a un ancla: un elemento, una ref o un rango de texto. Se queda en su sitio del árbol (no remonta lo que contiene) y sube a la capa superior del navegador. Coloca con flip y shift dentro del viewport visual, sigue a su ancla, se desliza si cambia de ancla y gestiona Escape, clic fuera y foco según su modalidad.',
   status: 'laboratorio',
-  imports: [{ names: ['NexPortal', 'useAnchoredLayer'], from: '@eclipsis/react' }, { names: ['placeFloating'], from: '@eclipsis/components' }],
+  imports: [{ names: ['NexAnchoredLayer', 'useAnchoredLayer'], from: '@eclipsis/react' }, { names: ['placeFloating'], from: '@eclipsis/components' }],
   origin: <>las capas contextuales de NexBook (menús de bloque, foco con Popover API) y NexMenu</>,
   controls: [
     { kind: 'select', name: 'side', label: 'Lado', options: ['bottom', 'top', 'right', 'left'], initial: 'bottom' },
@@ -115,19 +115,19 @@ export const portalDoc: ComponentDoc = {
     { kind: 'select', name: 'surface', label: 'Material', options: ['raised', 'plain', 'ink'], initial: 'raised' },
     { kind: 'boolean', name: 'modal', label: 'Modal', initial: false },
   ],
-  render: (v) => <PortalPlayground side={v.side as NexSide} align={v.align as NexAlign} presentation={v.presentation as 'anchored'} modal={Boolean(v.modal)} surface={v.surface as 'raised'} />,
+  render: (v) => <LayerPlayground side={v.side as NexSide} align={v.align as NexAlign} presentation={v.presentation as 'anchored'} modal={Boolean(v.modal)} surface={v.surface as 'raised'} />,
   code: (v) => `const anchor = useRef<HTMLButtonElement>(null);
 const [open, setOpen] = useState(false);
 
 <NexButton ref={anchor} aria-expanded={open} onClick={() => setOpen(!open)}>Opciones</NexButton>
-${jsx('NexPortal', { open: '{open}' as never, onOpenChange: '{setOpen}' as never, anchor: '{anchor}' as never, side: v.side as string, align: v.align as string, presentation: v.presentation as string, surface: v.surface as string, modal: Boolean(v.modal), label: 'Opciones' }, '…', { side: 'bottom', align: 'center', presentation: 'anchored', surface: 'raised', modal: false }).replace(/"\{(\w+)\}"/g, '{$1}')}`,
+${jsx('NexAnchoredLayer', { open: '{open}' as never, onOpenChange: '{setOpen}' as never, anchor: '{anchor}' as never, side: v.side as string, align: v.align as string, presentation: v.presentation as string, surface: v.surface as string, modal: Boolean(v.modal), label: 'Opciones' }, '…', { side: 'bottom', align: 'center', presentation: 'anchored', surface: 'raised', modal: false }).replace(/"\{(\w+)\}"/g, '{$1}')}`,
   showcases: [
     { title: 'Colisiones y recolocación', lead: 'Cuatro anclas en las esquinas de un marco con scroll, que es el límite de colisión (boundary). La misma petición —abajo y centrado— acaba en sitios distintos sin salir del marco ni del viewport.', render: () => <CollisionDemo /> },
     { title: 'Continuidad: cambiar de ancla', lead: 'Una sola capa abierta; al elegir otro paso, se desliza hasta él con los resortes del motor (sin animar con movimiento reducido).', render: () => <ReanchorDemo /> },
   ],
   api: [
     {
-      component: 'NexPortal',
+      component: 'NexAnchoredLayer',
       rows: [
         { name: 'open · onOpenChange', type: "boolean · (open, reason: 'escape' | 'outside' | 'focus-out') => void", description: 'Controlado. La capa pide cerrarse; la aplicación decide.' },
         { name: 'anchor', type: 'Element | RefObject | NexVirtualAnchor | null', description: 'Junto a qué. Un ancla virtual sólo necesita getBoundingClientRect (un rango de texto, un cursor) y, opcionalmente, contextElement.' },
@@ -164,7 +164,7 @@ ${jsx('NexPortal', { open: '{open}' as never, onOpenChange: '{setOpen}' as never
     'Un clic dentro de una capa anidada no cierra la madre; pulsar el ancla no cuenta como «fuera».',
     'Movimiento reducido: sin entrada ni deslizamiento; la posición final es la misma.',
     'Limitación: sin Popover API (navegadores antiguos) la capa queda fixed en su sitio y un ancestro con transform puede desplazarla.',
-    'NexPortal no transforma su contenido: para una superficie que nace de otra, NexMorph (que ya monta su destino).',
+    'NexAnchoredLayer no transforma su contenido: para una superficie que nace de otra, NexMorph (que ya monta su destino).',
   ],
 };
 
@@ -242,7 +242,7 @@ useEffect(() => { if (area.current) setAdapter(createTextareaInkAdapter(area.cur
       rows: [
         { name: 'adapter', type: 'NexInkAdapter<C> | null', description: 'El motor. Sin adaptador no pinta nada.' },
         { name: 'commands', type: 'NexInkCommand<C>[]', description: 'id, label, icon, shortcut (Mod+B), tier (primary | more) e input (pide un valor, como la URL de un enlace).' },
-        { name: 'presentation', type: "'contextual' | 'inline'", default: "'contextual'", description: 'Flota junto a la selección (NexPortal) o queda fija en su sitio.' },
+        { name: 'presentation', type: "'contextual' | 'inline'", default: "'contextual'", description: 'Flota junto a la selección (NexAnchoredLayer) o queda fija en su sitio.' },
         { name: 'label · shortcuts · onRun · motion', type: '…', description: 'Nombre de la barra, atajos sobre el editor (y Alt+F10), aviso tras ejecutar y movimiento.' },
       ],
     },

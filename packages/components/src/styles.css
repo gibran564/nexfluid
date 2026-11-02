@@ -1542,39 +1542,39 @@
   :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-frame__inspector-scroll, .nx-frame__tab, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill, .nx-input, .nx-checkbox__control, .nx-checkbox__check, .nx-checkbox__dash, .nx-select__trigger, .nx-select__popup, .nx-select__chevron):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
 }
 
-/* ---- NexPortal: superficie contextual junto a un ancla -------------------------
+/* ---- NexAnchoredLayer: superficie contextual junto a un ancla -------------------------
    Se queda en su sitio del árbol y sube a la capa superior (Popover API o
    <dialog> modal). El origen de la entrada es el ancla (--nx-anchor-arrow). */
 [data-layer='top'][data-anchor-hidden] { visibility: hidden; }
-.nx-portal {
+.nx-anchored-layer {
   position: fixed; z-index: var(--nx-layer-popover); inset: auto; left: 0; top: 0; margin: 0; padding: 0; border: 0;
   box-sizing: border-box; overflow: auto; overscroll-behavior: contain; color: var(--nx-fg); background: none;
-  --nx-portal-origin: var(--nx-anchor-arrow, 50%) 0;
-  transform-origin: var(--nx-portal-origin);
-  animation: nx-portal-in var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+  --nx-layer-origin: var(--nx-anchor-arrow, 50%) 0;
+  transform-origin: var(--nx-layer-origin);
+  animation: nx-layer-in var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
 }
-.nx-portal[data-placement='top'] { --nx-portal-origin: var(--nx-anchor-arrow, 50%) 100%; }
-.nx-portal[data-placement='left'] { --nx-portal-origin: 100% var(--nx-anchor-arrow, 50%); }
-.nx-portal[data-placement='right'] { --nx-portal-origin: 0 var(--nx-anchor-arrow, 50%); }
-.nx-portal::backdrop { background: color-mix(in srgb, var(--nx-fg) 18%, transparent); }
-.nx-portal:not([data-modal])::backdrop { display: none; }
-.nx-portal[data-nx-surface='raised'] {
+.nx-anchored-layer[data-placement='top'] { --nx-layer-origin: var(--nx-anchor-arrow, 50%) 100%; }
+.nx-anchored-layer[data-placement='left'] { --nx-layer-origin: 100% var(--nx-anchor-arrow, 50%); }
+.nx-anchored-layer[data-placement='right'] { --nx-layer-origin: 0 var(--nx-anchor-arrow, 50%); }
+.nx-anchored-layer::backdrop { background: color-mix(in srgb, var(--nx-fg) 18%, transparent); }
+.nx-anchored-layer:not([data-modal])::backdrop { display: none; }
+.nx-anchored-layer[data-nx-surface='raised'] {
   padding: 12px; border-radius: 18px; background: var(--nx-surface-raised);
   box-shadow: 0 18px 44px color-mix(in srgb, var(--nx-fg) 16%, transparent), inset 0 0 0 1px var(--nx-border);
 }
-.nx-portal[data-nx-surface='ink'] {
+.nx-anchored-layer[data-nx-surface='ink'] {
   padding: 3px; border-radius: 9999px; background: var(--nx-fg); color: var(--nx-bg);
   box-shadow: 0 10px 28px color-mix(in srgb, var(--nx-fg) 22%, transparent);
 }
-.nx-portal[data-presentation='sheet'] { border-radius: 20px; --nx-portal-origin: 50% 100%; }
-.nx-portal[data-presentation='sheet'][data-nx-surface='ink'] { border-radius: 22px; }
-.nx-portal:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 2px; }
-.nx-portal[data-state='closing'] { pointer-events: none; animation: nx-portal-out var(--nx-motion-control-duration) var(--nx-motion-control-easing) forwards; }
+.nx-anchored-layer[data-presentation='sheet'] { border-radius: 20px; --nx-layer-origin: 50% 100%; }
+.nx-anchored-layer[data-presentation='sheet'][data-nx-surface='ink'] { border-radius: 22px; }
+.nx-anchored-layer:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 2px; }
+.nx-anchored-layer[data-state='closing'] { pointer-events: none; animation: nx-layer-out var(--nx-motion-control-duration) var(--nx-motion-control-easing) forwards; }
 /* Escala mínima: el texto no se emborrona; la relación con el ancla la dice el origen. */
-@keyframes nx-portal-in { from { opacity: 0; transform: scale(0.96); } }
-@keyframes nx-portal-out { to { opacity: 0; transform: scale(0.98); } }
-[data-nx-motion-pref='reduce'] .nx-portal, .nx-portal[data-nx-motion='none'] { animation: none !important; }
-@media (prefers-reduced-motion: reduce) { .nx-portal:not([data-nx-motion-pref='full'] *) { animation: none !important; } }
+@keyframes nx-layer-in { from { opacity: 0; transform: scale(0.96); } }
+@keyframes nx-layer-out { to { opacity: 0; transform: scale(0.98); } }
+[data-nx-motion-pref='reduce'] .nx-anchored-layer, .nx-anchored-layer[data-nx-motion='none'] { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .nx-anchored-layer:not([data-nx-motion-pref='full'] *) { animation: none !important; } }
 
 /* ---- NexInk: herramientas editoriales junto a la selección -----------------------
    Una cápsula de tinta sobre la hoja: no compite con el texto. «Más» la
@@ -1617,3 +1617,78 @@ code.nx-ink__glyph { font: 500 11px var(--nx-font-mono); }
 [data-nx-motion-pref='reduce'] :is(.nx-ink__cmd, .nx-ink__more, .nx-ink__more-glyph) { transition: none !important; }
 @media (prefers-reduced-motion: reduce) { :is(.nx-ink__cmd, .nx-ink__more, .nx-ink__more-glyph):not([data-nx-motion-pref='full'] *) { transition: none !important; } }
 .nx-md-field__view { min-height: 1.6em; }
+
+/* ---- NexPortal: la web dentro de la composición -----------------------------------
+   Una superficie del flujo (no una capa). El iframe nunca cambia de sitio en el
+   árbol: la barra aparece o se va a su alrededor sin recargar la página. */
+.nx-portal {
+  position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; overflow: hidden;
+  border-radius: 18px; background: var(--nx-surface-raised); color: var(--nx-fg); box-shadow: inset 0 0 0 1px var(--nx-border);
+}
+.nx-portal__bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-width: 0; padding: 6px;
+  box-shadow: inset 0 -1px 0 var(--nx-border);
+}
+.nx-portal__nav { display: flex; align-items: center; gap: 2px; }
+.nx-portal__address {
+  display: flex; flex: 1 1 180px; align-items: center; gap: 8px; min-width: 0; height: 34px; padding: 0 12px; border-radius: 9999px;
+  background: var(--nx-surface-sunken); color: var(--nx-fg-muted); box-shadow: inset 0 0 0 1px var(--nx-border);
+  transition: box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-portal__address:focus-within { box-shadow: inset 0 0 0 1.5px var(--nx-accent); }
+.nx-portal__address input {
+  flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: none; color: var(--nx-fg);
+  font: 450 var(--nx-text-small) var(--nx-font-mono); outline: none;
+}
+.nx-portal__address input[aria-invalid='true'] { color: var(--nx-danger); }
+.nx-portal__stage {
+  position: relative; min-width: 0; height: var(--nx-portal-height, 420px);
+  transition: height var(--nx-motion-content-duration) var(--nx-motion-content-easing);
+}
+/* El contenido web trae su propio fondo; sin él, papel claro (no el tema del host). */
+.nx-portal__frame { display: block; width: 100%; height: 100%; border: 0; color-scheme: light; background: Canvas; }
+.nx-portal__frame[hidden] { display: none; }
+.nx-portal__progress {
+  position: absolute; z-index: 2; top: 0; left: 0; width: 32%; height: 2px; border-radius: 2px; background: var(--nx-accent);
+  animation: nx-portal-progress 1.4s var(--nx-motion-content-easing) infinite;
+}
+@keyframes nx-portal-progress { from { transform: translateX(-100%); } to { transform: translateX(320%); } }
+.nx-portal__notice {
+  position: absolute; z-index: 1; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; padding: 24px;
+  text-align: center; background: var(--nx-surface-raised); color: var(--nx-fg-muted); font: 450 var(--nx-text-small) / 1.5 var(--nx-font-body);
+}
+.nx-portal__notice p { max-width: 46ch; margin: 0; }
+.nx-portal__notice[data-tone='danger'] p { color: var(--nx-danger); }
+/* Lento: un aviso abajo, sin tapar lo que sí haya cargado. */
+.nx-portal__notice[data-tone='warning'] {
+  inset: auto 12px 12px; place-content: initial; justify-items: start; padding: 12px 14px; border-radius: 14px; text-align: left;
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--nx-fg) 14%, transparent), inset 0 0 0 1px var(--nx-border);
+}
+.nx-portal__notice-actions { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.nx-portal__link {
+  padding: 0; border: 0; background: none; color: var(--nx-accent); font: 600 var(--nx-text-small) var(--nx-font-body);
+  text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.nx-portal__external {
+  display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 9999px; color: var(--nx-fg-muted);
+}
+.nx-portal__external:hover { background: var(--nx-surface-sunken); color: var(--nx-fg); }
+.nx-portal__external:focus-visible, .nx-portal__link:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 2px; }
+/* Controles de una referencia o un sandbox: aparecen al acercarse o al enfocar. */
+.nx-portal__chrome {
+  position: absolute; z-index: 2; top: 8px; right: 8px; display: flex; align-items: center; gap: 2px; max-width: calc(100% - 16px);
+  padding: 2px 2px 2px 12px; border-radius: 9999px; background: color-mix(in srgb, var(--nx-surface-raised) 94%, transparent);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--nx-fg) 12%, transparent), inset 0 0 0 1px var(--nx-border);
+  opacity: 0; transform: translateY(-4px); pointer-events: none;
+  transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing), transform var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-portal:is(:hover, :focus-within) .nx-portal__chrome { opacity: 1; transform: none; pointer-events: auto; }
+.nx-portal__host { overflow: hidden; color: var(--nx-fg-muted); font: 500 var(--nx-text-micro) / 1.2 var(--nx-font-mono); text-overflow: ellipsis; white-space: nowrap; }
+@media (hover: none) { .nx-portal__chrome { opacity: 1; transform: none; pointer-events: auto; } }
+@media (pointer: coarse) { .nx-portal__address { height: 44px; } .nx-portal__external { width: 44px; height: 44px; } }
+[data-nx-motion-pref='reduce'] :is(.nx-portal__stage, .nx-portal__chrome, .nx-portal__address) { transition: none !important; }
+[data-nx-motion-pref='reduce'] .nx-portal__progress { animation: none !important; width: 100%; opacity: 0.6; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.nx-portal__stage, .nx-portal__chrome, .nx-portal__address):not([data-nx-motion-pref='full'] *) { transition: none !important; }
+  .nx-portal__progress:not([data-nx-motion-pref='full'] *) { animation: none !important; width: 100%; opacity: 0.6; }
+}

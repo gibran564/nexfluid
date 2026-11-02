@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Referencia · Cola M/M/1</title>
+<style>
+  :root { color-scheme: light; --ink: rgb(32 28 24); --muted: rgb(108 100 92); --accent: rgb(178 84 52); --paper: rgb(251 248 243); --line: rgb(226 219 209); }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 28px clamp(16px, 5vw, 40px) 40px; background: var(--paper); color: var(--ink); font: 16px/1.6 Georgia, 'Times New Roman', serif; }
+  header { border-bottom: 1px solid var(--line); margin-bottom: 20px; padding-bottom: 12px; }
+  .eyebrow { margin: 0; color: var(--accent); font: 600 12px/1.4 system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { margin: 4px 0 0; font-size: 28px; line-height: 1.2; }
+  h2 { margin: 28px 0 8px; font-size: 19px; }
+  p, li { max-width: 62ch; }
+  code { font: 14px ui-monospace, Consolas, monospace; background: rgb(240 234 225); padding: 1px 5px; border-radius: 4px; }
+  .formula { margin: 12px 0; padding: 12px 16px; border-left: 3px solid var(--accent); background: rgb(246 240 231); font: 17px ui-monospace, Consolas, monospace; }
+  form { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; max-width: 520px; margin-top: 12px; font: 14px system-ui, sans-serif; }
+  label { display: grid; gap: 4px; color: var(--muted); }
+  input { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font: inherit; color: var(--ink); background: white; }
+  output { display: block; margin-top: 14px; font: 600 15px system-ui, sans-serif; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">Referencia · Teoría de colas</p>
+  <h1>La cola M/M/1</h1>
+</header>
+<p>Llegadas de Poisson con tasa <code>λ</code>, un servidor con tiempos de servicio exponenciales de tasa <code>μ</code> y capacidad ilimitada. El sistema es estable si <code>ρ = λ / μ &lt; 1</code>.</p>
+<h2>Fórmulas</h2>
+<div class="formula">L = ρ / (1 − ρ)<br>W<sub>q</sub> = λ / (μ (μ − λ))<br>W = 1 / (μ − λ)</div>
+<p>La ley de Little relaciona las tres: <code>L = λ · W</code>.</p>
+<h2>Calcula</h2>
+<p>Esta página es un documento HTML real con su propio JavaScript: se ejecuta dentro de la superficie, no en la aplicación que la muestra.</p>
+<form id="calc">
+  <label>λ (llegadas por minuto)<input name="lambda" type="number" step="0.05" min="0" value="0.5"></label>
+  <label>μ (servicios por minuto)<input name="mu" type="number" step="0.05" min="0" value="0.75"></label>
+</form>
+<output id="out" for="calc" aria-live="polite"></output>
+<script>
+  const form = document.getElementById('calc');
+  const out = document.getElementById('out');
+  const update = () => {
+    const l = Number(form.lambda.value), m = Number(form.mu.value);
+    if (!(l > 0 && m > 0)) { out.textContent = 'Introduce tasas positivas.'; return; }
+    if (l >= m) { out.textContent = 'Inestable: con λ ≥ μ la cola crece sin límite.'; return; }
+    const rho = l / m;
+    out.textContent = `ρ = ${rho.toFixed(2)} · Wq = ${(l / (m * (m - l))).toFixed(2)} min · W = ${(1 / (m - l)).toFixed(2)} min`;
+  };
+  form.addEventListener('input', update);
+  update();
+</script>
+</body>
+</html>

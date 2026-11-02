@@ -1,16 +1,24 @@
-# NexPortal y NexInk — decisiones de arquitectura
+# NexAnchoredLayer y NexInk — decisiones de arquitectura
 
 Estado: **laboratorio** (2026-11-01). Este documento recoge qué se reutilizó,
 qué se creó, por qué, y qué queda propuesto. Las demos están en NexDocs:
-`#/componentes/portal`, `#/componentes/ink`, `#/componentes/markdown-field`
+`#/componentes/capa-anclada`, `#/componentes/ink`, `#/componentes/markdown-field`
 y el editor de `.md` del Composition Lab.
+
+> **Cambio de nombre (2026-11-02).** Esta capa contextual se llamó
+> provisionalmente `NexPortal`. Ese nombre pertenece a la superficie web
+> (ver [NEXPORTAL.md](NEXPORTAL.md)). Se renombró sin alias —nunca se
+> publicó en npm ni se fusionó—: `NexPortal` → `NexAnchoredLayer`,
+> `NexPortalProps` → `NexAnchoredLayerProps`, `NexPortalAnchor` →
+> `NexLayerAnchor`, `NexPortalDismissReason` → `NexLayerDismissReason`,
+> clase `.nx-portal` → `.nx-anchored-layer`. NexInk sólo cambió el import.
 
 ## 1. Matriz de decisiones
 
 | Capacidad | Implementación encontrada | Decisión | Justificación |
 |---|---|---|---|
-| Movimiento | `@eclipsis/core` (`FluidValue`, `MOTION_PRESETS`, `sharedClock`) y `springs.ts` | Reutilizar | El deslizamiento de NexPortal al cambiar de ancla usa `useSprings` + `presetFor`; ninguna física nueva. |
-| Morphing | `NexMorph` (`MorphTransition`, monta su destino) | Reutilizar, no envolver | NexPortal no transforma contenido. Una superficie que nace de otra es NexMorph. |
+| Movimiento | `@eclipsis/core` (`FluidValue`, `MOTION_PRESETS`, `sharedClock`) y `springs.ts` | Reutilizar | El deslizamiento de NexAnchoredLayer al cambiar de ancla usa `useSprings` + `presetFor`; ninguna física nueva. |
+| Morphing | `NexMorph` (`MorphTransition`, monta su destino) | Reutilizar, no envolver | NexAnchoredLayer no transforma contenido. Una superficie que nace de otra es NexMorph. |
 | Capas | `useAnchoredLayer` (Popover API) en NexMenu/NexCommandMenu; NexSelect con su propio cálculo | Extender y unificar | Un solo hook para los cuatro; NexSelect pierde su copia. Nueva pila `layers.ts` para Escape/clic fuera/anidamiento. |
 | Posicionamiento | Cálculo inline (sólo arriba/abajo, sin RTL ni límites) | Crear geometría pura | `placeFloating` en `@eclipsis/components`: flip, shift, RTL, lados L/R, `maxWidth/maxHeight`, `arrow`. Sin DOM, probado en Node. |
 | Formato Markdown | `applyMarkdownCommand` (sin alternancia) y barra propia dentro de NexMarkdownField | Extender y extraer | Comandos con toggle + `markdownCommandState`; la barra propia se sustituye por NexInk. |
@@ -24,7 +32,7 @@ infraestructura de capas (Popover API, viewport visual) ya existía. CSS
 Anchor Positioning no se usa: no está en todos los navegadores objetivo y la
 capa debe recolocarse con el viewport visual (teclado en pantalla).
 
-## 2. NexPortal
+## 2. NexAnchoredLayer
 
 - **API elegida:** un solo componente controlado (`open`, `onOpenChange`,
   `anchor`). Se descartó la forma compuesta `Root/Trigger/Content`: NexInk y
@@ -52,7 +60,7 @@ Tres responsabilidades separadas:
 1. **UI** (`NexInk`): barra, estados `true | false | 'mixed'`
    (`aria-pressed`), «Más» (`aria-expanded`), comandos con valor (enlace).
 2. **Interacción** (`NexInk`): aparece con una selección no colapsada,
-   NexPortal anclado al rango, debajo con puntero grueso (el menú nativo sale
+   NexAnchoredLayer anclado al rango, debajo con puntero grueso (el menú nativo sale
    encima), hoja inferior en viewports estrechos, Alt+F10, atajos `Mod+…`,
    Escape, marcador de selección.
 3. **Adaptador** (`NexInkAdapter`): `element · selection · state · enabled ·
@@ -93,7 +101,7 @@ historial compartido hasta tener un historial a nivel de modelo.
 
 - `packages/components/tests/anchor.test.ts` — geometría (flip, shift, RTL,
   viewport visual desplazado, cursor de ancho 0, recorte).
-- `packages/react/tests/portal-ink.test.tsx` — foco y Escape, clic fuera y
+- `packages/react/tests/anchored-layer-ink.test.tsx` — foco y Escape, clic fuera y
   ancla, capas anidadas, `<dialog>` modal, NexInk (estados mixtos, roving,
   «Más», comando con valor, contextual, atajos), comandos Markdown con
   toggle, ambos adaptadores, perspectivas sin pérdida + axe.

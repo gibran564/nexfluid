@@ -19,6 +19,13 @@ export const ICONS = {
   search: ['M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z', 'M15.5 15.5L20 20'],
   menu: ['M4 7h16', 'M4 12h16', 'M4 17h16'],
   external: ['M14 5h5v5', 'M19 5l-8 8', 'M17 14v5H5V7h5'],
+  /** Volver a cargar. */
+  reload: ['M19.5 12a7.5 7.5 0 1 1-2.2-5.3', 'M19.5 4.5v4h-4'],
+  /** Ampliar / reducir una superficie. */
+  expand: ['M14 4h6v6', 'M10 20H4v-6', 'M20 4l-6.5 6.5', 'M4 20l6.5-6.5'],
+  shrink: ['M20 10h-6V4', 'M4 14h6v6', 'M14 10l6.5-6.5', 'M10 14l-6.5 6.5'],
+  /** Una superficie web. */
+  globe: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M3.5 12h17', 'M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z'],
   file: ['M6 3h8l4 4v14H6z', 'M14 3v4h4'],
   folder: ['M3 6.5h6.5l2 2H21V19H3z'],
   code: ['M8.5 8L4.5 12l4 4', 'M15.5 8l4 4-4 4', 'M13.5 5.5l-3 13'],

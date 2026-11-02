@@ -32,7 +32,7 @@ export interface AnchoredLayerOptions {
    */
   promote?: boolean;
   /**
-   * Escribe la posición. Por defecto, `left`/`top` directos. NexPortal la
+   * Escribe la posición. Por defecto, `left`/`top` directos. NexAnchoredLayer la
    * sustituye para deslizar con resortes cuando cambia el ancla.
    */
   apply?: (el: HTMLElement, placement: FloatingPlacement) => void;

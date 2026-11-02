@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexPreviewBoundary, NexScroll, NexSegmented, NexTab, NexTabs } from '@eclipsis/react';
+import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexPortal, NexPreviewBoundary, NexScroll, NexSegmented, NexTab, NexTabs } from '@eclipsis/react';
 import { NexMarkdown } from '@eclipsis/react/markdown';
 import { NexExplorerWidget, NexInspectorWidget, NexMarkdownEditor, NexPreviewWidget } from '@eclipsis/react/widgets';
 import { NexSheets, cellKey, columnName, createSheet, createWorkbook, csvToSheet, type Workbook } from '@eclipsis/react/sheets';
 import { FluidBlob } from '@eclipsis/react/motion';
 import { PageHeader } from '../docs/kit.tsx';
+import { REFERENCE_URL, SandboxWorkbench } from '../examples/web-practice.tsx';
 
 const INITIAL = {
   'enunciado.md': `# Colas que esperan menos
@@ -164,6 +165,7 @@ export function CompositionLabPage() {
               <NexTab value="code" icon={<NexIcon name="code" />}>Editor</NexTab>
               <NexTab value="preview" icon={<NexIcon name="eye" />}>Vista previa</NexTab>
               <NexTab value="results" icon={<NexIcon name="grid" />}>Resultados</NexTab>
+              <NexTab value="web" icon={<NexIcon name="globe" />}>Práctica web</NexTab>
             </NexTabs.List>
           }
           explorer={
@@ -246,6 +248,15 @@ export function CompositionLabPage() {
                   <NexPreviewWidget title="informe.md publicado" actions={<NexButton appearance="ghost" density="compact" onClick={() => { setFile('informe.md'); setView('code'); }}>Editar</NexButton>}>
                     <div style={{ padding: 24 }}><NexMarkdown source={files['informe.md']} headingOffset={2} /></div>
                   </NexPreviewWidget>
+                </div>
+              </NexScroll.Area>
+            </NexTabs.Panel>
+            <NexTabs.Panel value="web" className="doc-lab-panel">
+              <NexScroll.Area variant="fluid" label="Práctica web: referencia, código y resultado" className="doc-lab-scroll">
+                <div className="doc-lab-pad doc-lab-web">
+                  {/* La referencia es una pieza de la composición, no una capa encima de la práctica. */}
+                  <NexPortal label="Referencia: cola M/M/1" mode="browser" defaultUrl={REFERENCE_URL} height={560} expandable={false} />
+                  <SandboxWorkbench height={220} layout="stack" />
                 </div>
               </NexScroll.Area>
             </NexTabs.Panel>

@@ -2,7 +2,7 @@ import { act, useRef, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NexInk, NexPortal, matchesShortcut, type NexInkAdapter, type NexInkCommand, type NexInkState } from '@eclipsis/react';
+import { NexInk, NexAnchoredLayer, matchesShortcut, type NexInkAdapter, type NexInkCommand, type NexInkState } from '@eclipsis/react';
 import {
   NexMarkdownField, applyMarkdownCommand, createRichTextInkAdapter, createTextareaInkAdapter, markdownCommandState, renderRichText,
 } from '@eclipsis/react/markdown';
@@ -31,29 +31,29 @@ function Demo({ log, nested = false, modal = false }: { log: string[]; nested?: 
     <>
       <button ref={anchor} type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}>Opciones</button>
       <button type="button">Fuera</button>
-      <NexPortal open={open} onOpenChange={(o, reason) => { log.push(`outer:${reason}`); setOpen(o); }} anchor={anchor} label="Opciones" modal={modal}>
+      <NexAnchoredLayer open={open} onOpenChange={(o, reason) => { log.push(`outer:${reason}`); setOpen(o); }} anchor={anchor} label="Opciones" modal={modal}>
         <button type="button">Primera</button>
         {nested && (
           <>
             <button ref={innerAnchor} type="button" onClick={() => setInner(true)}>Detalle</button>
-            <NexPortal open={inner} onOpenChange={(o, reason) => { log.push(`inner:${reason}`); setInner(o); }} anchor={innerAnchor} side="right" label="Detalle">
+            <NexAnchoredLayer open={inner} onOpenChange={(o, reason) => { log.push(`inner:${reason}`); setInner(o); }} anchor={innerAnchor} side="right" label="Detalle">
               <button type="button">Dentro</button>
-            </NexPortal>
+            </NexAnchoredLayer>
           </>
         )}
-      </NexPortal>
+      </NexAnchoredLayer>
     </>
   );
 }
 
-describe('NexPortal', () => {
+describe('NexAnchoredLayer', () => {
   it('no modal: diálogo con nombre, sin aria-modal; el foco entra y vuelve al ancla con Escape', async () => {
     const log: string[] = [];
     act(() => root.render(<Demo log={log} />));
-    expect($$('.nx-portal')).toHaveLength(0);
+    expect($$('.nx-anchored-layer')).toHaveLength(0);
     const trigger = $$('button').find((b) => b.textContent === 'Opciones')!;
     act(() => { trigger.focus(); trigger.click(); });
-    const layer = $('.nx-portal');
+    const layer = $('.nx-anchored-layer');
     expect(layer.getAttribute('role')).toBe('dialog');
     expect(layer.getAttribute('aria-label')).toBe('Opciones');
     expect(layer.hasAttribute('aria-modal')).toBe(false);
@@ -61,7 +61,7 @@ describe('NexPortal', () => {
     expect(await violations()).toEqual([]);
     key(document.activeElement!, 'Escape');
     expect(log).toEqual(['outer:escape']);
-    expect($$('.nx-portal')).toHaveLength(0);
+    expect($$('.nx-anchored-layer')).toHaveLength(0);
     expect(document.activeElement).toBe(trigger);
   });
 
@@ -81,22 +81,22 @@ describe('NexPortal', () => {
     act(() => root.render(<Demo log={log} nested />));
     act(() => $$('button').find((b) => b.textContent === 'Opciones')!.click());
     act(() => $$('button').find((b) => b.textContent === 'Detalle')!.click());
-    expect($$('.nx-portal')).toHaveLength(2);
+    expect($$('.nx-anchored-layer')).toHaveLength(2);
     press($$('button').find((b) => b.textContent === 'Dentro')!);
     expect(log).toEqual([]);
     key(document.body, 'Escape');
     expect(log).toEqual(['inner:escape']);
-    expect($$('.nx-portal')).toHaveLength(1);
+    expect($$('.nx-anchored-layer')).toHaveLength(1);
     key(document.body, 'Escape');
     expect(log).toEqual(['inner:escape', 'outer:escape']);
-    expect($$('.nx-portal')).toHaveLength(0);
+    expect($$('.nx-anchored-layer')).toHaveLength(0);
   });
 
   it('modal: un <dialog> (su rol es nativo) y Escape pasa por la misma pila', () => {
     const log: string[] = [];
     act(() => root.render(<Demo log={log} modal />));
     act(() => $$('button').find((b) => b.textContent === 'Opciones')!.click());
-    const dialog = $('dialog.nx-portal');
+    const dialog = $('dialog.nx-anchored-layer');
     expect(dialog).toBeTruthy();
     expect(dialog.hasAttribute('role')).toBe(false);
     expect(dialog.hasAttribute('data-modal')).toBe(true);
@@ -109,13 +109,13 @@ describe('NexPortal', () => {
     function Sticky() {
       const a = useRef<HTMLButtonElement>(null);
       return (<><button ref={a} type="button">A</button>
-        <NexPortal open onOpenChange={(_, r) => log.push(r)} anchor={a} label="Fija" dismiss={{ escape: false, outside: false }} initialFocus="none"><p>Hola</p></NexPortal></>);
+        <NexAnchoredLayer open onOpenChange={(_, r) => log.push(r)} anchor={a} label="Fija" dismiss={{ escape: false, outside: false }} initialFocus="none"><p>Hola</p></NexAnchoredLayer></>);
     }
     act(() => root.render(<Sticky />));
     key(document.body, 'Escape');
     press(document.body);
     expect(log).toEqual([]);
-    expect($('.nx-portal').textContent).toBe('Hola');
+    expect($('.nx-anchored-layer').textContent).toBe('Hola');
   });
 });
 
@@ -213,7 +213,7 @@ describe('NexInk', () => {
     act(() => root.render(<NexInk adapter={adapter} commands={COMMANDS} />));
     expect($$('[role="toolbar"]')).toHaveLength(0);
     adapter.collapse(false);
-    const layer = $('.nx-portal[role="toolbar"]');
+    const layer = $('.nx-anchored-layer[role="toolbar"]');
     expect(layer.getAttribute('aria-label')).toBe('Formato');
     expect(layer.dataset.nxSurface).toBe('ink');
     key(el, 'b', { ctrlKey: !/Mac/.test(navigator.platform), metaKey: /Mac/.test(navigator.platform) });

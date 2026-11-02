@@ -9,7 +9,7 @@
  * - UI (aquí): la barra, sus grupos, el estado de cada formato (activo,
  *   inactivo o mixto), la revelación progresiva («Más») y los campos de un
  *   comando que pide un valor (un enlace).
- * - Interacción (aquí): cuándo aparece, dónde (NexPortal anclado al rango
+ * - Interacción (aquí): cuándo aparece, dónde (NexAnchoredLayer anclado al rango
  *   seleccionado; hoja inferior sobre el teclado en pantallas estrechas),
  *   teclado (Alt+F10 entra en la barra, flechas la recorren, Escape vuelve al
  *   texto), atajos de los comandos y la conservación de la selección mientras
@@ -25,7 +25,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { cx, rovingIndex, type NexMotion } from '@eclipsis/components';
 import type { NexVirtualAnchor } from './anchored.ts';
-import { NexPortal } from './portal.tsx';
+import { NexAnchoredLayer } from './anchored-layer.tsx';
 import { useNex } from './provider.tsx';
 
 /** Activo, inactivo o mixto (la selección cruza texto con y sin el formato). */
@@ -276,7 +276,7 @@ export function NexInk<C extends string = string>({
 
   if (presentation === 'inline') return toolbar;
   return (
-    <NexPortal
+    <NexAnchoredLayer
       open={open}
       onOpenChange={(next) => { if (!next) { setDismissed(true); setInside(false); setAsking(null); } }}
       anchor={selection?.anchor ?? lastAnchor.current}
@@ -294,7 +294,7 @@ export function NexInk<C extends string = string>({
       className="nx-ink-layer"
     >
       {toolbar}
-    </NexPortal>
+    </NexAnchoredLayer>
   );
 }
 

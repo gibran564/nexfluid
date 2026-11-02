@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Pila de capas abiertas (NexPortal): quién cierra con Escape, quién con un
+ * Pila de capas abiertas (NexAnchoredLayer): quién cierra con Escape, quién con un
  * clic fuera, quién cuando el foco se va.
  *
  * - Escape cierra SÓLO la capa de arriba (la última abierta). Si alguien ya

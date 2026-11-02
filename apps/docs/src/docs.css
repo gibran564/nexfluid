@@ -401,3 +401,18 @@ kbd { display: inline-flex; align-items: center; min-height: 20px; padding: 0 7p
 .view-cases__width { display: grid; gap: 6px; color: var(--nx-fg-muted); font-size: var(--nx-text-small); }
 .view-cases__width input { accent-color: var(--nx-accent); }
 .view-case__chart rect { fill: var(--nx-accent); }
+
+/* ---- NexPortal: banco HTML/CSS/JS y práctica web del Composition Lab ---- */
+.doc-web-bench { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; min-width: 0; }
+.doc-web-bench[data-layout='stack'] { grid-template-columns: minmax(0, 1fr); }
+.doc-web-bench__editor, .doc-web-bench__result { display: grid; align-content: start; gap: 8px; min-width: 0; }
+.doc-web-bench__code { min-height: 0; resize: vertical; overflow: auto; white-space: pre; tab-size: 2; }
+.doc-web-bench__console {
+  display: grid; gap: 2px; max-height: 120px; margin: 0; padding: 8px 12px; overflow: auto; list-style: none; border-radius: 12px;
+  background: var(--nx-surface-sunken); font: 450 var(--nx-text-micro) / 1.5 var(--nx-font-mono); color: var(--nx-fg-muted);
+}
+.doc-web-bench__console [data-level='error'] { color: var(--nx-danger); }
+.doc-web-bench__console [data-level='warn'] { color: var(--nx-warning, var(--nx-fg)); }
+.doc-lab-web { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
+@container (max-width: 820px) { .doc-lab-web { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 820px) { .doc-lab-web { grid-template-columns: minmax(0, 1fr); } }
