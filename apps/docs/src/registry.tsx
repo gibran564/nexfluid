@@ -19,6 +19,7 @@ import { sheetsDoc } from './pages/docs-sheets.tsx';
 import { checkboxDoc, inputDoc, selectDoc } from './pages/docs-forms.tsx';
 import { flowDoc, menuDoc } from './pages/docs-editorial.tsx';
 import { consoleDoc, dataViewDoc, markdownFieldDoc } from './pages/docs-console.tsx';
+import { inkDoc, portalDoc } from './pages/docs-portal-ink.tsx';
 
 export interface PageDef {
   path: string;
@@ -30,8 +31,8 @@ export interface PageDef {
 }
 
 export const COMPONENT_DOCS: readonly ComponentDoc[] = [
-  surfaceDoc, buttonDoc, menuDoc, segmentedDoc, inputDoc, selectDoc, checkboxDoc, badgeDoc, cardDoc, panelDoc, tabsDoc, navDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
-  flowDoc, consoleDoc, markdownFieldDoc, dataViewDoc, markdownWidgetDoc, propertiesWidgetDoc, inspectorDoc, explorerDoc, previewDoc, sheetsDoc, fluidBlobDoc,
+  surfaceDoc, buttonDoc, menuDoc, portalDoc, segmentedDoc, inputDoc, selectDoc, checkboxDoc, badgeDoc, cardDoc, panelDoc, tabsDoc, navDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
+  flowDoc, inkDoc, consoleDoc, markdownFieldDoc, dataViewDoc, markdownWidgetDoc, propertiesWidgetDoc, inspectorDoc, explorerDoc, previewDoc, sheetsDoc, fluidBlobDoc,
 ];
 
 const component = (doc: ComponentDoc, section: string, group?: string, keywords?: string): PageDef => ({
@@ -63,6 +64,7 @@ export const PAGES: readonly PageDef[] = [
   component(surfaceDoc, 'Componentes', 'Primitiva', 'membrana superficie'),
   component(buttonDoc, 'Componentes', 'Acciones', 'boton icon button'),
   component(menuDoc, 'Componentes', 'Acciones', 'menu acciones desplegable contextual'),
+  component(portalDoc, 'Componentes', 'Capas', 'portal popover capa flotante ancla posicionamiento flip colision dialogo modal'),
   component(segmentedDoc, 'Componentes', 'Acciones', 'selector radio segmentos'),
   component(inputDoc, 'Componentes', 'Formularios', 'campo texto input entrada'),
   component(selectDoc, 'Componentes', 'Formularios', 'select lista desplegable lenguaje combobox'),
@@ -78,6 +80,7 @@ export const PAGES: readonly PageDef[] = [
   component(consoleDoc, 'Componentes', 'Contenido', 'consola terminal stdin salida nexview ejecucion programa'),
   component(markdownFieldDoc, 'Componentes', 'Contenido', 'markdown editor visual fuente texto enriquecido'),
   component(dataViewDoc, 'Componentes', 'Contenido', 'datos tabla grafico hoja nexsheets'),
+  component(inkDoc, 'Componentes', 'Editorial', 'ink formato seleccion barra negrita cursiva enlace toolbar wysiwyg markdown'),
   component(flowDoc, 'Componentes', 'Editorial', 'hoja documento editor nexbook bloques reordenar insertar seleccion barra comandos'),
 
   component(frameDoc, 'Layouts', undefined, 'frame marco layout regiones inspector rieles foco'),

@@ -93,7 +93,7 @@ export const markdownFieldDoc: ComponentDoc = {
   path: 'componentes/markdown-field',
   name: 'NexMarkdownField',
   eyebrow: 'Componentes · Contenido',
-  summary: 'Escribir Markdown sin verlo, o verlo cuando hace falta. Visual: se edita el texto ya compuesto; lo que no admite edición visual (tablas, código, fórmulas) queda como isla intacta. Markdown: la fuente. La barra de formato aparece al seleccionar.',
+  summary: 'Escribir Markdown sin verlo, o verlo cuando hace falta. Tres perspectivas del mismo valor: Visual (el texto ya compuesto; tablas, código y fórmulas quedan como islas intactas), Markdown (la fuente) y Vista (la lectura). NexInk aparece al seleccionar.',
   status: 'laboratorio',
   imports: [{ names: ['NexMarkdownField'], from: '@eclipsis/react/markdown' }],
   origin: <>el bloque de texto de NexBook (NexBookMarkdownEditor)</>,
@@ -104,12 +104,13 @@ export const markdownFieldDoc: ComponentDoc = {
     component: 'NexMarkdownField',
     rows: [
       { name: 'value · onChange', type: 'string', description: 'Siempre Markdown. Los bloques que no se tocan vuelven byte a byte.' },
-      { name: 'mode · defaultMode · onModeChange', type: "'visual' | 'source'", default: "'visual'", description: 'Edición compuesta o fuente.' },
+      { name: 'mode · defaultMode · onModeChange', type: "'visual' | 'source' | 'view'", default: "'visual'", description: 'Edición compuesta, fuente o lectura. El valor no cambia al pasar de una a otra.' },
+      { name: 'commands', type: 'NexInkCommand[]', default: 'MARKDOWN_INK_COMMANDS', description: 'Las herramientas de NexInk.' },
       { name: 'modeSwitch · placeholder · readOnly · markdown', type: '…', description: 'Cambio de modo propio, texto vacío, lectura y opciones de NexMarkdown.' },
     ],
   }],
   keyboard: [['Ctrl/⌘ + B · I · E · K', 'Negrita · cursiva · código · enlace'], ['Doble clic en una isla', 'Editarla en Markdown']],
-  a11y: ['El editor es un role="textbox" multilínea con nombre.', 'La barra de formato es un role="toolbar" con nombres y atajos (aria-keyshortcuts).', 'Pegar inserta texto plano.'],
+  a11y: ['El editor es un role="textbox" multilínea con nombre.', 'La barra de formato es NexInk: role="toolbar" con aria-pressed (incluido mixed) y atajos; Alt+F10 la alcanza desde el texto.', 'Pegar inserta texto plano.'],
 };
 
 function DataViewDemo() {

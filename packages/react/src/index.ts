@@ -58,6 +58,13 @@ export type { NexScrollAreaProps, NexScrollRootProps, NexScrollViewportProps, Ne
 export type { ScrollState as NexScrollState } from '@eclipsis/core';
 export { NexInput, NexCheckbox } from './fields.tsx';
 export type { NexInputProps, NexCheckboxProps } from './fields.tsx';
+export { NexPortal } from './portal.tsx';
+export type { NexPortalProps, NexPortalAnchor, NexPortalDismissReason, NexPortalPresentation } from './portal.tsx';
+export { useAnchoredLayer } from './anchored.ts';
+export type { AnchoredLayerOptions, NexAnchorTarget, NexVirtualAnchor } from './anchored.ts';
+export type { NexSide, NexAlign, FloatingPlacement } from '@eclipsis/components';
+export { NexInk, matchesShortcut } from './ink.tsx';
+export type { NexInkProps, NexInkAdapter, NexInkCommand, NexInkSelection, NexInkState } from './ink.tsx';
 export { NexMenu, NexCommandMenu } from './menu.tsx';
 export type { NexMenuProps, NexMenuItem, NexCommandMenuProps } from './menu.tsx';
 export { NexFlow, NexEditorialBlock, useNexFlow } from './flow.tsx';

@@ -230,6 +230,7 @@ export function CompositionLabPage() {
                     value={text}
                     onChange={(t) => write(file, t)}
                     layout={file.endsWith('.md') ? 'split' : 'editor'}
+                    ink={file.endsWith('.md')}
                     rows={16}
                     markdown={{ headingOffset: 2 }}
                     aside={file === 'llegadas.csv' ? (

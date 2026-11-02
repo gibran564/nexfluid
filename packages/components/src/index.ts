@@ -26,3 +26,5 @@ export { createSessionStore, SESSION_CAPABILITIES } from './console/live.ts';
 export type { NexSessionKind, NexSessionConnection, NexSessionCapabilities, NexSessionEvent, NexSessionSnapshot, NexSessionTransport, NexTerminalEmulator, NexSessionStore, NexSessionStoreOptions } from './console/live.ts';
 export { composeNexView, columnsFor } from './console/compose.ts';
 export type { NexViewSection, NexViewItem, NexViewRole, ComposeOptions } from './console/compose.ts';
+export { placeFloating, spaceAround, anchorClipped } from './anchor.ts';
+export type { NexSide, NexAlign, AnchorRect, PlaceFloatingInput, FloatingPlacement } from './anchor.ts';

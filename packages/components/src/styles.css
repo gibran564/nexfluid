@@ -1373,33 +1373,13 @@
   animation: nx-data-swap var(--nx-motion-content-duration) var(--nx-motion-content-easing);
 }
 .nx-md-field__source:is(:focus, :focus-visible) { outline: none; box-shadow: inset 0 0 0 1.5px var(--nx-accent); }
-/* Barra de formato: aparece sobre la selección; no ocupa sitio. */
-.nx-md-field__bar {
-  position: absolute; z-index: var(--nx-layer-popover); display: flex; align-items: center; gap: 1px; padding: 3px;
-  border-radius: 9999px; background: var(--nx-fg); color: var(--nx-bg); transform: translate(-50%, calc(-100% - 8px));
-  box-shadow: 0 10px 28px color-mix(in srgb, var(--nx-fg) 22%, transparent);
-  animation: nx-md-bar var(--nx-motion-control-duration) var(--nx-motion-control-easing);
-}
-@keyframes nx-md-bar { from { opacity: 0; transform: translate(-50%, calc(-100% - 2px)) scale(0.96); } }
-.nx-md-field[data-mode='source'] .nx-md-field__bar { transform: translate(-50%, calc(-100% - 6px)); }
-.nx-md-field__cmd {
-  display: inline-grid; place-items: center; min-width: 30px; height: 28px; padding: 0 6px; border: 0; border-radius: 9999px;
-  background: none; color: inherit; font: 600 13px / 1 var(--nx-font-body); cursor: pointer;
-}
-.nx-md-field__cmd code { font: 500 11px var(--nx-font-mono); }
-.nx-md-field__cmd:hover { background: color-mix(in srgb, var(--nx-bg) 18%, transparent); }
-.nx-md-field__cmd:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 1px; }
-.nx-md-field__link input {
-  width: min(240px, 60vw); height: 28px; padding: 0 12px; border: 0; border-radius: 9999px; background: var(--nx-bg); color: var(--nx-fg);
-  font: 450 var(--nx-text-small) var(--nx-font-body); outline: none;
-}
 /* Visual / Markdown: al enfocar o acercarse; siempre en táctil. */
 .nx-md-field__mode { position: absolute; top: -6px; right: 0; transform: translateY(-100%); opacity: 0; pointer-events: none; transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing); }
 .nx-md-field:is(:focus-within, :hover) > .nx-md-field__mode { opacity: 1; pointer-events: auto; }
-@media (hover: none) { .nx-md-field__mode { position: static; transform: none; margin-top: 8px; opacity: 1; pointer-events: auto; } .nx-md-field__cmd { min-width: 40px; height: 40px; } }
-[data-nx-motion-pref='reduce'] :is(.nx-md-field__bar, .nx-md-field__source, .nx-md-field__mode) { transition: none !important; animation: none !important; }
+@media (hover: none) { .nx-md-field__mode { position: static; transform: none; margin-top: 8px; opacity: 1; pointer-events: auto; } }
+[data-nx-motion-pref='reduce'] :is(.nx-md-field__source, .nx-md-field__mode) { transition: none !important; animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
-  :is(.nx-md-field__bar, .nx-md-field__source, .nx-md-field__mode):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
+  :is(.nx-md-field__source, .nx-md-field__mode):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
 }
 
 /* ---- NexConsole: la E/S de un programa, en consola o compuesta (NexView) ----------
@@ -1561,3 +1541,79 @@
 @media (prefers-reduced-motion: reduce) {
   :is(.nx-surface, .nx-surface *, .nx-tab, .nx-tabs__panel, .nx-frame__layout, .nx-frame__navigation, .nx-frame__inspector, .nx-frame__inspector-scroll, .nx-frame__tab, .nx-panel__body-wrap, .nx-panel__toggle .nx-icon, .nx-button__spinner > span, .nx-morph__scrim, .nx-action__layer, .nx-action__fill, .nx-action__drops > span, .nx-scroll, .nx-scroll__thumb-shape, .nx-scroll__rail::before, .nx-scroll__marker > button::before, .nx-sheet__content, .nx-formula-bar::after, .nx-sheet__fill, .nx-input, .nx-checkbox__control, .nx-checkbox__check, .nx-checkbox__dash, .nx-select__trigger, .nx-select__popup, .nx-select__chevron):not([data-nx-motion-pref='full'] *) { transition: none !important; animation: none !important; }
 }
+
+/* ---- NexPortal: superficie contextual junto a un ancla -------------------------
+   Se queda en su sitio del árbol y sube a la capa superior (Popover API o
+   <dialog> modal). El origen de la entrada es el ancla (--nx-anchor-arrow). */
+[data-layer='top'][data-anchor-hidden] { visibility: hidden; }
+.nx-portal {
+  position: fixed; z-index: var(--nx-layer-popover); inset: auto; left: 0; top: 0; margin: 0; padding: 0; border: 0;
+  box-sizing: border-box; overflow: auto; overscroll-behavior: contain; color: var(--nx-fg); background: none;
+  --nx-portal-origin: var(--nx-anchor-arrow, 50%) 0;
+  transform-origin: var(--nx-portal-origin);
+  animation: nx-portal-in var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
+}
+.nx-portal[data-placement='top'] { --nx-portal-origin: var(--nx-anchor-arrow, 50%) 100%; }
+.nx-portal[data-placement='left'] { --nx-portal-origin: 100% var(--nx-anchor-arrow, 50%); }
+.nx-portal[data-placement='right'] { --nx-portal-origin: 0 var(--nx-anchor-arrow, 50%); }
+.nx-portal::backdrop { background: color-mix(in srgb, var(--nx-fg) 18%, transparent); }
+.nx-portal:not([data-modal])::backdrop { display: none; }
+.nx-portal[data-nx-surface='raised'] {
+  padding: 12px; border-radius: 18px; background: var(--nx-surface-raised);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--nx-fg) 16%, transparent), inset 0 0 0 1px var(--nx-border);
+}
+.nx-portal[data-nx-surface='ink'] {
+  padding: 3px; border-radius: 9999px; background: var(--nx-fg); color: var(--nx-bg);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--nx-fg) 22%, transparent);
+}
+.nx-portal[data-presentation='sheet'] { border-radius: 20px; --nx-portal-origin: 50% 100%; }
+.nx-portal[data-presentation='sheet'][data-nx-surface='ink'] { border-radius: 22px; }
+.nx-portal:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 2px; }
+.nx-portal[data-state='closing'] { pointer-events: none; animation: nx-portal-out var(--nx-motion-control-duration) var(--nx-motion-control-easing) forwards; }
+/* Escala mínima: el texto no se emborrona; la relación con el ancla la dice el origen. */
+@keyframes nx-portal-in { from { opacity: 0; transform: scale(0.96); } }
+@keyframes nx-portal-out { to { opacity: 0; transform: scale(0.98); } }
+[data-nx-motion-pref='reduce'] .nx-portal, .nx-portal[data-nx-motion='none'] { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .nx-portal:not([data-nx-motion-pref='full'] *) { animation: none !important; } }
+
+/* ---- NexInk: herramientas editoriales junto a la selección -----------------------
+   Una cápsula de tinta sobre la hoja: no compite con el texto. «Más» la
+   ensancha en su sitio (la superficie no se sustituye por otra). */
+.nx-ink { display: flex; align-items: center; gap: 1px; min-width: 0; }
+.nx-ink[data-presentation='inline'] {
+  width: fit-content; max-width: 100%; padding: 3px; border-radius: 9999px; background: var(--nx-surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--nx-border); overflow-x: auto; scrollbar-width: none;
+}
+.nx-ink__cmd {
+  position: relative; display: inline-grid; place-items: center; flex: none; min-width: 32px; height: 30px; padding: 0 7px; border: 0;
+  border-radius: 9999px; background: none; color: inherit; font: 600 13px / 1 var(--nx-font-body); cursor: pointer;
+  transition: background-color var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-ink__cmd:hover { background: color-mix(in srgb, currentColor 14%, transparent); }
+.nx-ink__cmd:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 1px; }
+.nx-ink__cmd:disabled { opacity: 0.45; cursor: not-allowed; }
+.nx-ink__cmd[data-state='on'] { background: color-mix(in srgb, var(--nx-accent) 46%, transparent); }
+.nx-ink[data-presentation='inline'] .nx-ink__cmd[data-state='on'] { background: var(--nx-accent-soft); color: var(--nx-accent); }
+/* Mixto: una marca parcial bajo el glifo, no un color más. */
+.nx-ink__cmd[data-state='mixed']::after {
+  content: ''; position: absolute; left: 30%; right: 30%; bottom: 4px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+}
+.nx-ink__glyph { font: inherit; text-decoration: inherit; }
+code.nx-ink__glyph { font: 500 11px var(--nx-font-mono); }
+.nx-ink__more-glyph { display: block; width: 14px; height: 2px; border-radius: 2px; background: currentColor; box-shadow: 0 -5px 0 currentColor, 0 5px 0 currentColor; transform: scaleX(0.75); transition: transform var(--nx-motion-control-duration) var(--nx-motion-control-easing); }
+.nx-ink__cmd[aria-expanded='true'] .nx-ink__more-glyph { transform: rotate(90deg) scaleX(0.75); }
+.nx-ink__more { display: grid; grid-template-columns: 0fr; transition: grid-template-columns var(--nx-motion-indicator-duration) var(--nx-motion-indicator-easing); }
+.nx-ink__more[data-open] { grid-template-columns: 1fr; }
+.nx-ink__more-inner { display: flex; gap: 1px; min-width: 0; overflow: hidden; }
+.nx-ink__ask { display: flex; }
+.nx-ink__input {
+  width: min(260px, 64vw); height: 30px; padding: 0 12px; border: 0; border-radius: 9999px; background: var(--nx-bg); color: var(--nx-fg);
+  font: 450 var(--nx-text-small) var(--nx-font-body); outline: none;
+}
+.nx-ink__input:focus-visible { box-shadow: inset 0 0 0 1.5px var(--nx-accent); }
+.nx-ink-layer[data-presentation='sheet'] .nx-ink { justify-content: center; flex-wrap: wrap; }
+@media (pointer: coarse) { .nx-ink__cmd { min-width: 44px; height: 44px; } .nx-ink__input { height: 44px; } }
+[data-nx-motion-pref='reduce'] :is(.nx-ink__cmd, .nx-ink__more, .nx-ink__more-glyph) { transition: none !important; }
+@media (prefers-reduced-motion: reduce) { :is(.nx-ink__cmd, .nx-ink__more, .nx-ink__more-glyph):not([data-nx-motion-pref='full'] *) { transition: none !important; } }
+.nx-md-field__view { min-height: 1.6em; }
