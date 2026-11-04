@@ -1,4 +1,4 @@
-import { NexBadge, NexButton, NexCard, NexIcon } from '@eclipsis/react';
+import { NexBadge, NexButton, NexCard, NexIcon } from '@nexfluid/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 import { example } from '../examples/index.ts';
@@ -13,7 +13,7 @@ export const badgeDoc: ComponentDoc = {
   eyebrow: 'Componentes · Superficies',
   summary: 'Etiqueta no interactiva para estado y metadatos. El color acompaña al texto; nunca lo sustituye.',
   status: 'piloto',
-  imports: [{ names: ['NexBadge'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexBadge'], from: '@nexfluid/react' }],
   origin: <><code>StatusBadge</code>, <code>.tag</code>, <code>SubmissionBadge</code>, <code>ResourceStatusBadge</code></>,
   controls: [
     { kind: 'text', name: 'label', label: 'Texto', initial: 'Publicado' },
@@ -56,7 +56,7 @@ export const cardDoc: ComponentDoc = {
   eyebrow: 'Componentes · Superficies',
   summary: 'Una membrana viva con composición editorial: índice, titular, descripción, contenido, pie y acciones. El borde cede hacia el puntero, la presión aplasta sin perder volumen y, con expansion, la tarjeta se transforma en un panel.',
   status: 'piloto',
-  imports: [{ names: ['NexCard', 'NexButton', 'NexBadge'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexCard', 'NexButton', 'NexBadge'], from: '@nexfluid/react' }],
   origin: <><code>.panel</code> (115 usos), <code>ProjectCard</code>, <code>LinkCard</code>, <code>ResourceCard</code></>,
   controls: [
     { kind: 'select', name: 'appearance', label: 'Apariencia', options: CARD_APPEARANCES, initial: 'outlined' },

@@ -1,6 +1,6 @@
 {
-  "name": "@eclipsis/core",
-  "version": "0.3.0",
+  "name": "@nexfluid/core",
+  "version": "0.4.0",
   "description": "NexFluid: framework-free organic motion engine (springs, viscosity, organic geometry, shared clock)",
   "license": "MIT",
   "author": "gibran564",

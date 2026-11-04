@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { makeHarmonics, sampleContour, toSmoothPath } from '@eclipsis/core';
-import { DIRECTIONS, THEMES } from '@eclipsis/foundation';
-import { NexFrame, NexIcon, NexNav, NexProvider, NexSegmented } from '@eclipsis/react';
+import { makeHarmonics, sampleContour, toSmoothPath } from '@nexfluid/core';
+import { DIRECTIONS, THEMES } from '@nexfluid/foundation';
+import { NexFrame, NexIcon, NexNav, NexProvider, NexSegmented } from '@nexfluid/react';
 import { PAGES, SECTIONS } from './registry.tsx';
 import { href, useRoute } from './router.ts';
 import { useSettings, type DocsSettings } from './settings.ts';

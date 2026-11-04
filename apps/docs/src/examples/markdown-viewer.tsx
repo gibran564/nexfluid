@@ -1,4 +1,4 @@
-import { NexMarkdownWidget } from '@eclipsis/react/widgets';
+import { NexMarkdownWidget } from '@nexfluid/react/widgets';
 
 const SOURCE = `# Práctica 3 · Colas
 

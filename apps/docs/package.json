@@ -1,5 +1,5 @@
 {
-  "name": "@eclipsis/docs",
+  "name": "@nexfluid/docs",
   "version": "0.2.0",
   "private": true,
   "description": "NexDocs: interactive documentation for NexFluidUI. Consumes only public package entry points.",
@@ -12,10 +12,10 @@
     "@fontsource-variable/jetbrains-mono": "5.2.6",
     "@fontsource-variable/space-grotesk": "5.2.8",
     "@fontsource/instrument-serif": "5.3.0",
-    "@eclipsis/components": "0.3.0",
-    "@eclipsis/core": "0.3.0",
-    "@eclipsis/foundation": "0.3.0",
-    "@eclipsis/react": "0.3.0",
+    "@nexfluid/components": "0.4.0",
+    "@nexfluid/core": "0.4.0",
+    "@nexfluid/foundation": "0.4.0",
+    "@nexfluid/react": "0.4.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "katex": "0.16.47"

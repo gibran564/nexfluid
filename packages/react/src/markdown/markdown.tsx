@@ -3,7 +3,7 @@
 import { Children, isValidElement, useId, useMemo, type ReactElement, type ReactNode } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { cx, isExternalUrl, safeUrl, slugify, toDomId, type NexDensity } from '@eclipsis/components';
+import { cx, isExternalUrl, safeUrl, slugify, toDomId, type NexDensity } from '@nexfluid/components';
 import { NexCodeBlock } from '../code-block.tsx';
 import { NexIcon } from '../icon.tsx';
 import { markdownOutline } from './outline.ts';

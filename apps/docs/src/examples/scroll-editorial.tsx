@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { NexScroll } from '@eclipsis/react';
-import { NexMarkdown, markdownOutline } from '@eclipsis/react/markdown';
-import { NexMarkdownEditor } from '@eclipsis/react/widgets';
+import { NexScroll } from '@nexfluid/react';
+import { NexMarkdown, markdownOutline } from '@nexfluid/react/markdown';
+import { NexMarkdownEditor } from '@nexfluid/react/widgets';
 
 const GUIDE = `## Introducción
 

@@ -15,7 +15,7 @@
  *   cada formato recorriendo los nodos de texto del rango (activo, mixto o
  *   inactivo). Las islas (`contenteditable=false`) no se tocan.
  */
-import { safeUrl } from '@eclipsis/components';
+import { safeUrl } from '@nexfluid/components';
 import type { NexInkAdapter, NexInkCommand, NexInkSelection, NexInkState } from '../ink.tsx';
 import type { NexVirtualAnchor } from '../anchored.ts';
 

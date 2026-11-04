@@ -3,7 +3,7 @@ import {
   addSheet, cellKey, createAxis, createHistory, createWorkbook, edgeOf, evaluateSheet, fillRange, fillTarget, moveSelection, parseWorkbook,
   pasteGrid, rangeOf, rangeToText, removeSheet, renameSheet, selectionAt, selectionRange, serializeWorkbook, setCellInput, sheetFromRows,
   shiftFormula, stepInside, toCsv, sheetValueRows, updateSheet, WorkbookRejected, activeSheet, csvToSheet, type SheetData,
-} from '@eclipsis/sheets';
+} from '@nexfluid/sheets';
 
 const grid = (rows: Array<Array<string | number>>): SheetData => ({ ...sheetFromRows('t', rows, { rows: 20, columns: 8 }) });
 const input = (s: SheetData, r: number, c: number) => s.cells[cellKey(r, c)]?.input;

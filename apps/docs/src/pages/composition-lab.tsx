@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexPortal, NexPreviewBoundary, NexScroll, NexSegmented, NexTab, NexTabs } from '@eclipsis/react';
-import { NexMarkdown } from '@eclipsis/react/markdown';
-import { NexExplorerWidget, NexInspectorWidget, NexMarkdownEditor, NexPreviewWidget } from '@eclipsis/react/widgets';
-import { NexSheets, cellKey, columnName, createSheet, createWorkbook, csvToSheet, type Workbook } from '@eclipsis/react/sheets';
-import { FluidBlob } from '@eclipsis/react/motion';
+import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexPortal, NexPreviewBoundary, NexScroll, NexSegmented, NexTab, NexTabs } from '@nexfluid/react';
+import { NexMarkdown } from '@nexfluid/react/markdown';
+import { NexExplorerWidget, NexInspectorWidget, NexMarkdownEditor, NexPreviewWidget } from '@nexfluid/react/widgets';
+import { NexSheets, cellKey, columnName, createSheet, createWorkbook, csvToSheet, type Workbook } from '@nexfluid/react/sheets';
+import { FluidBlob } from '@nexfluid/react/motion';
 import { PageHeader } from '../docs/kit.tsx';
 import { REFERENCE_URL, SandboxWorkbench } from '../examples/web-practice.tsx';
 
@@ -129,7 +129,7 @@ export function CompositionLabPage() {
       <PageHeader
         eyebrow="Patrones · composición"
         title="Nex Composition Lab"
-        lead="Un espacio de trabajo completo y editable: NexFrame con disposición dividida o de foco, explorador, pestañas líquidas, Markdown que se pinta mientras escribes, una hoja NexSheets que calcula con tus datos, vista previa por dispositivo e inspector. Ninguna pieza es una copia: todo se importa de @eclipsis/*."
+        lead="Un espacio de trabajo completo y editable: NexFrame con disposición dividida o de foco, explorador, pestañas líquidas, Markdown que se pinta mientras escribes, una hoja NexSheets que calcula con tus datos, vista previa por dispositivo e inspector. Ninguna pieza es una copia: todo se importa de @nexfluid/*."
       />
       <h2 className="nx-visually-hidden">Espacio de trabajo</h2>
       <NexPreviewBoundary compactBelow={1000} constrainedBelow={620}>

@@ -26,7 +26,7 @@ import {
   type NexConsoleCellValue, type NexConsoleFigureOutput, type NexConsoleCustomOutput, type NexConsoleImageOutput, type NexConsoleJsonValue,
   type NexConsoleOutput, type NexConsoleState, type NexConsoleStatus, type NexConsoleTableOutput, type NexMotion, type NexViewDiagnostic, type NexViewEvent, type NexViewItem,
   type NexSessionConnection, type NexSessionStore, type NexSessionTransport, type NexTerminalEmulator,
-} from '@eclipsis/components';
+} from '@nexfluid/components';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { NexButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';

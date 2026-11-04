@@ -4,9 +4,9 @@ import {
   createContext, useCallback, useContext, useRef, useState,
   type AnchorHTMLAttributes, type HTMLAttributes, type ReactNode, type RefObject,
 } from 'react';
-import type { MorphPhysics, MorphPhysicsName } from '@eclipsis/core';
-import type { Material, ShapeFamily } from '@eclipsis/foundation';
-import { cx, type NexAppearance, type NexDensity, type NexMotion } from '@eclipsis/components';
+import type { MorphPhysics, MorphPhysicsName } from '@nexfluid/core';
+import type { Material, ShapeFamily } from '@nexfluid/foundation';
+import { cx, type NexAppearance, type NexDensity, type NexMotion } from '@nexfluid/components';
 import { NexIconButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';
 import { NexMorph, useNexMorphSource, type NexMorphTargetProps } from './morph.tsx';

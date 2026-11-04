@@ -20,8 +20,8 @@
  * no están siempre a la vista.
  */
 import { useId, useMemo, useState, type ReactNode } from 'react';
-import { createSheet, evaluateSheet, formatValue, type CellValue, type SheetData, type Workbook } from '@eclipsis/sheets';
-import { cx, type NexMotion } from '@eclipsis/components';
+import { createSheet, evaluateSheet, formatValue, type CellValue, type SheetData, type Workbook } from '@nexfluid/sheets';
+import { cx, type NexMotion } from '@nexfluid/components';
 import { NexButton } from '../button.tsx';
 import { NexIcon } from '../icon.tsx';
 import { NexMorph } from '../morph.tsx';

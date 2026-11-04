@@ -1,7 +1,7 @@
 /**
- * @eclipsis/components — NexComponents sin framework.
+ * @nexfluid/components — NexComponents sin framework.
  *
- * Dos contratos: la hoja `@eclipsis/components/styles.css` (clases `nx-*` y
+ * Dos contratos: la hoja `@nexfluid/components/styles.css` (clases `nx-*` y
  * atributos `data-nx-*`) y estos ayudantes puros de comportamiento.
  */
 export { cx, rovingIndex, toDomId, slugify, safeUrl, isExternalUrl } from './behaviour.ts';

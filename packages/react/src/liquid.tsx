@@ -12,8 +12,8 @@
  * Movimiento reducido y `motion="none"`: salto inmediato.
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
-import { liquidCapsule } from '@eclipsis/core';
-import type { NexMotion } from '@eclipsis/components';
+import { liquidCapsule } from '@nexfluid/core';
+import type { NexMotion } from '@nexfluid/components';
 import { canAnimate, useMotionPreference } from './provider.tsx';
 import { presetFor, useSprings, type SpringPreset } from './springs.ts';
 

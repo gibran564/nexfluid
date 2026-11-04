@@ -23,7 +23,7 @@
  * cierra y deja seguir.
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { cx, rovingIndex, type NexAppearance, type NexDensity, type NexMotion } from '@eclipsis/components';
+import { cx, rovingIndex, type NexAppearance, type NexDensity, type NexMotion } from '@nexfluid/components';
 import { useNex } from './provider.tsx';
 import { NexButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useLayoutEffect, type RefObject } from 'react';
-import { anchorClipped, placeFloating, type AnchorRect, type FloatingPlacement, type NexAlign, type NexSide } from '@eclipsis/components';
+import { anchorClipped, placeFloating, type AnchorRect, type FloatingPlacement, type NexAlign, type NexSide } from '@nexfluid/components';
 
 /**
  * Un ancla que no es un elemento: un rango de texto seleccionado, un cursor,
@@ -72,7 +72,7 @@ function clippingAncestors(start: Element | null | undefined): Element[] {
 /**
  * Coloca un popup junto a su ancla en la capa superior del navegador (Popover
  * API) y lo mantiene ahí mientras está abierto. La geometría es
- * `placeFloating` (@eclipsis/components): lado preferido, flip, alineación
+ * `placeFloating` (@nexfluid/components): lado preferido, flip, alineación
  * lógica (RTL), shift dentro de un margen seguro y máximos que impiden salir
  * del viewport VISUAL —el teclado en pantalla de un teléfono no tapa nada—.
  *

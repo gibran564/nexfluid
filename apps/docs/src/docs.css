@@ -1,5 +1,5 @@
 /* NexDocs — estilos propios del sitio (composición de páginas). Sólo tokens --nx-*.
-   Toda superficie, control e indicador viene de @eclipsis/components. */
+   Toda superficie, control e indicador viene de @nexfluid/components. */
 
 html, body { margin: 0; background: var(--nx-bg); }
 body { min-height: 100dvh; }

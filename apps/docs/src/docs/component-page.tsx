@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
-import { NexCodeBlock, NexFrameRegion, NexTab, NexTabs, NexTabsList, NexTabsPanel } from '@eclipsis/react';
+import { NexCodeBlock, NexFrameRegion, NexTab, NexTabs, NexTabsList, NexTabsPanel } from '@nexfluid/react';
 import { replaceTab } from '../router.ts';
 import { ControlPanel, importLine, initialValues, KeyboardTable, LiveExample, PageHeader, PropsTable, Section, Stage, Status, type Control, type PropRow, type Values } from './kit.tsx';
 
@@ -94,7 +94,7 @@ export function ComponentPage({ doc, tab }: { doc: ComponentDoc; tab: string | n
 
         <NexTabsPanel value="code">
           <Section title="Importar" lead="Componentes y estilos desde las entradas públicas de los paquetes.">
-            <NexCodeBlock language="tsx" title="imports.tsx" code={`${imports}\n\n// Una vez, en la raíz de la aplicación:\nimport '@eclipsis/foundation/tokens.css';\nimport '@eclipsis/components/styles.css';`} />
+            <NexCodeBlock language="tsx" title="imports.tsx" code={`${imports}\n\n// Una vez, en la raíz de la aplicación:\nimport '@nexfluid/foundation/tokens.css';\nimport '@nexfluid/components/styles.css';`} />
           </Section>
           <Section title="Uso con las propiedades actuales">
             <NexCodeBlock language="tsx" title={`${doc.name}.tsx`} code={usage} showLineNumbers />

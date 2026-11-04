@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { NexConsole, NexLiveConsole, type NexConsoleOutput, type NexConsoleState } from '@eclipsis/react';
-import { createSessionStore, splitInputLines, type NexSessionTransport } from '@eclipsis/components';
+import { NexConsole, NexLiveConsole, type NexConsoleOutput, type NexConsoleState } from '@nexfluid/react';
+import { createSessionStore, splitInputLines, type NexSessionTransport } from '@nexfluid/components';
 
 /**
  * Programas simulados para NexConsole. Los eventos son de mentira; los

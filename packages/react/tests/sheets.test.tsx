@@ -3,8 +3,8 @@ import { createRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NexProvider, NexScroll } from '@eclipsis/react';
-import { NexSheets, cellKey, createWorkbook, sheetFromRows, type Workbook } from '@eclipsis/react/sheets';
+import { NexProvider, NexScroll } from '@nexfluid/react';
+import { NexSheets, cellKey, createWorkbook, sheetFromRows, type Workbook } from '@nexfluid/react/sheets';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

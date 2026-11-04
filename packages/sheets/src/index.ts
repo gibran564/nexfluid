@@ -1,5 +1,5 @@
 /**
- * @eclipsis/sheets — NexSheets Core.
+ * @nexfluid/sheets — NexSheets Core.
  *
  * Modelo de hojas de cálculo sin framework ni estilos: libros, celdas,
  * rangos, selección, historial, fórmulas, autollenado, CSV/TSV/JSON y ejes

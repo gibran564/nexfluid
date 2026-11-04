@@ -23,7 +23,7 @@
  * del adaptador que se restaura antes de ejecutar.
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { cx, rovingIndex, type NexMotion } from '@eclipsis/components';
+import { cx, rovingIndex, type NexMotion } from '@nexfluid/components';
 import type { NexVirtualAnchor } from './anchored.ts';
 import { NexAnchoredLayer } from './anchored-layer.tsx';
 import { useNex } from './provider.tsx';

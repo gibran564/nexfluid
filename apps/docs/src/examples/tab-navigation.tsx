@@ -1,4 +1,4 @@
-import { NexBadge, NexCodeBlock, NexIcon, NexTab, NexTabs } from '@eclipsis/react';
+import { NexBadge, NexCodeBlock, NexIcon, NexTab, NexTabs } from '@nexfluid/react';
 
 /** Navegación por pestañas: el mismo trabajo como documento, código o resultado (patrón CellViewTabs). */
 export default function TabNavigationExample() {

@@ -5,7 +5,7 @@ import {
   type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { columnsToFold, cx, toDomId, type NexDensity, type NexMotion, type NexSpace } from '@eclipsis/components';
+import { columnsToFold, cx, toDomId, type NexDensity, type NexMotion, type NexSpace } from '@nexfluid/components';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { NexIcon } from './icon.tsx';
 import { morphSpring, useSprings } from './springs.ts';

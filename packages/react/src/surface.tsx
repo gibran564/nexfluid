@@ -5,7 +5,7 @@
  *
  * Estático primero: en el servidor y sin JS es un elemento con superelipse
  * CSS (`corner-shape`), relleno y borde del material. En el cliente, si es
- * `live`, mide su caja y pinta la membrana en SVG con @eclipsis/core; desde
+ * `live`, mide su caja y pinta la membrana en SVG con @nexfluid/core; desde
  * ahí recorre los estados rest → attract → deform → activate → settle:
  * el borde más cercano al puntero se abomba, la presión aplasta conservando
  * el área, la activación inunda la zona cromática y todo se recupera con la
@@ -15,9 +15,9 @@
  * tensión (attract) e Intro/Espacio la activan, sin deformación.
  */
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ElementType, type HTMLAttributes, type PointerEvent, type ReactNode, type Ref } from 'react';
-import { membranePath } from '@eclipsis/core';
-import type { Material, ShapeFamily } from '@eclipsis/foundation';
-import { cx, type NexMotion } from '@eclipsis/components';
+import { membranePath } from '@nexfluid/core';
+import type { Material, ShapeFamily } from '@nexfluid/foundation';
+import { cx, type NexMotion } from '@nexfluid/components';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { useSprings } from './springs.ts';
 

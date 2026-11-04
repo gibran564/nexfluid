@@ -8,7 +8,7 @@
  *     <NexMorph.Target label="Detalle"><NexMorph.Title>…</NexMorph.Title>…</NexMorph.Target>
  *   </NexMorph>
  *
- * La geometría y la física son de `MorphTransition` (@eclipsis/core). Aquí
+ * La geometría y la física son de `MorphTransition` (@nexfluid/core). Aquí
  * sólo se mide el DOM y se pinta: el panel destino se coloca una vez en su
  * sitio final (su contenido nunca se reescala ni se recoloca), y en cada
  * fotograma cambian el trazado de la membrana, el recorte del contenido,
@@ -24,8 +24,8 @@ import { createPortal } from 'react-dom';
 import {
   MorphTransition, morphPath, resolveMorphPhysics, type MorphFrame, type MorphPhysics, type MorphPhysicsName,
   type MorphPhysicsOverrides, type MorphTimeline, type Rect,
-} from '@eclipsis/core';
-import { cx, toDomId, type NexMotion } from '@eclipsis/components';
+} from '@nexfluid/core';
+import { cx, toDomId, type NexMotion } from '@nexfluid/components';
 import { NexIconButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';

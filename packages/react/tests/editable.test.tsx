@@ -1,8 +1,8 @@
 import { StrictMode, act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NexMarkdown, markdownOutline } from '@eclipsis/react/markdown';
-import { NexMarkdownEditor, NexMarkdownWidget } from '@eclipsis/react/widgets';
+import { NexMarkdown, markdownOutline } from '@nexfluid/react/markdown';
+import { NexMarkdownEditor, NexMarkdownWidget } from '@nexfluid/react/widgets';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

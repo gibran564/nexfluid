@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { columnIndex, columnName, evaluateCell, evaluateSheet, formatValue, literal, parseRange, parseReference, type SheetData } from '@eclipsis/sheets';
+import { columnIndex, columnName, evaluateCell, evaluateSheet, formatValue, literal, parseRange, parseReference, type SheetData } from '@nexfluid/sheets';
 
 /* Pruebas del motor portadas del editor de hojas de NexBook (Nextudio): el
    comportamiento heredado se comprueba con sus propias pruebas. */

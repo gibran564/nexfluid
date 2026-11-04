@@ -4,8 +4,8 @@ import {
   createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useRef, useState,
   type ButtonHTMLAttributes, type HTMLAttributes, type KeyboardEvent, type ReactNode, type RefObject,
 } from 'react';
-import { MOTION } from '@eclipsis/foundation';
-import { cx, rovingIndex, toDomId, type NexDensity, type NexMotion, type Orientation } from '@eclipsis/components';
+import { MOTION } from '@nexfluid/foundation';
+import { cx, rovingIndex, toDomId, type NexDensity, type NexMotion, type Orientation } from '@nexfluid/components';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { LiquidDrop, useLiquid } from './liquid.tsx';
 

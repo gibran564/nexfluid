@@ -63,9 +63,9 @@ describe('utilidades', () => {
 
 describe('tokenize (resaltado ligero)', () => {
   const samples: Record<string, string> = {
-    ts: "import { NexCard } from '@eclipsis/react';\nconst n: number = 42; // nota\nexport function A() { return <NexCard appearance=\"editorial\" />; }",
+    ts: "import { NexCard } from '@nexfluid/react';\nconst n: number = 42; // nota\nexport function A() { return <NexCard appearance=\"editorial\" />; }",
     python: 'def total(xs):\n    """Suma."""\n    return sum(xs)  # fin\nprint(True, None, 3.5)',
-    json: '{ "name": "@eclipsis/react", "version": 1, "ok": true }',
+    json: '{ "name": "@nexfluid/react", "version": 1, "ok": true }',
     css: '.nx-card { border: 1px solid var(--nx-border); color: #191a1c; }',
     html: '<a href="https://x.y" class=\'z\'>Hola</a><!-- c -->',
     bash: 'npm run dev -- --port 5290 # docs\nexport NODE_ENV="test"',
@@ -82,7 +82,7 @@ describe('tokenize (resaltado ligero)', () => {
     const t = tokenize(samples.ts!, 'tsx');
     const of = (type: string) => t.filter((x) => x.type === type).map((x) => x.text.trim());
     assert.ok(of('keyword').includes('import'));
-    assert.ok(of('string').some((s) => s.includes('@eclipsis/react')));
+    assert.ok(of('string').some((s) => s.includes('@nexfluid/react')));
     assert.ok(of('comment').some((s) => s.includes('nota')));
     assert.ok(of('number').includes('42'));
     assert.ok(of('tag').some((s) => s.startsWith('<NexCard')));

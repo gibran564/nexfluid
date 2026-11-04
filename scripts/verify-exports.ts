@@ -8,15 +8,15 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const EXPECTED: Record<string, string[]> = {
-  '@eclipsis/foundation': ['THEMES', 'TYPE_SCALE', 'SPACE', 'DENSITY', 'MOTION', 'ICONS', 'contrastRatio', 'renderTokensCss'],
-  '@eclipsis/core': ['stepSpring', 'FluidValue', 'MOTION_PRESETS', 'sharedClock', 'createFluidBlob', 'sampleContour'],
-  '@eclipsis/components': ['cx', 'rovingIndex', 'safeUrl', 'tokenize', 'CLASS', 'resolveSpace', 'reorderSlot', 'moveItem', 'keyboardMove', 'normalizeNexViewEvents', 'createSessionStore', 'fromNexBookOutputs', 'composeNexView', 'columnsFor'],
-  '@eclipsis/sheets': ['createWorkbook', 'evaluateSheet', 'pasteGrid', 'csvToSheet', 'toCsv', 'createHistory', 'moveSelection', 'fillRange', 'createAxis', 'parseWorkbook'],
-  '@eclipsis/react': ['NexProvider', 'NexButton', 'NexIconButton', 'NexBadge', 'NexCard', 'NexCardTitle', 'NexTabs', 'NexTab', 'NexTabsList', 'NexTabsPanel', 'NexFrame', 'NexFrameRegion', 'NexCodeBlock', 'NexIcon', 'NexMenu', 'NexCommandMenu', 'NexFlow', 'NexEditorialBlock', 'useNexFlow', 'NexConsole', 'NexLiveConsole'],
-  '@eclipsis/react/markdown': ['NexMarkdown', 'NexMarkdownField'],
-  '@eclipsis/react/widgets': ['NexMarkdownWidget', 'NexPropertiesWidget'],
-  '@eclipsis/react/motion': ['FluidBlob'],
-  '@eclipsis/react/sheets': ['NexSheets', 'NexSheetGrid', 'NexFormulaBar', 'NexSheetTabs', 'useNexSheets', 'createWorkbook', 'NexDataView'],
+  '@nexfluid/foundation': ['THEMES', 'TYPE_SCALE', 'SPACE', 'DENSITY', 'MOTION', 'ICONS', 'contrastRatio', 'renderTokensCss'],
+  '@nexfluid/core': ['stepSpring', 'FluidValue', 'MOTION_PRESETS', 'sharedClock', 'createFluidBlob', 'sampleContour'],
+  '@nexfluid/components': ['cx', 'rovingIndex', 'safeUrl', 'tokenize', 'CLASS', 'resolveSpace', 'reorderSlot', 'moveItem', 'keyboardMove', 'normalizeNexViewEvents', 'createSessionStore', 'fromNexBookOutputs', 'composeNexView', 'columnsFor'],
+  '@nexfluid/sheets': ['createWorkbook', 'evaluateSheet', 'pasteGrid', 'csvToSheet', 'toCsv', 'createHistory', 'moveSelection', 'fillRange', 'createAxis', 'parseWorkbook'],
+  '@nexfluid/react': ['NexProvider', 'NexButton', 'NexIconButton', 'NexBadge', 'NexCard', 'NexCardTitle', 'NexTabs', 'NexTab', 'NexTabsList', 'NexTabsPanel', 'NexFrame', 'NexFrameRegion', 'NexCodeBlock', 'NexIcon', 'NexMenu', 'NexCommandMenu', 'NexFlow', 'NexEditorialBlock', 'useNexFlow', 'NexConsole', 'NexLiveConsole'],
+  '@nexfluid/react/markdown': ['NexMarkdown', 'NexMarkdownField'],
+  '@nexfluid/react/widgets': ['NexMarkdownWidget', 'NexPropertiesWidget'],
+  '@nexfluid/react/motion': ['FluidBlob'],
+  '@nexfluid/react/sheets': ['NexSheets', 'NexSheetGrid', 'NexFormulaBar', 'NexSheetTabs', 'useNexSheets', 'createWorkbook', 'NexDataView'],
 };
 
 let files = 0;

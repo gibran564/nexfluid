@@ -11,7 +11,7 @@
  * Se construye el DOM con `createElement`/`textContent`, nunca con HTML en
  * texto: el contenido no confiable no puede inyectar marcado.
  */
-import { safeUrl } from '@eclipsis/components';
+import { safeUrl } from '@nexfluid/components';
 
 export interface RichIsland { element: HTMLElement; source: string }
 

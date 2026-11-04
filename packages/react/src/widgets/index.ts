@@ -1,4 +1,4 @@
-/** @eclipsis/react/widgets — NexWidgets, compuestos sólo con componentes públicos. */
+/** @nexfluid/react/widgets — NexWidgets, compuestos sólo con componentes públicos. */
 export { NexMarkdownWidget } from './markdown-widget.tsx';
 export type { NexMarkdownWidgetProps, NexMarkdownWidgetMode } from './markdown-widget.tsx';
 export { NexMarkdownEditor } from './markdown-editor.tsx';

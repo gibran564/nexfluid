@@ -1,8 +1,8 @@
 import { memo, useCallback, useId, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import {
   NexButton, NexCodeBlock, NexEditorialBlock, NexFlow, NexIcon, NexSegmented, useNexFlow, type NexFlowMode, type NexMenuItem,
-} from '@eclipsis/react';
-import { NexDataView, sheetFromRows, type SheetData } from '@eclipsis/react/sheets';
+} from '@nexfluid/react';
+import { NexDataView, sheetFromRows, type SheetData } from '@nexfluid/react/sheets';
 
 /**
  * Un documento editorial vivo sobre NexFlow. El modelo (un array de nodos), la

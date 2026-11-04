@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { cx, type NexMotion } from '@eclipsis/components';
+import { cx, type NexMotion } from '@nexfluid/components';
 import { canAnimate, useMotionPreference, useNex } from '../provider.tsx';
 import { NexSegmented } from '../segmented.tsx';
 import { useSprings } from '../springs.ts';

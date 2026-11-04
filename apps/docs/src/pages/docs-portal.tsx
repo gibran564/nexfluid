@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NexPortal, type NexPortalMode } from '@eclipsis/react';
+import { NexPortal, type NexPortalMode } from '@nexfluid/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { REFERENCE_URL, SandboxWorkbench } from '../examples/web-practice.tsx';
 
@@ -31,7 +31,7 @@ export const portalDoc: ComponentDoc = {
   eyebrow: 'Componentes · Web',
   summary: 'La web como contenido de la composición: una página de referencia incrustada, un navegador integrado con barra de dirección o un sandbox que ejecuta HTML, CSS y JavaScript propios aislados de la aplicación. Vive en el flujo del layout —una página, un panel, una región de NexFrame— y comparte un único motor entre sus tres modos.',
   status: 'laboratorio',
-  imports: [{ names: ['NexPortal'], from: '@eclipsis/react' }, { names: ['resolveWebAddress', 'frameSandbox', 'sandboxDocument'], from: '@eclipsis/components' }],
+  imports: [{ names: ['NexPortal'], from: '@nexfluid/react' }, { names: ['resolveWebAddress', 'frameSandbox', 'sandboxDocument'], from: '@nexfluid/components' }],
   origin: <>la referencia junto a una práctica de NexBook y la vista previa web de NexView</>,
   controls: [
     { kind: 'select', name: 'mode', label: 'Modo', options: ['embedded', 'browser', 'sandbox'], initial: 'embedded' },

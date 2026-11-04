@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { NexCodeBlock } from '@eclipsis/react';
+import { NexCodeBlock } from '@nexfluid/react';
 
 const INITIAL = `import type { NextConfig } from 'next';
 
 const config: NextConfig = {
-  transpilePackages: ['@eclipsis/react', '@eclipsis/components', '@eclipsis/core', '@eclipsis/foundation'],
+  transpilePackages: ['@nexfluid/react', '@nexfluid/components', '@nexfluid/core', '@nexfluid/foundation'],
 };
 
 export default config;`;

@@ -35,7 +35,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSPrope
 import {
   SANDBOX_PERMISSIONS, WEB_PAGE_PERMISSIONS, cx, frameSandbox, isPortalMessage, navHistoryGo, navHistoryPush, navHistoryStart,
   resolveWebAddress, sandboxDocument, type NavHistory, type NexWebPermissions, type WebAddress,
-} from '@eclipsis/components';
+} from '@nexfluid/components';
 import { NexIconButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';
 

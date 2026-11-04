@@ -1,5 +1,5 @@
-import { NexButton, NexCard, NexFrame, NexIcon, NexNav, NexSegmented, NexTab, NexTabs } from '@eclipsis/react';
-import { NexExplorerWidget, NexInspectorWidget } from '@eclipsis/react/widgets';
+import { NexButton, NexCard, NexFrame, NexIcon, NexNav, NexSegmented, NexTab, NexTabs } from '@nexfluid/react';
+import { NexExplorerWidget, NexInspectorWidget } from '@nexfluid/react/widgets';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 import { example } from '../examples/index.ts';
@@ -33,7 +33,7 @@ export const tabsDoc: ComponentDoc = {
   eyebrow: 'Componentes · Navegación',
   summary: 'Pestañas accesibles con una gota líquida: el borde que avanza tira, el otro le sigue con viscosidad y, mientras se estira, se le forma un cuello. Al pasar sobre otra pestaña, la gota se inclina hacia ella; el panel nuevo emerge desde la pestaña.',
   status: 'piloto',
-  imports: [{ names: ['NexTabs', 'NexTab'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexTabs', 'NexTab'], from: '@nexfluid/react' }],
   origin: <>necesidad de 20 <code>role="tablist"</code> propios y de <code>CellViewTabs</code> en Nextudio</>,
   controls: [
     { kind: 'select', name: 'appearance', label: 'Apariencia', options: TAB_APPEARANCES, initial: 'liquid' },
@@ -123,7 +123,7 @@ export const frameDoc: ComponentDoc = {
   summary: 'El espacio como sistema: un campo con zonas cromáticas sobre el que flotan membranas (superior, navegación, explorador, lienzo, inspector, dock). Las regiones vacías no ocupan columna; las cerradas se retraen a un riel; en foco, el lienzo crece; en móvil el inspector es una hoja.',
   status: 'piloto',
   wide: true,
-  imports: [{ names: ['NexFrame', 'NexFrameRegion'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexFrame', 'NexFrameRegion'], from: '@nexfluid/react' }],
   origin: <>el contrato de regiones del marco de Nextudio</>,
   controls: [
     { kind: 'select', name: 'variant', label: 'Variante', options: ['floating', 'joined', 'flush'], initial: 'floating' },

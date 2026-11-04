@@ -21,7 +21,7 @@
  */
 import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { cx } from '@eclipsis/components';
+import { cx } from '@nexfluid/components';
 import { NexSegmented } from '../segmented.tsx';
 import { NexInk, type NexInkAdapter, type NexInkCommand } from '../ink.tsx';
 import { NexMarkdown, type NexMarkdownProps } from './markdown.tsx';

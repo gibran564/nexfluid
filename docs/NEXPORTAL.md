@@ -12,11 +12,11 @@ ni depende de la Popover API.
 
 | Pieza | Dónde | Responsabilidad |
 |---|---|---|
-| Direcciones | `resolveWebAddress` (`@eclipsis/components/web.ts`) | Lo escrito → URL http(s) o motivo de rechazo (`empty`, `invalid`, `unsafe-scheme`). Rechaza `javascript:`, `data:`, `file:`, `blob:`, `mailto:`. Una ruta propia empieza por `./`, `../` o `/` (evita la ambigüedad con `react.dev/learn`). |
+| Direcciones | `resolveWebAddress` (`@nexfluid/components/web.ts`) | Lo escrito → URL http(s) o motivo de rechazo (`empty`, `invalid`, `unsafe-scheme`). Rechaza `javascript:`, `data:`, `file:`, `blob:`, `mailto:`. Una ruta propia empieza por `./`, `../` o `/` (evita la ambigüedad con `react.dev/learn`). |
 | Aislamiento | `frameSandbox`, `sandboxDocument` | Tokens de `sandbox` con mínimo privilegio y el documento de un sandbox con CSP. |
 | Puente | `isPortalMessage` + comprobación de `event.source` | Mensajes del sandbox al host: sólo consola, con token de sesión y forma conocida. |
 | Historial | `navHistoryStart/Push/Go` | Las direcciones abiertas desde nuestra barra. |
-| Componente | `NexPortal` (`@eclipsis/react`) | Un `<iframe>` que no cambia de sitio en el árbol; presentación, estados y eventos alrededor. |
+| Componente | `NexPortal` (`@nexfluid/react`) | Un `<iframe>` que no cambia de sitio en el árbol; presentación, estados y eventos alrededor. |
 
 Separación pedida, en el contrato del componente:
 

@@ -1,5 +1,5 @@
-import { NexBadge, NexIcon, NexNav, NexPanel, NexSegmented, NexSurface } from '@eclipsis/react';
-import { NexExplorerWidget, NexInspectorWidget } from '@eclipsis/react/widgets';
+import { NexBadge, NexIcon, NexNav, NexPanel, NexSegmented, NexSurface } from '@nexfluid/react';
+import { NexExplorerWidget, NexInspectorWidget } from '@nexfluid/react/widgets';
 import { PreviewPlayground } from './preview-playground.tsx';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
@@ -13,7 +13,7 @@ export const surfaceDoc: ComponentDoc = {
   eyebrow: 'Componentes · Primitiva',
   summary: 'La membrana: primitiva de toda superficie de NexFluidUI. Familia geométrica, material y estados. Estática por defecto (CSS); viva cuando es interactiva (SVG dibujado por el motor).',
   status: 'piloto',
-  imports: [{ names: ['NexSurface'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexSurface'], from: '@nexfluid/react' }],
   origin: <>la gramática propia de NexFluid Native</>,
   controls: [
     { kind: 'select', name: 'kind', label: 'Papel', options: ['surface', 'control', 'content'], initial: 'surface' },
@@ -61,7 +61,7 @@ export const panelDoc: ComponentDoc = {
   eyebrow: 'Componentes · Superficies',
   summary: 'Membrana elevada con cabecera y cuerpo plegable. El cuerpo cede y se recupera sin desmontarse; plegado, queda inerte.',
   status: 'piloto',
-  imports: [{ names: ['NexPanel'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexPanel'], from: '@nexfluid/react' }],
   origin: <>paneles laterales e inspectores de Nextudio</>,
   controls: [
     { kind: 'text', name: 'title', label: 'Título', initial: 'Geometría' },
@@ -95,7 +95,7 @@ export const navDoc: ComponentDoc = {
   eyebrow: 'Componentes · Navegación',
   summary: 'Navegación vertical con la misma gota líquida de las pestañas bajo el elemento actual. La gota se inclina hacia el elemento bajo el puntero. Grupos con nombre y niveles para árboles.',
   status: 'piloto',
-  imports: [{ names: ['NexNav'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexNav'], from: '@nexfluid/react' }],
   origin: <>barras laterales y listas de navegación de Nextudio</>,
   controls: [{ kind: 'boolean', name: 'groups', label: 'Con grupos', initial: true }, { kind: 'boolean', name: 'icons', label: 'Con iconos', initial: true }],
   render: (v) => {
@@ -127,7 +127,7 @@ export const segmentedDoc: ComponentDoc = {
   eyebrow: 'Componentes · Acciones',
   summary: 'Selector de una opción entre pocas: un radiogroup con la gota líquida. Para modos, vistas, dispositivos y filtros exclusivos.',
   status: 'piloto',
-  imports: [{ names: ['NexSegmented'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexSegmented'], from: '@nexfluid/react' }],
   origin: <>chips de selección exclusiva de Nextudio</>,
   controls: [
     { kind: 'select', name: 'density', label: 'Densidad', options: ['compact', 'comfortable', 'spacious'], initial: 'comfortable' },
@@ -147,7 +147,7 @@ export const inspectorDoc: ComponentDoc = {
   eyebrow: 'Widgets',
   summary: 'Inspector: pila de NexPanel plegables con propiedades o controles libres. Composición de componentes públicos.',
   status: 'piloto',
-  imports: [{ names: ['NexInspectorWidget'], from: '@eclipsis/react/widgets' }],
+  imports: [{ names: ['NexInspectorWidget'], from: '@nexfluid/react/widgets' }],
   origin: <>inspector contextual de NexFrame en Nextudio</>,
   controls: [{ kind: 'boolean', name: 'controls', label: 'Sección con controles', initial: true }],
   render: (v) => (
@@ -172,7 +172,7 @@ export const explorerDoc: ComponentDoc = {
   eyebrow: 'Widgets',
   summary: 'Explorador en árbol sobre NexNav: ramas plegables, selección con la gota líquida.',
   status: 'piloto',
-  imports: [{ names: ['NexExplorerWidget'], from: '@eclipsis/react/widgets' }],
+  imports: [{ names: ['NexExplorerWidget'], from: '@nexfluid/react/widgets' }],
   origin: <>explorador de archivos de NexCode</>,
   controls: [],
   render: () => (
@@ -194,7 +194,7 @@ export const previewDoc: ComponentDoc = {
   eyebrow: 'Widgets',
   summary: 'Vista previa: membrana con barra (título, selector de dispositivo, acciones) y un visor cuyo ancho fluye entre dispositivos con física de superficie.',
   status: 'piloto',
-  imports: [{ names: ['NexPreviewWidget'], from: '@eclipsis/react/widgets' }],
+  imports: [{ names: ['NexPreviewWidget'], from: '@nexfluid/react/widgets' }],
   origin: <>vistas previas de NexWeb y proyectos</>,
   wide: true,
   controls: [],

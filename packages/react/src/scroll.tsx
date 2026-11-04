@@ -19,12 +19,12 @@ import {
   createContext, forwardRef, useCallback, useContext, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState,
   type CSSProperties, type HTMLAttributes, type PointerEvent as ReactPointerEvent, type ReactNode, type Ref,
 } from 'react';
-import { ScrollTracker, type ScrollOrientation, type ScrollParts, type ScrollSection, type ScrollState } from '@eclipsis/core';
-import { cx, type NexDensity, type NexMotion } from '@eclipsis/components';
+import { ScrollTracker, type ScrollOrientation, type ScrollParts, type ScrollSection, type ScrollState } from '@nexfluid/core';
+import { cx, type NexDensity, type NexMotion } from '@nexfluid/components';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 
 export type NexScrollVariant = 'minimal' | 'fluid' | 'editorial' | 'spatial';
-export type { ScrollSection as NexScrollSection } from '@eclipsis/core';
+export type { ScrollSection as NexScrollSection } from '@nexfluid/core';
 
 /** Deformación viscosa por variante (0 = pulgar rígido). */
 const DEFORMATION: Record<NexScrollVariant, number> = { minimal: 0, fluid: 1, editorial: 0.6, spatial: 0.8 };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NexBadge, NexButton, NexCard, NexIcon } from '@eclipsis/react';
+import { NexBadge, NexButton, NexCard, NexIcon } from '@nexfluid/react';
 import { PageHeader, Section } from '../docs/kit.tsx';
 
 interface Measure { frames: number; mean: number; p95: number; max: number; long: number; surfaces: number }

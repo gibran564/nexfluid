@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { MotionMode } from '@eclipsis/core';
-import type { NexDensity, NexMotion } from '@eclipsis/react';
+import type { MotionMode } from '@nexfluid/core';
+import type { NexDensity, NexMotion } from '@nexfluid/react';
 
 export interface DocsSettings {
   theme: string;

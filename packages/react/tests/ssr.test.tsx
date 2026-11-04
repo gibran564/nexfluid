@@ -5,9 +5,9 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   NexBadge, NexButton, NexCard, NexCardContent, NexCardHeader, NexCardTitle, NexCodeBlock, NexFrame, NexFrameRegion,
   NexProvider, NexTab, NexTabs, NexTabsList, NexTabsPanel, NexFlow, NexEditorialBlock, NexMenu,
-} from '@eclipsis/react';
-import { NexMarkdown } from '@eclipsis/react/markdown';
-import { NexMarkdownWidget } from '@eclipsis/react/widgets';
+} from '@nexfluid/react';
+import { NexMarkdown } from '@nexfluid/react/markdown';
+import { NexMarkdownWidget } from '@nexfluid/react/widgets';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

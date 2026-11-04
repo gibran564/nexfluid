@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { cx } from '@eclipsis/components';
+import { cx } from '@nexfluid/components';
 import { NexNav, NexNavItem } from '../nav.tsx';
 
 export interface NexExplorerNode {

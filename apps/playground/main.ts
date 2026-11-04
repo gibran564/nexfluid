@@ -12,8 +12,8 @@ import {
   type MotionMode,
   type MotionOverrides,
   type MotionPresetName,
-} from '@eclipsis/core';
-import { applyTheme, THEMES, type ThemeName } from '@eclipsis/foundation';
+} from '@nexfluid/core';
+import { applyTheme, THEMES, type ThemeName } from '@nexfluid/foundation';
 
 const $ = <T extends Element>(sel: string) => {
   const el = document.querySelector<T>(sel);

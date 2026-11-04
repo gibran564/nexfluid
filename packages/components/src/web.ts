@@ -1,7 +1,7 @@
 /**
  * Superficie web: lo que no depende de React ni del DOM.
  *
- * NexPortal (@eclipsis/react) integra la web en el documento con un único
+ * NexPortal (@nexfluid/react) integra la web en el documento con un único
  * motor —un `<iframe>`— y tres presentaciones. Aquí viven sus reglas, para
  * probarlas con cadenas:
  *

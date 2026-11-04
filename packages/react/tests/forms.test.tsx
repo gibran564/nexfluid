@@ -2,8 +2,8 @@ import { act, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NexCheckbox, NexInput, NexSelect, type NexSelectOption } from '@eclipsis/react';
-import { NexMarkdown } from '@eclipsis/react/markdown';
+import { NexCheckbox, NexInput, NexSelect, type NexSelectOption } from '@nexfluid/react';
+import { NexMarkdown } from '@nexfluid/react/markdown';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

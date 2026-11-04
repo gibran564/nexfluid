@@ -1,4 +1,4 @@
-# @eclipsis/foundation
+# @nexfluid/foundation
 
 NexFoundation: tokens de NexFluid Native (temas, direcciones, familias geométricas, materiales, tipografía, movimiento) y hoja opcional de compatibilidad con Nextudio.
 

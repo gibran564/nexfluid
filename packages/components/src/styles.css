@@ -1,12 +1,12 @@
 /* ==========================================================================
-   @eclipsis/components — NexFluid Native · Living Editorial Interfaces
+   @nexfluid/components — NexFluid Native · Living Editorial Interfaces
 
    Gramática (no estilos sueltos):
    · Membrana: única primitiva de superficie. Rol (surface · control · content)
      → familia geométrica de la dirección; material (base · raised · sunken ·
      clear · accent · solid · ink · fluid) → relleno y borde. Modo estático
      (CSS: superelipse con corner-shape) y modo vivo (SVG dibujado por
-     @eclipsis/core, que se deforma).
+     @nexfluid/core, que se deforma).
    · Estados: rest → attract → deform → activate → morph → settle.
    · Gota líquida: indicador compartido por pestañas, navegación y selectores.
    · Tipografía como estructura: clases nx-type-* compartidas.

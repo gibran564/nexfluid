@@ -1,15 +1,15 @@
-import { NexCodeBlock } from '@eclipsis/react';
-import { NexMarkdownEditor, NexMarkdownWidget, NexPropertiesWidget } from '@eclipsis/react/widgets';
-import { FluidBlob } from '@eclipsis/react/motion';
+import { NexCodeBlock } from '@nexfluid/react';
+import { NexMarkdownEditor, NexMarkdownWidget, NexPropertiesWidget } from '@nexfluid/react/widgets';
+import { FluidBlob } from '@nexfluid/react/motion';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 import { example } from '../examples/index.ts';
 
 const SAMPLE_CODE: Record<string, string> = {
-  tsx: `import { NexCard } from '@eclipsis/react';\n\nexport function Project({ title }: { title: string }) {\n  // Toda la tarjeta navega\n  return <NexCard interactive>{title}</NexCard>;\n}`,
+  tsx: `import { NexCard } from '@nexfluid/react';\n\nexport function Project({ title }: { title: string }) {\n  // Toda la tarjeta navega\n  return <NexCard interactive>{title}</NexCard>;\n}`,
   python: `def espera_media(lam: float, mu: float) -> float:\n    """Cola M/M/1."""\n    return lam / (mu * (mu - lam))\n\nprint(espera_media(0.5, 0.75))  # 4.0`,
   css: `.nx-card[data-nx-appearance='editorial'] {\n  border-top: 2px solid var(--nx-fg);\n  padding-inline: 0;\n}`,
-  json: `{\n  "name": "@eclipsis/react",\n  "peerDependencies": { "react": "^19.0.0" }\n}`,
+  json: `{\n  "name": "@nexfluid/react",\n  "peerDependencies": { "react": "^19.0.0" }\n}`,
   bash: `npm install\nnpm run dev -- --port 5290  # NexDocs`,
 };
 
@@ -21,7 +21,7 @@ export const codeBlockDoc: ComponentDoc = {
   eyebrow: 'Componentes · Contenido',
   summary: 'Código de sólo lectura con resaltado ligero sin dependencias, números y líneas destacadas, ajuste de línea y copia accesible. Admite un resaltador propio (p. ej. Monaco).',
   status: 'piloto',
-  imports: [{ names: ['NexCodeBlock'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexCodeBlock'], from: '@nexfluid/react' }],
   origin: <><code>ColorizedCode</code> (Monaco), <code>CopyButton</code>, bloques de <code>MarkdownContent</code></>,
   controls: [
     { kind: 'select', name: 'language', label: 'Lenguaje', options: Object.keys(SAMPLE_CODE), initial: 'tsx' },
@@ -70,8 +70,8 @@ const MD = `## Instalación
 Importa los **estilos** una vez y los componentes donde los uses:
 
 \`\`\`tsx
-import '@eclipsis/foundation/tokens.css';
-import { NexCard } from '@eclipsis/react';
+import '@nexfluid/foundation/tokens.css';
+import { NexCard } from '@nexfluid/react';
 \`\`\`
 
 - [x] Tokens
@@ -79,8 +79,8 @@ import { NexCard } from '@eclipsis/react';
 
 | Paquete | Rol |
 |---|---|
-| \`@eclipsis/core\` | Motor |
-| \`@eclipsis/react\` | Puente React |
+| \`@nexfluid/core\` | Motor |
+| \`@nexfluid/react\` | Puente React |
 
 ## Fórmulas
 
@@ -103,7 +103,7 @@ export const markdownDoc: ComponentDoc = {
   eyebrow: 'Componentes · Contenido',
   summary: 'Renderizador de Markdown (GFM) seguro e independiente del editor. Sin HTML en línea, URLs filtradas, código con NexCodeBlock, tablas desplazables y títulos enlazables.',
   status: 'piloto',
-  imports: [{ names: ['NexMarkdown'], from: '@eclipsis/react/markdown' }],
+  imports: [{ names: ['NexMarkdown'], from: '@nexfluid/react/markdown' }],
   origin: <><code>MarkdownContent</code>, <code>LegalMarkdown</code>, <code>WorkspaceMarkdownPreview</code></>,
   controls: [
     { kind: 'select', name: 'density', label: 'Densidad', options: ['compact', 'comfortable'], initial: 'comfortable' },
@@ -137,7 +137,7 @@ export const markdownDoc: ComponentDoc = {
     'Las fórmulas ($…$ y $$…$$) se pintan con KaTeX en HTML y MathML: los lectores de pantalla leen la expresión. trust: false impide enlaces, imágenes o atributos desde TeX.',
   ],
   requires: [
-    <>Entrada aparte <code>@eclipsis/react/markdown</code>: añade <code>react-markdown</code> 10.1.0 y <code>remark-gfm</code> 4.0.1, las mismas versiones que Nextudio. La entrada principal no los carga.</>,
+    <>Entrada aparte <code>@nexfluid/react/markdown</code>: añade <code>react-markdown</code> 10.1.0 y <code>remark-gfm</code> 4.0.1, las mismas versiones que Nextudio. La entrada principal no los carga.</>,
     'Política de URLs: http, https, mailto, anclas y relativas. javascript:, data:, vbscript:, file: y esquemas propios se descartan (pruebas incluidas).',
   ],
 };
@@ -157,7 +157,7 @@ export const markdownWidgetDoc: ComponentDoc = {
   eyebrow: 'Widgets',
   summary: 'Bloque de documentación listo para usar: NexCard + NexTabs + NexMarkdown + NexCodeBlock. Una aplicación lo consume con una línea, sin copiar su implementación.',
   status: 'piloto',
-  imports: [{ names: ['NexMarkdownWidget'], from: '@eclipsis/react/widgets' }],
+  imports: [{ names: ['NexMarkdownWidget'], from: '@nexfluid/react/widgets' }],
   origin: <>Previsualizaciones de enunciados, <code>WorkspaceMarkdownPreview</code></>,
   controls: [
     { kind: 'text', name: 'title', label: 'Título', initial: 'Documentación' },
@@ -195,7 +195,7 @@ export const propertiesWidgetDoc: ComponentDoc = {
   eyebrow: 'Widgets',
   summary: 'Panel clave → valor agrupado para inspectores y metadatos, con listas de definición reales.',
   status: 'piloto',
-  imports: [{ names: ['NexPropertiesWidget'], from: '@eclipsis/react/widgets' }],
+  imports: [{ names: ['NexPropertiesWidget'], from: '@nexfluid/react/widgets' }],
   origin: <>Paneles de propiedades del inspector de NexFrame, <code>Stat</code> y <code>Field</code> de Aula</>,
   controls: [
     { kind: 'select', name: 'material', label: 'Material', options: ['raised', 'base', 'sunken', 'clear'], initial: 'raised' },
@@ -225,8 +225,8 @@ export const fluidBlobDoc: ComponentDoc = {
   eyebrow: 'Motion · NexFluid',
   summary: 'La primitiva orgánica del motor: contorno con volumen constante, atracción hacia el puntero y presión elástica. Es decorativa por defecto y se detiene sola en reposo.',
   status: 'laboratorio',
-  imports: [{ names: ['FluidBlob'], from: '@eclipsis/react/motion' }],
-  origin: <>Fase 1 de NexFluid (<code>createFluidBlob</code> de <code>@eclipsis/core</code>)</>,
+  imports: [{ names: ['FluidBlob'], from: '@nexfluid/react/motion' }],
+  origin: <>Fase 1 de NexFluid (<code>createFluidBlob</code> de <code>@nexfluid/core</code>)</>,
   controls: [
     { kind: 'select', name: 'motion', label: 'Preset', options: ['calm', 'flow', 'elastic', 'viscous', 'magnetic', 'morph', 'spring', 'ambient'], initial: 'morph' },
     { kind: 'number', name: 'intensity', label: 'Intensidad', initial: 0.7, min: 0, max: 1, step: 0.05 },

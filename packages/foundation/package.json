@@ -1,6 +1,6 @@
 {
-  "name": "@eclipsis/foundation",
-  "version": "0.3.0",
+  "name": "@nexfluid/foundation",
+  "version": "0.4.0",
   "description": "NexFoundation: NexFluid Native tokens (themes, directions, shapes, materials, type, motion) plus an optional Nextudio compatibility sheet",
   "license": "MIT",
   "author": "gibran564",

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NexButton, NexPortal, NexSegmented, type NexPortalConsoleEntry } from '@eclipsis/react';
+import { NexButton, NexPortal, NexSegmented, type NexPortalConsoleEntry } from '@nexfluid/react';
 
 /** Recurso propio servido por NexDocs: se deja incrustar y su JavaScript es real. */
 export const REFERENCE_URL = './reference/cola-mm1.html';

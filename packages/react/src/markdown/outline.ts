@@ -7,7 +7,7 @@
  * Lee títulos ATX (`#`… `######`) fuera de bloques de código cercados. El
  * texto se toma sin marcas en línea (énfasis, código, enlaces).
  */
-import { slugify } from '@eclipsis/components';
+import { slugify } from '@nexfluid/components';
 
 export interface MarkdownHeading {
   level: 1 | 2 | 3 | 4 | 5 | 6;

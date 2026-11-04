@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { NexButton, NexInk, NexAnchoredLayer, type NexAlign, type NexSide } from '@eclipsis/react';
+import { NexButton, NexInk, NexAnchoredLayer, type NexAlign, type NexSide } from '@nexfluid/react';
 import {
   MARKDOWN_INK_COMMANDS, NexMarkdownField, createTextareaInkAdapter, type MarkdownInkCommand,
-} from '@eclipsis/react/markdown';
-import type { NexInkAdapter } from '@eclipsis/react';
+} from '@nexfluid/react/markdown';
+import type { NexInkAdapter } from '@nexfluid/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 
@@ -80,7 +80,7 @@ function CollisionDemo() {
   );
 }
 
-/** Continuidad: la misma capa cambia de ancla y se desliza con los resortes de @eclipsis/core. */
+/** Continuidad: la misma capa cambia de ancla y se desliza con los resortes de @nexfluid/core. */
 function ReanchorDemo() {
   const steps = ['Datos', 'Modelo', 'Resultados', 'Informe'];
   const [at, setAt] = useState(0);
@@ -106,7 +106,7 @@ export const anchoredLayerDoc: ComponentDoc = {
   eyebrow: 'Componentes · Capas',
   summary: 'Una superficie contextual junto a un ancla: un elemento, una ref o un rango de texto. Se queda en su sitio del árbol (no remonta lo que contiene) y sube a la capa superior del navegador. Coloca con flip y shift dentro del viewport visual, sigue a su ancla, se desliza si cambia de ancla y gestiona Escape, clic fuera y foco según su modalidad.',
   status: 'laboratorio',
-  imports: [{ names: ['NexAnchoredLayer', 'useAnchoredLayer'], from: '@eclipsis/react' }, { names: ['placeFloating'], from: '@eclipsis/components' }],
+  imports: [{ names: ['NexAnchoredLayer', 'useAnchoredLayer'], from: '@nexfluid/react' }, { names: ['placeFloating'], from: '@nexfluid/components' }],
   origin: <>las capas contextuales de NexBook (menús de bloque, foco con Popover API) y NexMenu</>,
   controls: [
     { kind: 'select', name: 'side', label: 'Lado', options: ['bottom', 'top', 'right', 'left'], initial: 'bottom' },
@@ -148,7 +148,7 @@ ${jsx('NexAnchoredLayer', { open: '{open}' as never, onOpenChange: '{setOpen}' a
       ],
     },
     {
-      component: 'placeFloating(input) — @eclipsis/components',
+      component: 'placeFloating(input) — @nexfluid/components',
       rows: [
         { name: 'anchor · floating · viewport', type: 'AnchorRect · { width, height } · AnchorRect', description: 'Geometría pura, sin DOM: devuelve x, y, side, flipped, shift, maxWidth, maxHeight y arrow.' },
       ],
@@ -217,8 +217,8 @@ export const inkDoc: ComponentDoc = {
   summary: 'Herramientas editoriales que aparecen con la selección y se retiran al leer. NexInk es la barra y su interacción; un adaptador habla con el editor concreto (textarea, contenteditable, Monaco…). Refleja formatos activos y mixtos, no destruye la selección, se recorre con teclado y en pantallas estrechas se acomoda sobre el teclado en pantalla.',
   status: 'laboratorio',
   imports: [
-    { names: ['NexInk'], from: '@eclipsis/react' },
-    { names: ['MARKDOWN_INK_COMMANDS', 'createTextareaInkAdapter', 'createRichTextInkAdapter', 'NexMarkdownField'], from: '@eclipsis/react/markdown' },
+    { names: ['NexInk'], from: '@nexfluid/react' },
+    { names: ['MARKDOWN_INK_COMMANDS', 'createTextareaInkAdapter', 'createRichTextInkAdapter', 'NexMarkdownField'], from: '@nexfluid/react/markdown' },
   ],
   origin: <>la barra de formato de NexBook (operaciones de texto con toggle y una parada de deshacer)</>,
   controls: [],
@@ -234,7 +234,7 @@ useEffect(() => { if (area.current) setAdapter(createTextareaInkAdapter(area.cur
 <textarea ref={area} value={markdown} onChange={(e) => setMarkdown(e.target.value)} />
 <NexInk adapter={adapter} commands={MARKDOWN_INK_COMMANDS} />`,
   showcases: [
-    { title: 'Barra fija, mismo contrato', lead: 'presentation="inline": para un consumidor que no quiere capas flotantes. El adaptador es el público de @eclipsis/react/markdown.', render: () => <InkInlineDemo /> },
+    { title: 'Barra fija, mismo contrato', lead: 'presentation="inline": para un consumidor que no quiere capas flotantes. El adaptador es el público de @nexfluid/react/markdown.', render: () => <InkInlineDemo /> },
   ],
   api: [
     {
@@ -257,7 +257,7 @@ useEffect(() => { if (area.current) setAdapter(createTextareaInkAdapter(area.cur
       ],
     },
     {
-      component: 'Markdown (@eclipsis/react/markdown)',
+      component: 'Markdown (@nexfluid/react/markdown)',
       rows: [
         { name: 'createTextareaInkAdapter(textarea)', type: 'NexInkAdapter', description: 'Ediciones mínimas con insertText: entran en el deshacer nativo del campo.' },
         { name: 'createRichTextInkAdapter(root, { onChange })', type: 'NexInkAdapter', description: 'El editor visual de NexMarkdownField. Estado por nodos del rango (mixto real); las islas no se tocan.' },

@@ -2,9 +2,9 @@ import { act, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NexCard, NexFrame, NexIcon, NexNav, NexPanel, NexProvider, NexSegmented, NexSurface } from '@eclipsis/react';
-import { NexMarkdown } from '@eclipsis/react/markdown';
-import { NexExplorerWidget, NexInspectorWidget, NexPreviewWidget } from '@eclipsis/react/widgets';
+import { NexCard, NexFrame, NexIcon, NexNav, NexPanel, NexProvider, NexSegmented, NexSurface } from '@nexfluid/react';
+import { NexMarkdown } from '@nexfluid/react/markdown';
+import { NexExplorerWidget, NexInspectorWidget, NexPreviewWidget } from '@nexfluid/react/widgets';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

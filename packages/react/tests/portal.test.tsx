@@ -2,8 +2,8 @@ import { act, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { NexPortal, type NexPortalConsoleEntry, type NexPortalStatus } from '@eclipsis/react';
-import * as api from '@eclipsis/react';
+import { NexPortal, type NexPortalConsoleEntry, type NexPortalStatus } from '@nexfluid/react';
+import * as api from '@nexfluid/react';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

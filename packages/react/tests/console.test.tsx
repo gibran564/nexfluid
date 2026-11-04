@@ -2,10 +2,10 @@ import { act, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { NexConsole, NexLiveConsole, type NexConsoleOutput } from '@eclipsis/react';
-import { createSessionStore, fromNexBookOutputs, normalizeNexViewEvents, type NexSessionTransport } from '@eclipsis/components';
-import { NexMarkdownField, renderRichText, richTextToMarkdown } from '@eclipsis/react/markdown';
-import { NexDataView, sheetFromRows } from '@eclipsis/react/sheets';
+import { NexConsole, NexLiveConsole, type NexConsoleOutput } from '@nexfluid/react';
+import { createSessionStore, fromNexBookOutputs, normalizeNexViewEvents, type NexSessionTransport } from '@nexfluid/components';
+import { NexMarkdownField, renderRichText, richTextToMarkdown } from '@nexfluid/react/markdown';
+import { NexDataView, sheetFromRows } from '@nexfluid/react/sheets';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

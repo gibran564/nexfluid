@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NexMarkdownField } from '@eclipsis/react/markdown';
-import { NexDataView, sheetFromRows, type SheetData } from '@eclipsis/react/sheets';
+import { NexMarkdownField } from '@nexfluid/react/markdown';
+import { NexDataView, sheetFromRows, type SheetData } from '@nexfluid/react/sheets';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { ConsoleShowcase, LiveSessionDemo } from '../examples/console-demos.tsx';
 import { ViewCases } from '../examples/view-cases.tsx';
@@ -12,7 +12,7 @@ export const consoleDoc: ComponentDoc = {
   summary: 'La entrada y la salida de un programa en una sola superficie. Consola: stdout, stderr y stdin en el orden real, con la línea de entrada detrás de su prompt. NexView: la misma ejecución compuesta (tablas, matrices, JSON, imágenes, figuras, diagnósticos). Cambiar de vista no ejecuta nada.',
   status: 'laboratorio',
   wide: true,
-  imports: [{ names: ['NexConsole', 'NexLiveConsole'], from: '@eclipsis/react' }, { names: ['createSessionStore', 'fromNexBookOutputs', 'fromTerminalSegments'], from: '@eclipsis/components' }],
+  imports: [{ names: ['NexConsole', 'NexLiveConsole'], from: '@nexfluid/react' }, { names: ['createSessionStore', 'fromNexBookOutputs', 'fromTerminalSegments'], from: '@nexfluid/components' }],
   origin: <>ProgramTerminal, StdinField y NexView de Nextudio</>,
   controls: [],
   render: () => <ConsoleShowcase which="normal" />,
@@ -95,7 +95,7 @@ export const markdownFieldDoc: ComponentDoc = {
   eyebrow: 'Componentes · Contenido',
   summary: 'Escribir Markdown sin verlo, o verlo cuando hace falta. Tres perspectivas del mismo valor: Visual (el texto ya compuesto; tablas, código y fórmulas quedan como islas intactas), Markdown (la fuente) y Vista (la lectura). NexInk aparece al seleccionar.',
   status: 'laboratorio',
-  imports: [{ names: ['NexMarkdownField'], from: '@eclipsis/react/markdown' }],
+  imports: [{ names: ['NexMarkdownField'], from: '@nexfluid/react/markdown' }],
   origin: <>el bloque de texto de NexBook (NexBookMarkdownEditor)</>,
   controls: [],
   render: () => <MarkdownFieldDemo />,
@@ -127,7 +127,7 @@ export const dataViewDoc: ComponentDoc = {
   eyebrow: 'Componentes · Datos',
   summary: 'Los datos de una hoja dentro de un documento, como tabla o gráfico, con las fórmulas evaluadas. «Abrir en NexSheets» transforma la vista en el editor completo; o lo delega en la aplicación con onOpenSheets. Un solo dato: tabla, gráfico y editor no se desincronizan.',
   status: 'laboratorio',
-  imports: [{ names: ['NexDataView'], from: '@eclipsis/react/sheets' }],
+  imports: [{ names: ['NexDataView'], from: '@nexfluid/react/sheets' }],
   origin: <>la tabla y la gráfica de un bloque de hoja de NexBook</>,
   controls: [],
   render: () => <DataViewDemo />,

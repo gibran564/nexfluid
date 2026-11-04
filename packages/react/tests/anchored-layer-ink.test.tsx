@@ -2,10 +2,10 @@ import { act, useRef, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NexInk, NexAnchoredLayer, matchesShortcut, type NexInkAdapter, type NexInkCommand, type NexInkState } from '@eclipsis/react';
+import { NexInk, NexAnchoredLayer, matchesShortcut, type NexInkAdapter, type NexInkCommand, type NexInkState } from '@nexfluid/react';
 import {
   NexMarkdownField, applyMarkdownCommand, createRichTextInkAdapter, createTextareaInkAdapter, markdownCommandState, renderRichText,
-} from '@eclipsis/react/markdown';
+} from '@nexfluid/react/markdown';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

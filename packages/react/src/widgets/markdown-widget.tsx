@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { cx, type NexAppearance, type NexDensity, type NexMotion } from '@eclipsis/components';
+import { cx, type NexAppearance, type NexDensity, type NexMotion } from '@nexfluid/components';
 import { NexCard, NexCardContent, NexCardDescription, NexCardEyebrow, NexCardHeader, NexCardTitle } from '../card.tsx';
 import { NexCodeBlock } from '../code-block.tsx';
 import { NexMarkdown, type NexMarkdownProps } from '../markdown/markdown.tsx';

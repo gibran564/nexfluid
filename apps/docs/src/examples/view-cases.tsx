@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NexConsole, NexSelect, type NexConsoleOutput } from '@eclipsis/react';
+import { NexConsole, NexSelect, type NexConsoleOutput } from '@nexfluid/react';
 
 /** Los 14 casos de composición de NexView, como salidas del contrato real. */
 type O = NexConsoleOutput;

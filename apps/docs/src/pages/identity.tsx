@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { DIRECTIONS, MOTION_FAMILIES, SHAPES, SURFACE_STATES, type DirectionName } from '@eclipsis/foundation';
-import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexNav, NexPanel, NexProvider, NexSegmented, NexSurface, NexTab, NexTabs } from '@eclipsis/react';
-import { NexMarkdownWidget } from '@eclipsis/react/widgets';
+import { DIRECTIONS, MOTION_FAMILIES, SHAPES, SURFACE_STATES, type DirectionName } from '@nexfluid/foundation';
+import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexNav, NexPanel, NexProvider, NexSegmented, NexSurface, NexTab, NexTabs } from '@nexfluid/react';
+import { NexMarkdownWidget } from '@nexfluid/react/widgets';
 import { PageHeader, Section } from '../docs/kit.tsx';
 
 const MD = `## Colas\n\nUn modelo **M/M/1** con λ = 0.5.\n\n> [!TIP]\n> Compara con la simulación.`;

@@ -5,9 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   NexBadge, NexButton, NexCard, NexCodeBlock, NexFrame, NexFrameRegion, NexIconButton, NexIcon, NexProvider, NexTab,
   NexTabs, NexTabsList, NexTabsPanel,
-} from '@eclipsis/react';
-import { NexMarkdown } from '@eclipsis/react/markdown';
-import { NexMarkdownWidget, NexPropertiesWidget } from '@eclipsis/react/widgets';
+} from '@nexfluid/react';
+import { NexMarkdown } from '@nexfluid/react/markdown';
+import { NexMarkdownWidget, NexPropertiesWidget } from '@nexfluid/react/widgets';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

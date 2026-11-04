@@ -1,6 +1,6 @@
 {
-  "name": "@eclipsis/sheets",
-  "version": "0.3.0",
+  "name": "@nexfluid/sheets",
+  "version": "0.4.0",
   "description": "NexSheets Core: framework-free spreadsheet model (workbooks, cells, ranges, selection, history, formulas, CSV/TSV/JSON)",
   "license": "MIT",
   "author": "gibran564",

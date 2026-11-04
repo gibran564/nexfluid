@@ -1,4 +1,4 @@
-import { NexMenu, type NexMenuItem } from '@eclipsis/react';
+import { NexMenu, type NexMenuItem } from '@nexfluid/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 import { EditorialDocument } from '../examples/editorial-document.tsx';
@@ -16,7 +16,7 @@ export const menuDoc: ComponentDoc = {
   eyebrow: 'Componentes · Acciones',
   summary: 'Un botón que abre una lista de acciones: grupos, pistas, interruptores y acciones destructivas. Sube a la capa superior del navegador, sigue a su disparador y no escucha nada mientras está cerrado. NexCommandMenu es su variante con búsqueda para «/».',
   status: 'laboratorio',
-  imports: [{ names: ['NexMenu', 'NexCommandMenu'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexMenu', 'NexCommandMenu'], from: '@nexfluid/react' }],
   origin: <>los menús de acciones y de inserción de NexBook</>,
   controls: [
     { kind: 'select', name: 'align', label: 'Alineación', options: ['start', 'end'], initial: 'start' },
@@ -90,7 +90,7 @@ export const flowDoc: ComponentDoc = {
   summary: 'Living Editorial Blocks. En reposo, el documento es editorial; al acercarse, cada bloque revela su contorno con la membrana de NexSurface; al seleccionarlo, su límite se vuelve explícito. Identidad, orden, inserción y Focus siguen ahí: sólo cambia cuándo se ven.',
   status: 'laboratorio',
   wide: true,
-  imports: [{ names: ['NexFlow', 'NexEditorialBlock', 'useNexFlow'], from: '@eclipsis/react' }],
+  imports: [{ names: ['NexFlow', 'NexEditorialBlock', 'useNexFlow'], from: '@nexfluid/react' }],
   origin: <>el documento de NexBook: texto, código, datos e interacción en una sola hoja</>,
   controls: [
     { kind: 'select', name: 'mode', label: 'Modo', options: ['read', 'edit'], initial: 'edit' },

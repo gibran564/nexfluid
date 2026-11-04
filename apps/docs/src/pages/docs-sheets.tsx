@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { NexButton, NexCodeBlock, NexSegmented } from '@eclipsis/react';
-import { NexSheets, createWorkbook, evaluateSheet, sheetFromRows, type Workbook } from '@eclipsis/react/sheets';
+import { NexButton, NexCodeBlock, NexSegmented } from '@nexfluid/react';
+import { NexSheets, createWorkbook, evaluateSheet, sheetFromRows, type Workbook } from '@nexfluid/react/sheets';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx, type Values } from '../docs/kit.tsx';
 import { example } from '../examples/index.ts';
@@ -164,7 +164,7 @@ function PerformanceBench() {
 
 const INTEGRATION = `// Adaptador NexBook ⇄ NexSheets (futuro, en Nextudio).
 // La hoja de NexBook y la de NexSheets comparten contrato: { rows, columns, cells: { "r:c": { input } }, headers? }.
-import { NexSheets, createSheet, createWorkbook, type Workbook } from '@eclipsis/react/sheets';
+import { NexSheets, createSheet, createWorkbook, type Workbook } from '@nexfluid/react/sheets';
 
 const NEXBOOK_LIMITS = { maxRows: 200, maxColumns: 40, maxCells: 2_000, maxCellChars: 300 };
 
@@ -194,7 +194,7 @@ export const sheetsDoc: ComponentDoc = {
   summary: 'Un editor de hojas de cálculo real: rejilla virtual, barra de fórmulas, pestañas, autollenado, historial, CSV y portapapeles TSV. El motor de fórmulas y el modelo de datos proceden del editor de hojas de Nextudio; la selección es una superficie fluida que viaja con precisión.',
   status: 'laboratorio',
   wide: true,
-  imports: [{ names: ['NexSheets', 'createWorkbook', 'sheetFromRows'], from: '@eclipsis/react/sheets' }, { names: ['evaluateSheet', 'fillRange', 'createHistory'], from: '@eclipsis/sheets' }],
+  imports: [{ names: ['NexSheets', 'createWorkbook', 'sheetFromRows'], from: '@nexfluid/react/sheets' }, { names: ['evaluateSheet', 'fillRange', 'createHistory'], from: '@nexfluid/sheets' }],
   origin: <>editor de hojas de NexBook y su modo enfoque (motor de fórmulas, direcciones, ediciones y CSV)</>,
   controls: [
     { kind: 'select', name: 'motion', label: 'Movimiento', options: ['none', 'subtle', 'fluid', 'elastic'], initial: 'fluid' },
@@ -236,7 +236,7 @@ export const sheetsDoc: ComponentDoc = {
       ],
     },
     {
-      component: '@eclipsis/sheets (Core)',
+      component: '@nexfluid/sheets (Core)',
       rows: [
         { name: 'Libro', type: 'createWorkbook · addSheet · renameSheet · removeSheet · updateSheet', description: 'Operaciones puras e inmutables.' },
         { name: 'Fórmulas', type: 'evaluateSheet · FORMULA_NAMES', description: 'Intérprete cerrado sin eval, en español e inglés. Sin referencias entre hojas, matrices ni fechas.' },
@@ -265,5 +265,5 @@ export const sheetsDoc: ComponentDoc = {
     'Los errores de fórmula se explican en texto (aria-describedby), no sólo con color.',
     'Con movimiento reducido o motion="none", la selección salta sin animación. La animación nunca retrasa la edición: el dato cambia al instante.',
   ],
-  requires: ['@eclipsis/sheets (dependencia de @eclipsis/react).', 'Pendiente: XLSX (el lector de Nextudio depende de fflate), referencias entre hojas, formato de celdas, inmovilizar paneles.'],
+  requires: ['@nexfluid/sheets (dependencia de @nexfluid/react).', 'Pendiente: XLSX (el lector de Nextudio depende de fflate), referencias entre hojas, formato de celdas, inmovilizar paneles.'],
 };

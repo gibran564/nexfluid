@@ -17,10 +17,10 @@ y el editor de `.md` del Composition Lab.
 
 | Capacidad | Implementación encontrada | Decisión | Justificación |
 |---|---|---|---|
-| Movimiento | `@eclipsis/core` (`FluidValue`, `MOTION_PRESETS`, `sharedClock`) y `springs.ts` | Reutilizar | El deslizamiento de NexAnchoredLayer al cambiar de ancla usa `useSprings` + `presetFor`; ninguna física nueva. |
+| Movimiento | `@nexfluid/core` (`FluidValue`, `MOTION_PRESETS`, `sharedClock`) y `springs.ts` | Reutilizar | El deslizamiento de NexAnchoredLayer al cambiar de ancla usa `useSprings` + `presetFor`; ninguna física nueva. |
 | Morphing | `NexMorph` (`MorphTransition`, monta su destino) | Reutilizar, no envolver | NexAnchoredLayer no transforma contenido. Una superficie que nace de otra es NexMorph. |
 | Capas | `useAnchoredLayer` (Popover API) en NexMenu/NexCommandMenu; NexSelect con su propio cálculo | Extender y unificar | Un solo hook para los cuatro; NexSelect pierde su copia. Nueva pila `layers.ts` para Escape/clic fuera/anidamiento. |
-| Posicionamiento | Cálculo inline (sólo arriba/abajo, sin RTL ni límites) | Crear geometría pura | `placeFloating` en `@eclipsis/components`: flip, shift, RTL, lados L/R, `maxWidth/maxHeight`, `arrow`. Sin DOM, probado en Node. |
+| Posicionamiento | Cálculo inline (sólo arriba/abajo, sin RTL ni límites) | Crear geometría pura | `placeFloating` en `@nexfluid/components`: flip, shift, RTL, lados L/R, `maxWidth/maxHeight`, `arrow`. Sin DOM, probado en Node. |
 | Formato Markdown | `applyMarkdownCommand` (sin alternancia) y barra propia dentro de NexMarkdownField | Extender y extraer | Comandos con toggle + `markdownCommandState`; la barra propia se sustituye por NexInk. |
 | Edición visual | `renderRichText` / `richTextToMarkdown` (islas) | Reutilizar | Ya preserva lo no representable como isla con su fuente exacta. NexInk se le conecta con un adaptador. |
 | Selección | `selectionchange` + rango guardado sólo para el enlace | Adaptar | Contrato `bookmark/restore` en el adaptador; la barra no toma el foco al pulsar. |
@@ -67,7 +67,7 @@ Tres responsabilidades separadas:
    run · bookmark · restore · subscribe`. Nada de Markdown, Monaco ni NexBook
    en el contrato.
 
-Adaptadores incluidos (en `@eclipsis/react/markdown`): `textarea` (ediciones
+Adaptadores incluidos (en `@nexfluid/react/markdown`): `textarea` (ediciones
 mínimas con `insertText` → una parada en el deshacer nativo) y el editor
 visual de NexMarkdownField (`execCommand`/`insertHTML` escapado → también en
 su deshacer; estado por nodos del rango, islas excluidas).

@@ -30,8 +30,8 @@ import {
   type FocusEvent, type HTMLAttributes, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { cx, edgeScrollStep, keyboardMove, reorderSlot, type NexDensity, type NexMotion } from '@eclipsis/components';
-import type { MotionPreference } from '@eclipsis/core';
+import { cx, edgeScrollStep, keyboardMove, reorderSlot, type NexDensity, type NexMotion } from '@nexfluid/components';
+import type { MotionPreference } from '@nexfluid/core';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { NexIcon } from './icon.tsx';
 import { NexCommandMenu, NexMenu, type NexMenuItem } from './menu.tsx';

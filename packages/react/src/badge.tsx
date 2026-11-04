@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import { cx, type NexDensity, type NexTone } from '@eclipsis/components';
+import { cx, type NexDensity, type NexTone } from '@nexfluid/components';
 
 export interface NexBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: NexTone;

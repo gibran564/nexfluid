@@ -1,5 +1,5 @@
 /**
- * @eclipsis/core — NexFluid, el motor de movimiento orgánico.
+ * @nexfluid/core — NexFluid, el motor de movimiento orgánico.
  *
  * No depende de ningún framework ni de los componentes. Todo lo que no se
  * exporta aquí es interno.

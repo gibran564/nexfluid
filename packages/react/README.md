@@ -1,4 +1,4 @@
-# @eclipsis/react
+# @nexfluid/react
 
 NexFluidUI para React 19: componentes, widgets y Markdown seguro sobre NexFluid.
 

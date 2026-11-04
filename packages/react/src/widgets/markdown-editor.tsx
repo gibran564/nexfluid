@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
-import { cx } from '@eclipsis/components';
+import { cx } from '@nexfluid/components';
 import { NexMarkdown, type NexMarkdownProps } from '../markdown/markdown.tsx';
 import { MARKDOWN_INK_COMMANDS, createTextareaInkAdapter, type MarkdownInkCommand } from '../markdown/ink.tsx';
 import { NexInk, type NexInkAdapter } from '../ink.tsx';

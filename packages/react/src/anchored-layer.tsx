@@ -17,7 +17,7 @@
  * ciclo de apertura con salida interrumpible, pila de capas (Escape cierra la
  * de arriba; un clic dentro de una capa hija no cierra la madre), foco según
  * modalidad y continuidad: si cambia el ancla con la capa abierta, la
- * superficie SE DESLIZA con los resortes de @eclipsis/core en vez de saltar.
+ * superficie SE DESLIZA con los resortes de @nexfluid/core en vez de saltar.
  *
  * No hace morphing. Cuando el contenido debe transformarse desde su origen
  * (una tarjeta que se vuelve panel) eso es NexMorph, que ya monta su destino.
@@ -26,7 +26,7 @@ import {
   useCallback, useEffect, useId, useLayoutEffect, useRef, useState,
   type CSSProperties, type HTMLAttributes, type ReactNode, type RefObject,
 } from 'react';
-import { cx, type FloatingPlacement, type NexAlign, type NexMotion, type NexSide } from '@eclipsis/components';
+import { cx, type FloatingPlacement, type NexAlign, type NexMotion, type NexSide } from '@nexfluid/components';
 import { useAnchoredLayer, type NexAnchorTarget } from './anchored.ts';
 import { LayerContext, pushLayer, useParentLayer, type NexLayer, type NexLayerDismissReason } from './layers.ts';
 import { canAnimate, useMotionPreference, useNex } from './provider.tsx';

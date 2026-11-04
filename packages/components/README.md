@@ -1,4 +1,4 @@
-# @eclipsis/components
+# @nexfluid/components
 
 NexComponents: contrato visual sin framework (clases nx-*, styles.css) y comportamiento puro (teclado ARIA, URLs seguras, resaltado).
 

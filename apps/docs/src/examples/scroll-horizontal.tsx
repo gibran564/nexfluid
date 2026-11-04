@@ -1,4 +1,4 @@
-import { NexCard, NexScroll } from '@eclipsis/react';
+import { NexCard, NexScroll } from '@nexfluid/react';
 
 const WEEKS = ['Colas M/M/1', 'Little', 'Simulación', 'Varianza', 'Intervalos', 'Redes', 'Prioridades', 'Informe'];
 
