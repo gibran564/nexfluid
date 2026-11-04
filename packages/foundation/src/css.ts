@@ -81,8 +81,15 @@ export function renderTokensCss(): string {
 
   out.push('/* ---- Temas: [data-nx-theme] ---- */');
   for (const name of Object.keys(THEMES) as Array<keyof typeof THEMES>) {
-    const selector = name === 'editorial-light' ? ":root,\n[data-nx-theme='editorial-light']" : `[data-nx-theme='${name}']`;
-    out.push(block(selector, colorLines(themeValues(THEMES[name]), THEMES[name].scheme)));
+    if (name === 'editorial-light') {
+      // `:root` da los valores por defecto, pero NO `color-scheme`: en una isla dentro de
+      // otra aplicación, declararlo en `:root` impone el esquema claro al anfitrión
+      // (barras de desplazamiento y controles nativos) aunque esté en modo oscuro.
+      out.push(block(":root,\n[data-nx-theme='editorial-light']", colorLines(themeValues(THEMES[name]))));
+      out.push(block("[data-nx-theme='editorial-light']", [`color-scheme: ${THEMES[name].scheme};`]));
+      continue;
+    }
+    out.push(block(`[data-nx-theme='${name}']`, colorLines(themeValues(THEMES[name]), THEMES[name].scheme)));
   }
   out.push(block("[data-nx-theme='auto']", colorLines(themeValues(THEMES['editorial-light']), 'light')));
   out.push(`@media (prefers-color-scheme: dark) {\n${block("[data-nx-theme='auto']", colorLines(themeValues(THEMES['editorial-dark']), 'dark')).replace(/^/gm, '  ')}\n}`, '');
