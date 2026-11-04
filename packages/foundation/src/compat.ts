@@ -5,7 +5,7 @@
  * apariencia actual mientras se adopta NexFluid Native. Lee las variables
  * de Nextudio (`--bg`, `--accent`…) y, fuera de Nextudio, cae a los valores
  * de NEX Origen claro. Se publica en una hoja aparte
- * (`@nexfluid/foundation/compat/nextudio.css`): quien no la importa no la carga.
+ * (`@eclipsis/foundation/compat/nextudio.css`): quien no la importa no la carga.
  */
 import type { ColorRole, Direction } from './tokens.ts';
 

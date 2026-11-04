@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexSegmented } from '@nexfluid/react';
-import { NexExplorerWidget, NexInspectorWidget } from '@nexfluid/react/widgets';
+import { NexBadge, NexButton, NexCard, NexFrame, NexIcon, NexSegmented } from '@eclipsis/react';
+import { NexExplorerWidget, NexInspectorWidget } from '@eclipsis/react/widgets';
 
 /** Layout con inspector: explorador en árbol, lienzo e inspector plegable dentro de un NexFrame. */
 export default function InspectorLayoutExample() {

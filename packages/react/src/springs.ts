@@ -1,15 +1,15 @@
 'use client';
 
 /**
- * Puente mínimo entre React y los resortes de @nexfluid/core.
+ * Puente mínimo entre React y los resortes de @eclipsis/core.
  *
  * Los valores se aplican directamente al DOM en `onFrame` (sin renderizar
  * React por fotograma) y la tarea se da de baja del reloj compartido en
  * cuanto todo está en reposo.
  */
 import { useEffect, useRef } from 'react';
-import { FluidValue, MORPH_PHYSICS, MOTION_PRESETS, sharedClock, type MorphPhysicsName, type MotionPresetName, type SpringParams, type Tick } from '@nexfluid/core';
-import type { NexMotion } from '@nexfluid/components';
+import { FluidValue, MORPH_PHYSICS, MOTION_PRESETS, sharedClock, type MorphPhysicsName, type MotionPresetName, type SpringParams, type Tick } from '@eclipsis/core';
+import type { NexMotion } from '@eclipsis/components';
 
 /** Preset del motor para cada nivel físico y papel dentro del componente. */
 export function presetFor(level: NexMotion, role: 'lead' | 'trail' | 'press' = 'lead'): MotionPresetName {

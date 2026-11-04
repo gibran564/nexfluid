@@ -1,10 +1,10 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { MORPH_PHYSICS, morphTimeline, morphTiming, overshootOf, resolveMorphPhysics, type MorphFrame, type MorphPhysics, type MorphPhysicsName } from '@nexfluid/core';
+import { MORPH_PHYSICS, morphTimeline, morphTiming, overshootOf, resolveMorphPhysics, type MorphFrame, type MorphPhysics, type MorphPhysicsName } from '@eclipsis/core';
 import {
   NexActionButton, NexBadge, NexButton, NexCard, NexCodeBlock, NexDock, NexFrame, NexIcon, NexMorph, NexProvider, NexSegmented,
   NexTab, NexTabs, type NexActionStatus, type NexMorphController,
-} from '@nexfluid/react';
-import { NexPropertyList } from '@nexfluid/react/widgets';
+} from '@eclipsis/react';
+import { NexPropertyList } from '@eclipsis/react/widgets';
 import { PageHeader, Section } from '../docs/kit.tsx';
 
 type DemoId = 'card' | 'tabs' | 'button' | 'dock' | 'frame';
@@ -233,7 +233,7 @@ function FrameDemo({ mode, onMode }: { mode: number; onMode: (m: number) => void
 // ─── Código real de cada demostración ─────────────────────────────────────
 
 const CODE: Record<DemoId, string> = {
-  card: `import { NexCard, NexFrame, NexMorph } from '@nexfluid/react';
+  card: `import { NexCard, NexFrame, NexMorph } from '@eclipsis/react';
 
 const stage = useRef<HTMLDivElement>(null);
 
@@ -253,7 +253,7 @@ const stage = useRef<HTMLDivElement>(null);
 </div>
 
 // O sin componer nada: <NexCard expansion={<Detalle />} expansionPhysics="viscous" />`,
-  tabs: `import { NexTabs, NexTab } from '@nexfluid/react';
+  tabs: `import { NexTabs, NexTab } from '@eclipsis/react';
 
 <NexTabs defaultValue="resumen" motion="fluid">   {/* appearance="liquid" por defecto */}
   <NexTabs.List aria-label="Secciones del proyecto">
@@ -263,7 +263,7 @@ const stage = useRef<HTMLDivElement>(null);
   <NexTabs.Panel value="resumen">…</NexTabs.Panel>
   <NexTabs.Panel value="archivos">…</NexTabs.Panel>
 </NexTabs>`,
-  button: `import { NexActionButton } from '@nexfluid/react';
+  button: `import { NexActionButton } from '@eclipsis/react';
 
 <NexActionButton
   action={() => api.publicar(practica)}   // promesa real: pendiente → éxito | error
@@ -274,7 +274,7 @@ const stage = useRef<HTMLDivElement>(null);
 </NexActionButton>
 
 // Controlado: <NexActionButton status={estado} onStatusChange={setEstado}>…`,
-  dock: `import { NexDock, NexIcon } from '@nexfluid/react';
+  dock: `import { NexDock, NexIcon } from '@eclipsis/react';
 
 <div style={{ position: 'relative', height: 420 }}>
   <NexDock
@@ -286,7 +286,7 @@ const stage = useRef<HTMLDivElement>(null);
     ]}
   />
 </div>`,
-  frame: `import { NexFrame } from '@nexfluid/react';
+  frame: `import { NexFrame } from '@eclipsis/react';
 
 // compacto · dividido · inspector · expandido
 <NexFrame
@@ -380,7 +380,7 @@ export function MorphStudioPage() {
       <PageHeader
         eyebrow="Movimiento · NexMorph"
         title="NexMorph Studio"
-        lead="Transformación continua de materia: una superficie se convierte en otra cambiando posición, tamaño, contorno y función, con el contenido coreografiado aparte. Todo lo que ves usa la API pública de @nexfluid/react y @nexfluid/core."
+        lead="Transformación continua de materia: una superficie se convierte en otra cambiando posición, tamaño, contorno y función, con el contenido coreografiado aparte. Todo lo que ves usa la API pública de @eclipsis/react y @eclipsis/core."
       />
 
       <div className="studio">

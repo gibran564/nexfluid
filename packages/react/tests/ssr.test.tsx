@@ -4,10 +4,10 @@ import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 import {
   NexBadge, NexButton, NexCard, NexCardContent, NexCardHeader, NexCardTitle, NexCodeBlock, NexFrame, NexFrameRegion,
-  NexProvider, NexTab, NexTabs, NexTabsList, NexTabsPanel,
-} from '@nexfluid/react';
-import { NexMarkdown } from '@nexfluid/react/markdown';
-import { NexMarkdownWidget } from '@nexfluid/react/widgets';
+  NexProvider, NexTab, NexTabs, NexTabsList, NexTabsPanel, NexFlow, NexEditorialBlock, NexMenu,
+} from '@eclipsis/react';
+import { NexMarkdown } from '@eclipsis/react/markdown';
+import { NexMarkdownWidget } from '@eclipsis/react/widgets';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -31,6 +31,9 @@ function App() {
           <NexTabsPanel value="b"><NexCodeBlock code="print(1)" language="python" /></NexTabsPanel>
         </NexTabs>
         <NexMarkdownWidget title="Notas" source="Hola" />
+        <NexFlow mode="edit" selectedId="p1" onSelect={() => {}} onReorder={() => {}} insertItems={() => [{ id: 'md', label: 'Texto', onSelect: () => {} }]}>
+          <NexEditorialBlock blockId="p1" label="Párrafo 1" actions={[{ id: 'x', label: 'Duplicar', onSelect: () => {} }]} tools={<NexMenu label="Vista" items={[]} />}><p>Texto</p></NexEditorialBlock>
+        </NexFlow>
       </NexFrame>
     </NexProvider>
   );

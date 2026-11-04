@@ -1,4 +1,4 @@
-# @nexfluid/core
+# @eclipsis/core
 
 NexFluid: motor de movimiento orgánico sin framework (resortes analíticos, viscosidad, membranas, gotas líquidas, reloj compartido).
 

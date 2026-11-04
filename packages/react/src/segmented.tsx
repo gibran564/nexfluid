@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useRef, useState, type HTMLAttributes, type KeyboardEvent, type ReactNode } from 'react';
-import { cx, rovingIndex, type NexDensity, type NexMotion } from '@nexfluid/components';
+import { cx, rovingIndex, type NexDensity, type NexMotion } from '@eclipsis/components';
 import { useNex } from './provider.tsx';
 import { LiquidDrop, useLiquid, type LiquidOrigin } from './liquid.tsx';
 

@@ -14,8 +14,8 @@
  */
 import { useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { metaballPath, type MorphFrame, type MorphPhysicsName } from '@nexfluid/core';
-import { cx, rovingIndex, type NexMotion } from '@nexfluid/components';
+import { metaballPath, type MorphFrame, type MorphPhysicsName } from '@eclipsis/core';
+import { cx, rovingIndex, type NexMotion } from '@eclipsis/components';
 import { NexMorph, useNexMorph, useNexMorphSource } from './morph.tsx';
 import { useNex } from './provider.tsx';
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NexButton, NexFrame, NexFrameRegion, NexTab, NexTabs } from '@nexfluid/react';
+import { NexButton, NexFrame, NexFrameRegion, NexTab, NexTabs } from '@eclipsis/react';
 
 /** NexFrameRegion: una pantalla profunda coloca sus herramientas en la fila del marco sin conocer su DOM. */
 function Editor() {

@@ -1,4 +1,4 @@
-import { NexSheets, createWorkbook, sheetFromRows } from '@nexfluid/react/sheets';
+import { NexSheets, createWorkbook, sheetFromRows } from '@eclipsis/react/sheets';
 
 const workbook = createWorkbook([
   sheetFromRows('Lecturas', [['Sensor', 'Valor'], ['T1', 21.4], ['T2', 22.1], ['T3', 20.8], ['Media', '=PROMEDIO(B2:B4)']], { rows: 20, columns: 4 }),

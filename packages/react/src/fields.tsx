@@ -10,7 +10,7 @@
  * dentro y la casilla dibuja su marca con un trazo.
  */
 import { forwardRef, useEffect, useId, useImperativeHandle, useRef, type InputHTMLAttributes, type ReactNode } from 'react';
-import { cx, type NexDensity } from '@nexfluid/components';
+import { cx, type NexDensity } from '@eclipsis/components';
 import { useNex } from './provider.tsx';
 
 export interface NexInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'prefix'> {

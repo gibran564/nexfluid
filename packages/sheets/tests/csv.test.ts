@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CsvRejected, cellKey, csvToSheet, detectDelimiter, evaluateSheet, parseCsvRows, DEFAULT_SHEET_LIMITS } from '@nexfluid/sheets';
+import { CsvRejected, cellKey, csvToSheet, detectDelimiter, evaluateSheet, parseCsvRows, DEFAULT_SHEET_LIMITS } from '@eclipsis/sheets';
 
 const NEXBOOK_LIMITS = { maxSheetRows: 200, maxSheetColumns: 40, maxSheetCells: 2_000 };
 const LIMITS = { ...DEFAULT_SHEET_LIMITS, maxRows: 200, maxColumns: 40, maxCells: 2_000 };

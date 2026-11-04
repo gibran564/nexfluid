@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NexCheckbox, NexIcon, NexInput, NexSelect, type NexSelectOption } from '@nexfluid/react';
+import { NexCheckbox, NexIcon, NexInput, NexSelect, type NexSelectOption } from '@eclipsis/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 
@@ -81,7 +81,7 @@ export const selectDoc: ComponentDoc = {
   summary: 'Elegir una opción de una lista con opciones ricas: detalle en segunda línea, imagen o logotipo, grupos, deshabilitadas y búsqueda. Es el selector de lenguajes de NexBook convertido en componente.',
   status: 'piloto',
   wide: true,
-  imports: [{ names: ['NexSelect'], from: '@nexfluid/react' }],
+  imports: [{ names: ['NexSelect'], from: '@eclipsis/react' }],
   origin: <>selector de lenguaje de NexBook (lista con motor y atribución)</>,
   controls: [
     { kind: 'select', name: 'density', label: 'Densidad', options: ['compact', 'comfortable', 'spacious'], initial: 'comfortable' },
@@ -149,7 +149,7 @@ export const inputDoc: ComponentDoc = {
   summary: 'Campo de texto nativo con etiqueta, ayuda, error y adornos delante o detrás. Todo atributo de <input> funciona (type, pattern, autocomplete…).',
   status: 'piloto',
   wide: true,
-  imports: [{ names: ['NexInput'], from: '@nexfluid/react' }],
+  imports: [{ names: ['NexInput'], from: '@eclipsis/react' }],
   origin: <><code>.field</code> de Nextudio</>,
   controls: [
     { kind: 'select', name: 'density', label: 'Densidad', options: ['compact', 'comfortable', 'spacious'], initial: 'comfortable' },
@@ -201,7 +201,7 @@ export const checkboxDoc: ComponentDoc = {
   eyebrow: 'Componentes · Formularios',
   summary: 'Casilla nativa con marca trazada, estado mixto real (indeterminate) y descripción. La membrana se redondea al marcarse.',
   status: 'piloto',
-  imports: [{ names: ['NexCheckbox'], from: '@nexfluid/react' }],
+  imports: [{ names: ['NexCheckbox'], from: '@eclipsis/react' }],
   origin: <>casillas de tareas y ajustes de Nextudio</>,
   controls: [{ kind: 'select', name: 'density', label: 'Densidad', options: ['compact', 'comfortable', 'spacious'], initial: 'comfortable' }],
   render: (v) => <CheckboxPreview density={String(v.density)} />,

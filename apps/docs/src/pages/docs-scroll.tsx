@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { NexButton, NexPreviewBoundary, NexScroll, type NexScrollSection, type NexScrollVariant } from '@nexfluid/react';
-import { NexMarkdown, markdownOutline } from '@nexfluid/react/markdown';
-import { NexMarkdownEditor } from '@nexfluid/react/widgets';
+import { NexButton, NexPreviewBoundary, NexScroll, type NexScrollSection, type NexScrollVariant } from '@eclipsis/react';
+import { NexMarkdown, markdownOutline } from '@eclipsis/react/markdown';
+import { NexMarkdownEditor } from '@eclipsis/react/widgets';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx, type Values } from '../docs/kit.tsx';
 import { example } from '../examples/index.ts';
@@ -171,7 +171,7 @@ export const scrollDoc: ComponentDoc = {
   summary: 'Un carril de lectura hecho de materia viva sobre el scroll nativo: mapa del contenido, pulgar viscoso que representa la posición real, progreso, capítulos y una cabecera contextual que nunca tapa el texto.',
   status: 'laboratorio',
   wide: true,
-  imports: [{ names: ['NexScroll'], from: '@nexfluid/react' }, { names: ['ScrollTracker'], from: '@nexfluid/core' }],
+  imports: [{ names: ['NexScroll'], from: '@eclipsis/react' }, { names: ['ScrollTracker'], from: '@eclipsis/core' }],
   origin: <>barras de desplazamiento por defecto en paneles y documentación</>,
   controls: [
     { kind: 'select', name: 'variant', label: 'Variante', options: VARIANTS, initial: 'editorial' },
@@ -250,7 +250,7 @@ export const scrollDoc: ComponentDoc = {
       ],
     },
     {
-      component: 'ScrollTracker (@nexfluid/core)',
+      component: 'ScrollTracker (@eclipsis/core)',
       rows: [
         { name: 'new ScrollTracker(el, options)', type: 'ScrollTrackerOptions', description: 'El mismo controlador sin React: scroll pasivo, ResizeObserver y reloj compartido sólo mientras hay movimiento.' },
         { name: 'setParts({ root, track, thumb, progress, label, markers })', type: 'ScrollParts', description: 'Elementos que pinta.' },

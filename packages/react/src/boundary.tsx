@@ -11,7 +11,7 @@
  * (otra composición) en lugar de dejar que se superponga.
  */
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { cx, DEFAULT_SPACE_THRESHOLDS, resolveSpace, type NexSpace } from '@nexfluid/components';
+import { cx, DEFAULT_SPACE_THRESHOLDS, resolveSpace, type NexSpace } from '@eclipsis/components';
 
 export interface NexBoundaryState {
   space: NexSpace;

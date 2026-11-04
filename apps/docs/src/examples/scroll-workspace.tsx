@@ -1,4 +1,4 @@
-import { NexScroll } from '@nexfluid/react';
+import { NexScroll } from '@eclipsis/react';
 
 const FILES = Array.from({ length: 28 }, (_, i) => `practica-${String(i + 1).padStart(2, '0')}.py`);
 const LOG = Array.from({ length: 60 }, (_, i) => `[${String(i).padStart(2, '0')}:00] cliente ${i + 1} atendido · espera ${(Math.sin(i) * 2 + 4).toFixed(2)} min`);

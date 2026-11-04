@@ -1,6 +1,6 @@
 import { useId, type ReactNode } from 'react';
 import { Fragment } from 'react';
-import { NexBadge, NexCodeBlock, NexPreviewBoundary } from '@nexfluid/react';
+import { NexBadge, NexCodeBlock, NexPreviewBoundary } from '@eclipsis/react';
 
 // ------------------------------------------------------------------ controles
 

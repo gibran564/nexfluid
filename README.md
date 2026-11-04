@@ -24,10 +24,10 @@ npm run build            # dist/ de los paquetes → verificación de exports �
 
 | Módulo | Paquete | Contenido |
 |---|---|---|
-| NexFoundation | `@nexfluid/foundation` | Tokens TS (fuente única) → `tokens.css`; temas, direcciones, familias geométricas, materiales, tipografía, movimiento, iconos. Compatibilidad opcional en `compat/nextudio.css` |
-| NexFluid | `@nexfluid/core` | Resortes analíticos, viscosidad exacta, presets medidos, reloj compartido, geometría orgánica, membranas, gotas líquidas y NexMorph (transformación continua) |
-| NexComponents | `@nexfluid/components` | Contrato sin framework: `styles.css` (`nx-*`, `data-nx-*`) y comportamiento puro |
-| NexBridge + NexWidgets | `@nexfluid/react` (`.`, `./markdown`, `./widgets`, `./motion`) | Componentes React 19 tipados y SSR-seguros |
+| NexFoundation | `@eclipsis/foundation` | Tokens TS (fuente única) → `tokens.css`; temas, direcciones, familias geométricas, materiales, tipografía, movimiento, iconos. Compatibilidad opcional en `compat/nextudio.css` |
+| NexFluid | `@eclipsis/core` | Resortes analíticos, viscosidad exacta, presets medidos, reloj compartido, geometría orgánica, membranas, gotas líquidas y NexMorph (transformación continua) |
+| NexComponents | `@eclipsis/components` | Contrato sin framework: `styles.css` (`nx-*`, `data-nx-*`) y comportamiento puro |
+| NexBridge + NexWidgets | `@eclipsis/react` (`.`, `./markdown`, `./widgets`, `./motion`) | Componentes React 19 tipados y SSR-seguros |
 | NexDocs | `apps/docs` | Documentación; consume sólo los `exports` públicos |
 
 ## Componentes
@@ -37,9 +37,9 @@ npm run build            # dist/ de los paquetes → verificación de exports �
 ## Uso mínimo
 
 ```tsx
-import '@nexfluid/foundation/tokens.css';
-import '@nexfluid/components/styles.css';
-import { NexProvider, NexCard, NexTabs, NexTab } from '@nexfluid/react';
+import '@eclipsis/foundation/tokens.css';
+import '@eclipsis/components/styles.css';
+import { NexProvider, NexCard, NexTabs, NexTab } from '@eclipsis/react';
 
 <NexProvider theme="editorial-light" direction="native" motion="fluid">
   <NexCard interactive expansion={<Detail />}>

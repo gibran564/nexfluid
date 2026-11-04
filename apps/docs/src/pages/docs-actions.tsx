@@ -1,4 +1,4 @@
-import { NexButton, NexIcon, NexIconButton } from '@nexfluid/react';
+import { NexButton, NexIcon, NexIconButton } from '@eclipsis/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 import { example } from '../examples/index.ts';
@@ -14,7 +14,7 @@ export const buttonDoc: ComponentDoc = {
   eyebrow: 'Componentes · Acciones',
   summary: 'Botón de acción con cinco apariencias, tres densidades, estado de carga accesible y presión opcional con resortes. Con href se pinta como enlace.',
   status: 'piloto',
-  imports: [{ names: ['NexButton', 'NexIconButton', 'NexIcon'], from: '@nexfluid/react' }],
+  imports: [{ names: ['NexButton', 'NexIconButton', 'NexIcon'], from: '@eclipsis/react' }],
   origin: <><code>.btn</code>, <code>.btn-primary</code>, <code>.btn-ghost</code> de Nextudio (648 usos)</>,
   controls: [
     { kind: 'text', name: 'label', label: 'Texto', initial: 'Crear proyecto' },
@@ -96,7 +96,7 @@ export const buttonDoc: ComponentDoc = {
         { name: 'appearance', type: "'default' | 'filled' | 'outlined' | 'ghost' | 'editorial'", default: "'default'", description: 'default = secundario; filled = acción principal (una por vista); editorial = tinta.' },
         { name: 'tone', type: "'neutral' | 'danger'", default: "'neutral'", description: 'danger para acciones destructivas; el texto debe nombrar la consecuencia.' },
         { name: 'density', type: "'compact' | 'comfortable' | 'spacious'", default: 'contexto', description: 'Alto 36 / 44 / 50 px. comfortable cumple el objetivo táctil de 44 px.' },
-        { name: 'motion', type: "'none' | 'subtle' | 'fluid' | 'elastic'", default: 'contexto', description: 'subtle: escala 0.97 al presionar (CSS). fluid/elastic: resorte de @nexfluid/core. Teclado y movimiento reducido: sin animación.' },
+        { name: 'motion', type: "'none' | 'subtle' | 'fluid' | 'elastic'", default: 'contexto', description: 'subtle: escala 0.97 al presionar (CSS). fluid/elastic: resorte de @eclipsis/core. Teclado y movimiento reducido: sin animación.' },
         { name: 'loading', type: 'boolean', default: 'false', description: 'aria-busy, conserva ancho y foco, bloquea onClick.' },
         { name: 'loadingLabel', type: 'string', default: "'Cargando'", description: 'Texto para lectores de pantalla durante loading.' },
         { name: 'iconStart / iconEnd', type: 'ReactNode', description: 'Iconos decorativos (NexIcon).' },

@@ -46,7 +46,7 @@ const EXTERNAL: Record<string, readonly string[]> = {
 
 describe('arquitectura', () => {
   for (const pkg of PACKAGES) {
-    it(`@nexfluid/${pkg} sólo depende de las capas permitidas`, () => {
+    it(`@eclipsis/${pkg} sólo depende de las capas permitidas`, () => {
       const problems: string[] = [];
       for (const file of walk(`${root}packages/${pkg}/src`)) {
         for (const spec of imports(file)) {
@@ -56,9 +56,9 @@ describe('arquitectura', () => {
             continue;
           }
           if (spec.startsWith('node:')) { problems.push(`${relative(root, file)} usa ${spec} (los paquetes son de navegador)`); continue; }
-          const nex = /^@nexfluid\/([a-z]+)/.exec(spec)?.[1];
+          const nex = /^@eclipsis\/([a-z]+)/.exec(spec)?.[1];
           if (nex) {
-            if (!ALLOWED[pkg]!.includes(nex)) problems.push(`${relative(root, file)} importa @nexfluid/${nex}`);
+            if (!ALLOWED[pkg]!.includes(nex)) problems.push(`${relative(root, file)} importa @eclipsis/${nex}`);
             if (spec.split('/').length > 2) problems.push(`${relative(root, file)} hace una importación profunda: ${spec}`);
             continue;
           }
@@ -89,7 +89,7 @@ describe('arquitectura', () => {
     assert.deepEqual(cycles, []);
   });
 
-  it('la entrada principal de @nexfluid/react no arrastra react-markdown', () => {
+  it('la entrada principal de @eclipsis/react no arrastra react-markdown', () => {
     const seen = new Set<string>();
     const heavy: string[] = [];
     const visit = (file: string) => {
@@ -116,7 +116,7 @@ describe('arquitectura', () => {
     for (const file of files) {
       for (const spec of imports(file)) {
         if (spec.startsWith('.') && resolve(dirname(file), spec).includes(`${join('nexfluid', 'packages')}`)) problems.push(`${relative(root, file)} → ${spec}`);
-        if (spec.startsWith('@nexfluid/') && !declared.has(spec)) problems.push(`${relative(root, file)} → ${spec} (no es una entrada pública)`);
+        if (spec.startsWith('@eclipsis/') && !declared.has(spec)) problems.push(`${relative(root, file)} → ${spec} (no es una entrada pública)`);
       }
     }
     assert.deepEqual(problems, []);
@@ -125,7 +125,7 @@ describe('arquitectura', () => {
   it('ningún paquete depende de NexDocs ni del Playground', () => {
     for (const pkg of PACKAGES) {
       const manifest = readFileSync(`${root}packages/${pkg}/package.json`, 'utf8');
-      assert.doesNotMatch(manifest, /@nexfluid\/(docs|playground)/);
+      assert.doesNotMatch(manifest, /@eclipsis\/(docs|playground)/);
     }
   });
 });

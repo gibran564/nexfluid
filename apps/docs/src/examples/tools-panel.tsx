@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NexBadge, NexButton, NexCard, NexIcon, NexIconButton } from '@nexfluid/react';
+import { NexBadge, NexButton, NexCard, NexIcon, NexIconButton } from '@eclipsis/react';
 
 /**
  * Panel de herramientas sobre un texto real: guardar una versión, crear un

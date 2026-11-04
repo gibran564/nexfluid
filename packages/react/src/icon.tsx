@@ -1,4 +1,4 @@
-import { ICONS, type IconName } from '@nexfluid/foundation';
+import { ICONS, type IconName } from '@eclipsis/foundation';
 import type { SVGProps } from 'react';
 
 export interface NexIconProps extends Omit<SVGProps<SVGSVGElement>, 'name'> {

@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { formatReference, formatValue, isFormula, isFormulaError, rangeLabel, rangeSize, rangeStats, selectionRange, type CellRange } from '@nexfluid/sheets';
-import { cx } from '@nexfluid/components';
+import { formatReference, formatValue, isFormula, isFormulaError, rangeLabel, rangeSize, rangeStats, selectionRange, type CellRange } from '@eclipsis/sheets';
+import { cx } from '@eclipsis/components';
 import { NexButton, NexIconButton } from '../button.tsx';
 import { NexIcon } from '../icon.tsx';
 import { NexSegmented } from '../segmented.tsx';

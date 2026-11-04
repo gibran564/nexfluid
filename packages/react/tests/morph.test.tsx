@@ -4,7 +4,7 @@ import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   NexActionButton, NexCard, NexDock, NexIcon, NexMorph, NexProvider, NexTab, NexTabs, type NexMorphController,
-} from '@nexfluid/react';
+} from '@eclipsis/react';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

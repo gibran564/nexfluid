@@ -1,5 +1,5 @@
-import { NexBadge, NexButton, NexCard, NexIcon, NexSegmented, NexSurface, NexTab, NexTabs } from '@nexfluid/react';
-import { FluidBlob } from '@nexfluid/react/motion';
+import { NexBadge, NexButton, NexCard, NexIcon, NexSegmented, NexSurface, NexTab, NexTabs } from '@eclipsis/react';
+import { FluidBlob } from '@eclipsis/react/motion';
 import { href } from '../router.ts';
 
 const PRINCIPLES = [
@@ -62,7 +62,7 @@ export function CoverPage() {
             <NexButton appearance="editorial">Publicar</NexButton>
             <NexButton>Borrador</NexButton>
           </div>
-          <p className="doc-hint">Todo lo que ves aquí son componentes importados de <code>@nexfluid/react</code>, no maquetas.</p>
+          <p className="doc-hint">Todo lo que ves aquí son componentes importados de <code>@eclipsis/react</code>, no maquetas.</p>
         </div>
       </section>
 

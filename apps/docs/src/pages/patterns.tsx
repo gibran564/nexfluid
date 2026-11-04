@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NexCodeBlock } from '@nexfluid/react';
+import { NexCodeBlock } from '@eclipsis/react';
 import { ControlPanel, initialValues, LiveExample, PageHeader, Stage, type Values } from '../docs/kit.tsx';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { example, type ExampleId } from '../examples/index.ts';

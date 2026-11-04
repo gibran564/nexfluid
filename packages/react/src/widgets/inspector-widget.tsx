@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { cx, type NexDensity } from '@nexfluid/components';
+import { cx, type NexDensity } from '@eclipsis/components';
 import { NexPanel } from '../panel.tsx';
 import { NexPropertyList, type NexPropertyGroup } from './properties-widget.tsx';
 

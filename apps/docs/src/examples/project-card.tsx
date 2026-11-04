@@ -1,4 +1,4 @@
-import { NexBadge, NexButton, NexCard, NexIcon } from '@nexfluid/react';
+import { NexBadge, NexButton, NexCard, NexIcon } from '@eclipsis/react';
 
 /** Tarjeta de proyecto (equivalente a ProjectCard de Nextudio): toda la tarjeta navega, las acciones siguen siendo botones. */
 export default function ProjectCardExample() {

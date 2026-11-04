@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NexMarkdown } from '@nexfluid/react/markdown';
-import { NexMarkdownEditor, NexPreviewWidget } from '@nexfluid/react/widgets';
+import { NexMarkdown } from '@eclipsis/react/markdown';
+import { NexMarkdownEditor, NexPreviewWidget } from '@eclipsis/react/widgets';
 
 const PAGE = `# Colas que esperan menos
 
