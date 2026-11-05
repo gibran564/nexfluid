@@ -67,6 +67,35 @@
 }
 .nx-icon { flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
 
+/* «ai-generate» se anima con `data-nx-live` (p. ej. mientras genera): la chispa
+ * respira hacia ICON_POSES['ai-generate'].breath, la burbuja sube y la partícula
+ * titila. Son el 1.º, 2.º y 3.º trazo del icono. Sin `data-nx-live`, es estático. */
+.nx-icon[data-nx-icon='ai-generate'] { overflow: visible; }
+.nx-icon[data-nx-icon='ai-generate'] > path { transform-box: fill-box; transform-origin: center; }
+.nx-icon[data-nx-icon='ai-generate'][data-nx-live] > path:nth-child(1) { animation: nx-ai-breathe 2.4s cubic-bezier(0.45, 0, 0.25, 1) infinite; }
+.nx-icon[data-nx-icon='ai-generate'][data-nx-live] > path:nth-child(2) { animation: nx-ai-rise 2.4s cubic-bezier(0.3, 0, 0.2, 1) infinite; }
+.nx-icon[data-nx-icon='ai-generate'][data-nx-live] > path:nth-child(3) { animation: nx-ai-twinkle 2.4s ease-in-out infinite; }
+@keyframes nx-ai-breathe {
+  0%, 100% { d: path('M7.7 11.92C9.5 9.93 8.39 5.87 9.59 5.81C10.79 5.75 10.09 9.9 12.08 11.7C14.07 13.5 17.13 12.44 17.19 13.64C17.25 14.84 14.1 14.09 12.3 16.08C10.5 18.07 11.59 21.73 10.39 21.79C9.19 21.85 9.91 18.1 7.92 16.3C5.93 14.5 3.27 15.54 3.21 14.34C3.15 13.14 5.9 13.91 7.7 11.92z'); transform: rotate(0deg); }
+  50% { d: path('M7.33 11.58C9.13 9.59 8.18 6.58 9.63 6.51C11.07 6.44 10.42 9.53 12.42 11.33C14.41 13.13 16.52 12.22 16.59 13.67C16.66 15.12 14.47 14.42 12.67 16.42C10.87 18.41 11.8 21.02 10.35 21.09C8.91 21.16 9.58 18.47 7.58 16.67C5.59 14.87 3.88 15.76 3.81 14.31C3.74 12.86 5.53 13.58 7.33 11.58z'); transform: rotate(7deg); }
+}
+@keyframes nx-ai-rise {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  55% { transform: translate(0.6px, -1.6px) scale(0.86); opacity: 0.9; }
+  80% { transform: translate(0.9px, -2.4px) scale(0.6); opacity: 0; }
+  81% { transform: translate(-0.8px, 1.4px) scale(0.5); opacity: 0; }
+  100% { transform: translate(0, 0) scale(1); opacity: 1; }
+}
+@keyframes nx-ai-twinkle {
+  0%, 30%, 100% { opacity: 1; transform: scale(1); }
+  45% { opacity: 0.15; transform: scale(0.4); }
+  60% { opacity: 1; transform: scale(1.25); }
+}
+[data-nx-motion-pref='reduce'] .nx-icon[data-nx-live] > path { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .nx-icon[data-nx-live]:not([data-nx-motion-pref='full'] *) > path { animation: none !important; }
+}
+
 /* ---- Membrana ------------------------------------------------------------ */
 .nx-surface, .nx-membrane {
   --nx-r: var(--nx-surface-radius);

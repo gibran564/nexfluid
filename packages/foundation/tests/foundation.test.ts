@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import { NEXTUDIO_BRIDGE } from '../src/compat.ts';
 import { renderCompatCss, renderTokensCss } from '../src/css.ts';
-import { ICONS } from '../src/icons.ts';
+import { ICON_POSES, ICONS } from '../src/icons.ts';
 import {
   COLOR_ROLES, CONTRAST_REQUIREMENTS, contrastRatio, cssVar, customTheme, DIRECTIONS, SHAPES, SPACE, THEMES, TYPE_SCALE,
   type ThemeName,
@@ -81,6 +81,17 @@ describe('contrato de tokens', () => {
         for (const n of d.match(/-?\d+(\.\d+)?/g) ?? []) assert.ok(Math.abs(Number(n)) <= 24, `${name}: ${n}`);
       }
     }
+  });
+  it('cada pose se interpola con el trazo de reposo: mismos comandos y dentro de la retícula', () => {
+    const commands = (d: string) => d.replace(/[^A-Za-z]/g, '');
+    for (const [name, poses] of Object.entries(ICON_POSES)) {
+      const rest = ICONS[name as keyof typeof ICONS][0];
+      for (const [pose, d] of Object.entries(poses)) {
+        assert.equal(commands(d), commands(rest), `${name}.${pose}`);
+        for (const n of d.match(/-?\d+(\.\d+)?/g) ?? []) assert.ok(Number(n) >= 0 && Number(n) <= 24, `${name}.${pose}: ${n}`);
+      }
+    }
+    assert.equal(ICONS['ai-generate'].length, 3, 'chispa, burbuja y partícula: tres trazos animables');
   });
 });
 
