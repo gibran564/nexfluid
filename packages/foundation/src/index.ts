@@ -11,6 +11,8 @@ export {
 } from './tokens.ts';
 export type { ColorTheme, ColorRole, ThemeName, Density, MotionLevel, ShapeFamily, Material, SurfaceState, Direction, DirectionName } from './tokens.ts';
 export { NEXTUDIO_BRIDGE, NEXTUDIO_DIRECTION } from './compat.ts';
+export { hostContrast, resolveBridge, readCssVariables } from './host.ts';
+export type { HostContrastResult, HostContrastFailure } from './host.ts';
 export { ICONS, ICON_NAMES } from './icons.ts';
 export type { IconName } from './icons.ts';
 export { renderTokensCss, renderCompatCss } from './css.ts';
