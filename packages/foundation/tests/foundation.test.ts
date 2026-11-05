@@ -85,6 +85,14 @@ describe('contrato de tokens', () => {
 });
 
 describe('hojas generadas', () => {
+  it('ningún bloque de :root declara color-scheme: no se impone al anfitrión', () => {
+    const css = renderTokensCss().replace(/\/\*[\s\S]*?\*\//g, '');
+    const rootBlocks = [...css.matchAll(/(^|\})\s*([^{}@]*:root[^{}]*)\{([^}]*)\}/g)];
+    assert.ok(rootBlocks.length > 0);
+    for (const [, , selector = "", body = ""] of rootBlocks) assert.doesNotMatch(body, /color-scheme/, `${selector.trim()} declara color-scheme`);
+    assert.match(css, /\[data-nx-theme='editorial-light'\] \{\n  color-scheme: light;/);
+  });
+
   it('tokens.css coincide byte a byte con la fuente TS', () => {
     assert.equal(readFileSync(new URL('../src/tokens.css', import.meta.url), 'utf8'), renderTokensCss(), 'Ejecuta `npm run tokens`');
   });

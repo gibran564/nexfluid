@@ -1,6 +1,6 @@
 {
   "name": "@nexfluid/react",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "NexBridge for React 19: typed NexComponents and NexWidgets over @nexfluid/components, optional NexFluid motion",
   "license": "MIT",
   "author": "gibran564",
@@ -62,10 +62,10 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@nexfluid/components": "0.2.0",
-    "@nexfluid/core": "0.2.0",
-    "@nexfluid/foundation": "0.2.0",
-    "@nexfluid/sheets": "0.2.0",
+    "@nexfluid/components": "0.4.0",
+    "@nexfluid/core": "0.4.0",
+    "@nexfluid/foundation": "0.4.0",
+    "@nexfluid/sheets": "0.4.0",
     "katex": "0.16.47",
     "react-markdown": "10.1.0",
     "rehype-katex": "7.0.1",

@@ -14,7 +14,7 @@
  * Teclado y táctil son equivalentes: el foco visible pone la membrana en
  * tensión (attract) e Intro/Espacio la activan, sin deformación.
  */
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, type ElementType, type HTMLAttributes, type PointerEvent, type ReactNode, type Ref } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ElementType, type HTMLAttributes, type PointerEvent, type ReactNode, type Ref } from 'react';
 import { membranePath } from '@nexfluid/core';
 import type { Material, ShapeFamily } from '@nexfluid/foundation';
 import { cx, type NexMotion } from '@nexfluid/components';
@@ -35,8 +35,20 @@ export interface NexSurfaceProps extends Omit<HTMLAttributes<HTMLElement>, 'role
   interactive?: boolean;
   /** Inunda la zona cromática al activarse (clic, Intro, Espacio). */
   activatable?: boolean;
-  /** Pinta la membrana en SVG. Por defecto, sólo si es interactiva. */
-  live?: boolean;
+  /**
+   * Pinta la membrana en SVG. Por defecto, sólo si es interactiva.
+   * `engaged`: sólo mientras se interactúa (puntero, foco, selección) y hasta
+   * que se asienta; en reposo vuelve a ser CSS. Para listas largas: cien
+   * bloques no necesitan cien SVG ni cien ResizeObserver vivos.
+   */
+  live?: boolean | 'engaged';
+  /**
+   * Mantiene los estados del borde (atracción, selección) sin mover la
+   * geometría: para superficies cuyo contenido se está editando.
+   */
+  calm?: boolean;
+  /** El foco DENTRO (un editor, un campo) también tensa la membrana. */
+  focusWithin?: boolean;
   selected?: boolean;
   /** Sin borde en reposo. */
   quiet?: boolean;
@@ -61,7 +73,7 @@ function readGeometry(el: HTMLElement): Geometry {
 }
 
 export function NexSurface({
-  as: Tag = 'div', kind = 'surface', shape, material = 'base', interactive = false, activatable = false, live, selected, quiet,
+  as: Tag = 'div', kind = 'surface', shape, material = 'base', interactive = false, activatable = false, live, calm = false, focusWithin = false, selected, quiet,
   motion, ariaRole, ref, className, children, onPointerEnter, onPointerMove, onPointerLeave, onPointerDown, onPointerUp, onFocus, onBlur, onKeyDown, ...rest
 }: NexSurfaceProps) {
   const defaults = useNex();
@@ -76,10 +88,14 @@ export function NexSurface({
   const focus = useRef({ x: 0, y: 0 });
   const geometry = useRef<Geometry>({ radius: 16, smoothing: 0.8, pull: 0, push: 0 });
   const gradient = `nx-m-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
-  const drawLive = live ?? interactive;
+  const [engaged, setEngaged] = useState(false);
+  const drawLive = live === 'engaged' ? engaged || Boolean(selected) : (live ?? interactive);
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
 
   const setState = (state: string) => {
     if (el.current) el.current.dataset.nxState = state;
+    if (live === 'engaged' && state !== 'rest') setEngaged(true);
   };
 
   const draw = useCallback((amount: number, press: number) => {
@@ -99,7 +115,11 @@ export function NexSurface({
 
   const springs = useSprings([0, 0], ([amount, press]) => {
     draw(amount!, press!);
-    if (amount! < 0.05 && press! < 0.0005 && el.current?.dataset.nxState === 'settle') setState('rest');
+    if (amount! < 0.05 && press! < 0.0005 && el.current?.dataset.nxState === 'settle') {
+      setState('rest');
+      // Asentada y sin seleccionar: la membrana vuelve a ser CSS.
+      if (live === 'engaged' && !selectedRef.current) setEngaged(false);
+    }
   }, 0.01);
 
   // Medida y dibujo inicial (antes de pintar en el cliente).
@@ -121,7 +141,7 @@ export function NexSurface({
     return () => observer.disconnect();
   }, [drawLive, draw, springs, shape, kind, defaults.look]);
 
-  const physical = () => drawLive && canAnimate(level, preference) && (level === 'fluid' || level === 'elastic' || level === 'subtle');
+  const physical = () => drawLive && !calm && canAnimate(level, preference) && (level === 'fluid' || level === 'elastic' || level === 'subtle');
   const amplitude = () => (level === 'subtle' ? 0.5 : level === 'elastic' ? 1.3 : 1);
 
   const locate = (e: PointerEvent<HTMLElement>) => {
@@ -153,9 +173,11 @@ export function NexSurface({
           onPointerMove?.(e as never);
         },
         onPointerLeave: (e: PointerEvent<HTMLElement>) => {
+          // Con el foco dentro, el puntero que se va no destensa la membrana.
+          if (focusWithin && e.currentTarget.matches(':focus-within')) { onPointerLeave?.(e as never); return; }
           setState('settle');
           if (physical()) springs.to([0, 0], [kind === 'control' ? 'elastic' : 'viscous', kind === 'control' ? 'elastic' : 'viscous']);
-          else setState('rest');
+          else { setState('rest'); if (live === 'engaged' && !selectedRef.current) setEngaged(false); }
           onPointerLeave?.(e as never);
         },
         onPointerDown: (e: PointerEvent<HTMLElement>) => {
@@ -173,11 +195,14 @@ export function NexSurface({
           onPointerUp?.(e as never);
         },
         onFocus: (e: React.FocusEvent<HTMLElement>) => {
-          if (e.target === e.currentTarget && e.currentTarget.matches(':focus-visible')) setState('attract');
+          if ((e.target === e.currentTarget && e.currentTarget.matches(':focus-visible')) || (focusWithin && e.target !== e.currentTarget)) setState('attract');
           onFocus?.(e as never);
         },
         onBlur: (e: React.FocusEvent<HTMLElement>) => {
-          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setState('rest');
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+            setState('rest');
+            if (live === 'engaged' && !selectedRef.current) setEngaged(false);
+          }
           onBlur?.(e as never);
         },
         onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
@@ -191,6 +216,10 @@ export function NexSurface({
         },
       }
     : { onPointerEnter, onPointerMove, onPointerLeave, onPointerDown, onPointerUp, onFocus, onBlur, onKeyDown };
+
+  useEffect(() => {
+    if (live === 'engaged' && !selected && el.current?.dataset.nxState === 'rest') setEngaged(false);
+  }, [live, selected]);
 
   useEffect(() => () => {
     const node = el.current;
@@ -214,6 +243,7 @@ export function NexSurface({
       data-nx-state={(rest["data-nx-state"] as string | undefined) ?? "rest"}
       data-nx-selected={selected ? '' : undefined}
       data-nx-quiet={quiet ? '' : undefined}
+      data-nx-calm={calm ? '' : undefined}
       data-nx-motion={level}
     >
       {drawLive && (

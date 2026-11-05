@@ -17,6 +17,7 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { cx, type NexDensity, type NexMotion } from '@nexfluid/components';
 import { useNex } from './provider.tsx';
+import { useAnchoredLayer } from './anchored.ts';
 import { NexIcon } from './icon.tsx';
 import { LiquidDrop, useLiquid } from './liquid.tsx';
 
@@ -88,35 +89,7 @@ export function NexSelect({
    * junto al disparador: ningún contenedor con `overflow: hidden` (tarjetas,
    * escenarios, paneles) la recorta. Sin Popover API, queda absoluta debajo.
    */
-  useLayoutEffect(() => {
-    const el = popup.current;
-    const t = trigger.current;
-    if (!open || !el || !t || typeof el.showPopover !== 'function') return;
-    el.setAttribute('popover', 'manual');
-    el.showPopover();
-    el.dataset.layer = 'top';
-    let frame = 0;
-    const place = () => {
-      const r = t.getBoundingClientRect();
-      const below = window.innerHeight - r.bottom;
-      const up = below < 300 && r.top > below;
-      el.style.left = `${Math.round(r.left)}px`;
-      el.style.width = `${Math.round(r.width)}px`;
-      el.style.top = up ? 'auto' : `${Math.round(r.bottom + 6)}px`;
-      el.style.bottom = up ? `${Math.round(window.innerHeight - r.top + 6)}px` : 'auto';
-      el.dataset.placement = up ? 'top' : 'bottom';
-    };
-    const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(place); };
-    place();
-    addEventListener('scroll', schedule, true);
-    addEventListener('resize', schedule);
-    return () => {
-      cancelAnimationFrame(frame);
-      removeEventListener('scroll', schedule, true);
-      removeEventListener('resize', schedule);
-      if (el.matches(':popover-open')) el.hidePopover();
-    };
-  }, [open]);
+  useAnchoredLayer(open, popup, () => trigger.current, { side: 'bottom', align: 'start', matchWidth: true });
   const typed = useRef({ text: '', at: 0 });
 
   const visible = useMemo(() => (query ? options.filter((o) => norm(textOf(o)).includes(norm(query))) : options), [options, query]);

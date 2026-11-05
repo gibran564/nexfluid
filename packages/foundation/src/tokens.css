@@ -113,7 +113,6 @@
 /* ---- Temas: [data-nx-theme] ---- */
 :root,
 [data-nx-theme='editorial-light'] {
-  color-scheme: light;
   --nx-bg: #f3f1ea;
   --nx-surface: #fbfaf6;
   --nx-surface-raised: #ffffff;
@@ -144,6 +143,9 @@
   --nx-code-number: #7a5106;
   --nx-code-comment: #56585f;
   --nx-code-type: #8c3013;
+}
+[data-nx-theme='editorial-light'] {
+  color-scheme: light;
 }
 [data-nx-theme='editorial-dark'] {
   color-scheme: dark;

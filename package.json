@@ -30,7 +30,8 @@
     "build": "npm run build:lib && npm run verify:exports && npm run build:docs && npm run build:playground",
     "verify:exports": "node scripts/verify-exports.ts",
     "dev": "vite apps/docs",
-    "dev:playground": "vite apps/playground"
+    "dev:playground": "vite apps/playground",
+    "release:pack": "node scripts/release-pack.ts"
   },
   "devDependencies": {
     "@types/jsdom": "27.0.0",

@@ -5,12 +5,13 @@ import { PageHeader, Section } from '../docs/kit.tsx';
 export function InstallPage() {
   return (
     <article className="doc-page">
-      <PageHeader eyebrow="Primeros pasos" title="Instalación" lead="Los paquetes no están publicados en npm. Se consumen como workspace o paquete enlazado; la estructura ya está preparada para publicarse bajo el ámbito @nexfluid." />
-      <Section title="1 · Enlazar los paquetes">
-        <NexCodeBlock language="bash" title="desde la aplicación consumidora" code={`# Compila dist/ con declaraciones de tipos\nnpm --prefix ../experimentos/nexfluid run build:lib\n\n# Enlace local (o "file:" en package.json, como vendor/stepcode en Nextudio)\nnpm install ../experimentos/nexfluid/packages/foundation ../experimentos/nexfluid/packages/core \\\n  ../experimentos/nexfluid/packages/components ../experimentos/nexfluid/packages/react`} />
+      <PageHeader eyebrow="Primeros pasos" title="Instalación" lead="Los paquetes están publicados en npm bajo el ámbito @nexfluid. Instala los que uses: react incluye como dependencias a foundation, core, components y sheets." />
+      <Section title="1 · Instalar">
+        <NexCodeBlock language="bash" title="terminal" code={`npm install @nexfluid/react @nexfluid/foundation @nexfluid/components\n\n# Fórmulas en Markdown (KaTeX): sus estilos, una vez\nnpm install katex`} />
+        <p className="doc-hint">Sin React: <code>@nexfluid/core</code> (motor de movimiento), <code>@nexfluid/components</code> (clases y ayudantes) y <code>@nexfluid/sheets</code> (modelo de hojas de cálculo) funcionan solos.</p>
       </Section>
       <Section title="2 · Estilos (una vez, en la raíz)">
-        <NexCodeBlock language="tsx" title="app/layout.tsx" code={`import '@nexfluid/foundation/tokens.css';   // tokens --nx-*, temas y densidades\nimport '@nexfluid/components/styles.css';  // clases nx-* de los componentes`} />
+        <NexCodeBlock language="tsx" title="app/layout.tsx" code={`import '@nexfluid/foundation/tokens.css';   // tokens --nx-*, temas y densidades\nimport '@nexfluid/components/styles.css';  // clases nx-* de los componentes\nimport 'katex/dist/katex.min.css';         // sólo si usas fórmulas en NexMarkdown`} />
         <p className="doc-hint">Sin estilos globales: todo vive bajo clases <code>nx-</code> y propiedades <code>--nx-</code>. En Nextudio, el tema <code>nextudio</code> lee <code>--bg</code>, <code>--accent</code>… y sigue a NEX Origen o NEX Pulso automáticamente.</p>
       </Section>
       <Section title="3 · Proveedor (opcional) y componentes">
@@ -32,7 +33,8 @@ export function InstallPage() {
               <tr><td><code>@nexfluid/foundation</code></td><td><code>.</code>, <code>./tokens.css</code></td><td>ninguna</td></tr>
               <tr><td><code>@nexfluid/core</code></td><td><code>.</code></td><td>ninguna</td></tr>
               <tr><td><code>@nexfluid/components</code></td><td><code>.</code>, <code>./styles.css</code></td><td>foundation</td></tr>
-              <tr><td><code>@nexfluid/react</code></td><td><code>.</code>, <code>./markdown</code>, <code>./widgets</code>, <code>./motion</code></td><td>react ^19 (peer), react-markdown + remark-gfm (sólo <code>./markdown</code>)</td></tr>
+              <tr><td><code>@nexfluid/sheets</code></td><td><code>.</code></td><td>ninguna</td></tr>
+              <tr><td><code>@nexfluid/react</code></td><td><code>.</code>, <code>./markdown</code>, <code>./widgets</code>, <code>./motion</code>, <code>./sheets</code></td><td>react ^19 (peer), react-markdown + remark-gfm + remark-math + rehype-katex (sólo <code>./markdown</code>)</td></tr>
             </tbody>
           </table>
         </div>

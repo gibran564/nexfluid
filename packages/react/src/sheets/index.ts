@@ -7,6 +7,8 @@
  */
 export { NexSheets, NexSheetsEditor, NexFormulaBar, NexSheetTabs, NexSheetToolbar, NexSheetStatusBar, NexCellInspector } from './parts.tsx';
 export type { NexSheetsProps } from './parts.tsx';
+export { NexDataView } from './data-view.tsx';
+export type { NexDataViewProps, NexDataViewMode, NexSheetsOpenRequest } from './data-view.tsx';
 export { NexSheetGrid } from './grid.tsx';
 export type { NexSheetGridProps } from './grid.tsx';
 export { NexSheetsProvider, useNexSheets, useSheetsInteraction } from './controller.tsx';
