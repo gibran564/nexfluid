@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
+import { ICON_POSES, ICONS } from '../../foundation/src/icons.ts';
 import { cx, rovingIndex, safeUrl, slugify, toDomId } from '../src/behaviour.ts';
 import { isSupportedLanguage, normalizeLanguage, splitLines, SUPPORTED_LANGUAGES, tokenize } from '../src/highlight.ts';
 
@@ -196,5 +197,20 @@ describe('NexFrame: el estado de un marco no alcanza a los marcos anidados', () 
     assert.deepEqual(leaks, []);
     const morph = css.match(/\.nx-frame__layout\[data-nx-morphing\] (?!>)[.:]/g) ?? [];
     assert.deepEqual(morph, []);
+  });
+});
+
+describe('icono animable ai-generate', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  it('la respiración interpola entre el trazo de ICONS y la pose de ICON_POSES', () => {
+    const block = css.match(/@keyframes nx-ai-breathe \{([\s\S]*?)\r?\n\}/)?.[1] ?? '';
+    const paths = [...block.matchAll(/d: path\('([^']+)'\)/g)].map((m) => m[1]);
+    assert.deepEqual(paths, [ICONS['ai-generate'][0], ICON_POSES['ai-generate'].breath]);
+  });
+  it('sólo se mueve con data-nx-live y se detiene con movimiento reducido', () => {
+    assert.match(css, /\.nx-icon\[data-nx-icon='ai-generate'\]\[data-nx-live\] > path:nth-child\(1\) \{ animation: nx-ai-breathe/);
+    assert.doesNotMatch(css, /\.nx-icon\[data-nx-icon='ai-generate'\] > path[^{]*\{[^}]*animation/);
+    assert.match(css, /\[data-nx-motion-pref='reduce'\] \.nx-icon\[data-nx-live\] > path \{ animation: none !important; \}/);
+    assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.nx-icon\[data-nx-live\]:not\(\[data-nx-motion-pref='full'\] \*\) > path \{ animation: none !important; \}/);
   });
 });

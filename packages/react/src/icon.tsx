@@ -17,6 +17,7 @@ export function NexIcon({ name, size = 16, label, className, ...rest }: NexIconP
       width={size}
       height={size}
       className={className ? `nx-icon ${className}` : 'nx-icon'}
+      data-nx-icon={name}
       aria-hidden={label ? undefined : true}
       role={label ? 'img' : undefined}
       aria-label={label}

@@ -45,7 +45,28 @@ export const ICONS = {
   grip: ['M9 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M9 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M9 19a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 19a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'],
   /** Más acciones. */
   more: ['M6 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M18 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'],
+  /**
+   * Generar con IA: una chispa fluida, su burbuja y una partícula, en ese orden.
+   * Son trazos separados para animarlos por separado (`data-nx-live` en
+   * `@nexfluid/components`); la chispa respira hacia `ICON_POSES['ai-generate']`.
+   */
+  'ai-generate': [
+    'M7.7 11.92C9.5 9.93 8.39 5.87 9.59 5.81C10.79 5.75 10.09 9.9 12.08 11.7C14.07 13.5 17.13 12.44 17.19 13.64C17.25 14.84 14.1 14.09 12.3 16.08C10.5 18.07 11.59 21.73 10.39 21.79C9.19 21.85 9.91 18.1 7.92 16.3C5.93 14.5 3.27 15.54 3.21 14.34C3.15 13.14 5.9 13.91 7.7 11.92z',
+    'M18.6 7.15a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5z',
+    'M20.25 10.75h0',
+  ],
 } as const satisfies Record<string, readonly string[]>;
 
 export type IconName = keyof typeof ICONS;
 export const ICON_NAMES = Object.keys(ICONS) as IconName[];
+
+/**
+ * Otras poses del primer trazo de un icono, con los mismos comandos que el de
+ * reposo: así `d` se interpola sin saltos. La hoja de `@nexfluid/components`
+ * las copia en sus `@keyframes` y sus pruebas comprueban que coinciden.
+ */
+export const ICON_POSES = {
+  'ai-generate': {
+    breath: 'M7.33 11.58C9.13 9.59 8.18 6.58 9.63 6.51C11.07 6.44 10.42 9.53 12.42 11.33C14.41 13.13 16.52 12.22 16.59 13.67C16.66 15.12 14.47 14.42 12.67 16.42C10.87 18.41 11.8 21.02 10.35 21.09C8.91 21.16 9.58 18.47 7.58 16.67C5.59 14.87 3.88 15.76 3.81 14.31C3.74 12.86 5.53 13.58 7.33 11.58z',
+  },
+} as const satisfies Partial<Record<IconName, Record<string, string>>>;
