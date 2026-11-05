@@ -36,7 +36,7 @@ function runNpm(args: string[], cwd = root): string {
     process.env.npm_execpath,
     join(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js'),
   ];
-  const cli = candidates.find((candidate) => candidate && /npm-cli\\.[cm]?js$/i.test(candidate) && existsSync(candidate));
+  const cli = candidates.find((candidate) => candidate && /npm-cli\.[cm]?js$/i.test(candidate) && existsSync(candidate));
   if (cli) return run(process.execPath, [cli, ...args], cwd);
   if (process.platform === 'win32') {
     throw new Error('No se encontró npm-cli.js. Ejecuta el script con npm run release:pack, o instala npm junto a Node.js.');
