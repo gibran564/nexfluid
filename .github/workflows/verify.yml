@@ -23,3 +23,21 @@ jobs:
       - run: npm run build
       - run: npm run release:pack -- --draft
       - run: cat release/*/manifest.json
+
+  windows-release-pack:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Reproducir empaquetado desde Windows sin shims
+        run: npm run release:pack -- --draft
+      - name: Verificar manifiesto
+        shell: pwsh
+        run: |
+          $manifest = Get-ChildItem release/*/manifest.json | Select-Object -First 1
+          if (-not $manifest) { throw 'No se generó manifest.json' }
+          Get-Content $manifest.FullName
