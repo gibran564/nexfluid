@@ -77,3 +77,7 @@ export type { NexSelectProps, NexSelectOption } from './select.tsx';
 export { NexConsole, NexLiveConsole, NexTerminalSurface, useNexSession } from './console.tsx';
 export type { NexConsoleProps, NexConsoleView, NexConsoleRenderers, NexLiveConsoleProps } from './console.tsx';
 export type { NexConsoleOutput, NexConsoleState } from '@nexfluid/components';
+export { NexGrid, NexGridItem } from './grid.tsx';
+export type { NexGridProps, NexGridItemProps } from './grid.tsx';
+export type { NexGridGap, NexGridLayout, NexGridItemLayout } from '@nexfluid/components';
+export { normalizeGridLayout, NEX_GRID_LIMITS } from '@nexfluid/components';

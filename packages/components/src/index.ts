@@ -11,6 +11,10 @@ export type { Token, TokenType } from './highlight.ts';
 export { APPEARANCES, DENSITIES, MOTIONS, TONES, CLASS, variantAttributes } from './contract.ts';
 export type { NexAppearance, NexDensity, NexMotion, NexTone } from './contract.ts';
 export { reorderSlot, moveItem, edgeScrollStep, keyboardMove } from './reorder.ts';
+export {
+  NEX_GRID_GAPS, NEX_GRID_LIMITS, clampColumns, clampSpan, normalizeGridLayout, gridRowsOf, gridKeyboardMove, gridResizeStep, gridReorderSlot, gridGapValue,
+} from './grid.ts';
+export type { NexGridGap, NexGridItemLayout, NexGridLayout, GridRect } from './grid.ts';
 export { resolveSpace, columnsToFold, SPACES, DEFAULT_SPACE_THRESHOLDS } from './space.ts';
 export type { NexSpace, SpaceThresholds, ColumnFit } from './space.ts';
 export * from './console/types.ts';

@@ -121,7 +121,9 @@ describe('contrato CSS', () => {
     const local = new Set([...(css.match(/--nx-[a-z0-9-]+(?=:)/g) ?? []), '--nx-frame-height', '--nx-frame-inspector-w', '--nx-frame-navigation-w', '--nx-frame-explorer-w', '--nx-code-max-height',
       // Fijadas por los componentes en tiempo de ejecución (puntero, columnas, nivel…).
       '--nx-zone-x', '--nx-zone-y', '--nx-emerge-x', '--nx-nav-level', '--nx-frame-cols', '--nx-frame-areas', '--nx-preview-w', '--nx-morph-p', '--nx-morph-in', '--nx-morph-i', '--nx-explorer-w', '--nx-explorer-reveal', '--nx-inspector-w', '--nx-inspector-reveal',
-      '--nx-scroll-max', '--nx-scroll-fill', '--nx-scroll-at', '--nx-scroll-marker', '--nx-near', '--nx-sheets-height', '--nx-aspect', '--nx-sheet-rowhead', '--nx-font-serif', '--nx-danger', '--nx-anchor-arrow', '--nx-portal-height']);
+      '--nx-scroll-max', '--nx-scroll-fill', '--nx-scroll-at', '--nx-scroll-marker', '--nx-near', '--nx-sheets-height', '--nx-aspect', '--nx-sheet-rowhead', '--nx-font-serif', '--nx-danger', '--nx-anchor-arrow', '--nx-portal-height',
+      // NexGrid: columnas, separación y anchos que fija el componente desde sus props.
+      '--nx-grid-columns', '--nx-grid-gap', '--nx-grid-span', '--nx-grid-row-span', '--nx-grid-span-compact']);
     const used = new Set(css.match(/var\(--nx-[a-z0-9-]+/g)?.map((v) => v.slice(4)));
     const unknown = [...used].filter((v) => !defined.has(v) && !local.has(v));
     assert.deepEqual(unknown, []);
