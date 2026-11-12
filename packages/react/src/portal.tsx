@@ -31,10 +31,10 @@
  * host —el evento `load` llega igual—, así que NexPortal no afirma que esté
  * bloqueado: si tarda, lo dice y ofrece abrirlo aparte. No hay proxies.
  */
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type HTMLAttributeReferrerPolicy, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState, type CSSProperties, type HTMLAttributeReferrerPolicy, type ReactNode, type Ref } from 'react';
 import {
-  SANDBOX_PERMISSIONS, WEB_PAGE_PERMISSIONS, cx, frameSandbox, isPortalMessage, navHistoryGo, navHistoryPush, navHistoryStart,
-  resolveWebAddress, sandboxDocument, type NavHistory, type NexWebPermissions, type WebAddress,
+  SANDBOX_PERMISSIONS, WEB_PAGE_PERMISSIONS, cx, frameSandbox, isPortalChannelMessage, isPortalMessage, navHistoryGo, navHistoryPush, navHistoryStart,
+  portalHostMessage, resolveWebAddress, sandboxDocument, type NavHistory, type NexWebPermissions, type SandboxResources, type WebAddress,
 } from '@nexfluid/components';
 import { NexIconButton } from './button.tsx';
 import { NexIcon } from './icon.tsx';
@@ -55,6 +55,17 @@ export interface NexPortalConsoleEntry {
   text: string;
 }
 
+/**
+ * Control imperativo de un sandbox (`ref`). `post` entrega datos al contenido
+ * (`nexPortal.onMessage`) y espera a que el documento cargue; `reload` crea un
+ * documento NUEVO (y con él se va todo lo que el contenido tuviera vivo, sus
+ * Workers incluidos).
+ */
+export interface NexPortalHandle {
+  post(data: unknown): boolean;
+  reload(): void;
+}
+
 export interface NexPortalProps {
   /** Nombre accesible de la superficie y título del iframe. Obligatorio. */
   label: string;
@@ -72,6 +83,14 @@ export interface NexPortalProps {
   javascript?: string;
   /** sandbox: consola del documento aislado. */
   onConsole?: (entry: NexPortalConsoleEntry) => void;
+  /** sandbox: datos de `nexPortal.send(...)`. Son DATO no confiable: valídalos. */
+  onMessage?: (data: unknown) => void;
+  /** sandbox: prefijos http(s) que el documento puede cargar (`scripts`) o pedir (`connect`). */
+  resources?: SandboxResources;
+  /** sandbox: mostrar la etiqueta «Aislado» y «Ejecutar de nuevo». Por defecto, sí. */
+  chrome?: boolean;
+  /** Control imperativo (sandbox): `post` y `reload`. */
+  ref?: Ref<NexPortalHandle>;
   /** Capacidades concedidas. Por defecto, las mínimas de cada modo. */
   permissions?: NexWebPermissions;
   /** Alto de la superficie (número en px o longitud CSS). */
@@ -103,7 +122,7 @@ const ERRORS: Record<'invalid' | 'unsafe-scheme' | 'offline', string> = {
 
 export function NexPortal({
   label, mode: controlledMode, defaultMode = 'embedded', onModeChange, url: controlledUrl, defaultUrl, onNavigate,
-  html, css, javascript, onConsole, permissions, height = 420, expandedHeight = 'min(78vh, 760px)', expandable = true,
+  html, css, javascript, onConsole, onMessage, resources, chrome = true, ref, permissions, height = 420, expandedHeight = 'min(78vh, 760px)', expandable = true,
   showToolbar = true, slowAfter = 12000, referrerPolicy = 'strict-origin-when-cross-origin', onStatusChange, actions, className, style,
 }: NexPortalProps) {
   const [innerMode, setInnerMode] = useState(defaultMode);
@@ -141,8 +160,11 @@ export function NexPortal({
   const sandboxed = mode === 'sandbox';
   const session = useMemo(() => token(), [html, css, javascript, sandboxed]); // eslint-disable-line react-hooks/exhaustive-deps
   const srcDoc = useMemo(
-    () => (sandboxed ? sandboxDocument({ html, css, javascript, token: session, network: permissions?.network }) : undefined),
-    [sandboxed, html, css, javascript, session, permissions?.network],
+    () => (sandboxed
+      ? sandboxDocument({ html, css, javascript, token: session, network: permissions?.network, workers: permissions?.workers, wasm: permissions?.wasm, resources })
+      : undefined),
+    // `resources` se compara por contenido: un arreglo nuevo con lo mismo no recrea el documento.
+    [sandboxed, html, css, javascript, session, permissions?.network, permissions?.workers, permissions?.wasm, JSON.stringify(resources ?? null)], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const sameOrigin = !sandboxed && current !== undefined && typeof location !== 'undefined' && hostOf(current) === location.host && new URL(current).protocol === location.protocol;
   const sandbox = sandboxed
@@ -169,19 +191,31 @@ export function NexPortal({
     return () => window.clearTimeout(slowTimer.current);
   }, [loadKey, reloads, rejected, slowAfter]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Lo enviado antes de que el documento cargue espera aquí (y se descarta si el documento cambia).
+  const loadedDoc = useRef(false);
+  const outbox = useRef<unknown[]>([]);
+  useEffect(() => { loadedDoc.current = false; outbox.current = []; }, [loadKey, reloads]);
   const onLoad = () => {
     window.clearTimeout(slowTimer.current);
     if (sandboxed || current) setStatus({ phase: 'loaded', url: current });
+    if (sandboxed) {
+      loadedDoc.current = true;
+      const pending = outbox.current.splice(0);
+      for (const data of pending) frame.current?.contentWindow?.postMessage(portalHostMessage(session, data), '*');
+    }
   };
 
   // ---- Puente del sandbox -------------------------------------------------------------
   const consoleRef = useRef(onConsole);
   consoleRef.current = onConsole;
+  const messageRef = useRef(onMessage);
+  messageRef.current = onMessage;
   useEffect(() => {
     if (!sandboxed) return;
     const listen = (event: MessageEvent) => {
       // Tres comprobaciones: viene de NUESTRO frame, con el token de ESTA sesión y con una forma conocida.
       if (event.source !== frame.current?.contentWindow) return;
+      if (isPortalChannelMessage(event.data, session)) { messageRef.current?.(event.data.data); return; }
       if (!isPortalMessage(event.data, session)) return;
       consoleRef.current?.({ level: event.data.level, text: event.data.text });
     };
@@ -220,6 +254,17 @@ export function NexPortal({
     else if (current) el.src = current;
     setReloads((n) => n + 1);
   };
+
+  useImperativeHandle(ref, () => ({
+    post(data: unknown) {
+      if (!sandboxed) return false;
+      // El destino es un origen OPACO: no tiene nombre que poner en `targetOrigin`; la ventana es la de NUESTRO frame.
+      if (loadedDoc.current) frame.current?.contentWindow?.postMessage(portalHostMessage(session, data), '*');
+      else outbox.current.push(data);
+      return true;
+    },
+    reload,
+  }));
 
   const id = useId();
   const statusId = `${id}-status`;
@@ -324,7 +369,7 @@ export function NexPortal({
             )}
           </div>
         )}
-        {mode === 'sandbox' && (
+        {mode === 'sandbox' && chrome && (
           <div className="nx-portal__chrome">
             <span className="nx-portal__host">Aislado</span>
             <NexIconButton type="button" density="compact" label="Ejecutar de nuevo" icon={<NexIcon name="reload" />} onClick={reload} />

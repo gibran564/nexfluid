@@ -50,6 +50,40 @@ Separación pedida, en el contrato del componente:
   `localStorage` lanzan `SecurityError`; `fetch` falla por la CSP; el origen
   es `null`; el DOM propio sí funciona; el host no cambia.
 
+### 2.1 Sandbox para runtimes (0.5.0)
+
+Algunos contenidos necesitan un hilo propio y WebAssembly; Pyodide (Python en el navegador) es el caso que lo motivó, en NexPod de Nextudio. El sandbox los admite **sin** `allow-same-origin`:
+
+```tsx
+const portal = useRef<NexPortalHandle>(null);
+<NexPortal
+  ref={portal}
+  label="Runtime aislado"
+  mode="sandbox"
+  chrome={false}
+  permissions={{ scripts: true, workers: true, wasm: true, network: true }}
+  resources={{ scripts: [`${origin}/runtime/`], connect: [`${origin}/runtime/`] }}
+  javascript={runtimeScript}            // usa nexPortal.send / nexPortal.onMessage
+  onMessage={(data) => validate(data)}  // DATO no confiable
+/>;
+portal.current?.post({ type: 'run', … }); // espera a que el documento cargue
+```
+
+| Permiso | CSP | Por qué |
+|---|---|---|
+| `workers` | `worker-src data:` | Chromium no arranca un Worker de **módulo** desde un `blob:` creado en un origen opaco, y desde `data:` sí. El Worker nace en otro origen opaco y hereda esta política. No se abre `blob:` ni ninguna ruta del host |
+| `wasm` | `'wasm-unsafe-eval'` | Compilar WebAssembly. No habilita `eval` ni `Function` de JavaScript |
+| `resources.scripts` | prefijos en `script-src` | Lo que el Worker importa (`pyodide.mjs`). Son prefijos exactos, sin comodines |
+| `resources.connect` | prefijos en `connect-src` | Lo que el contenido descarga (el Worker compilado, `.wasm`, ruedas) |
+
+El servidor de esos recursos tiene que responder a CORS con `Origin: null`, porque el sandbox es opaco. Basta `Access-Control-Allow-Origin: null`, que sólo admite contextos opacos y no a otros sitios normales.
+
+**Canal de datos.** Dentro del sandbox, `nexPortal.send(datos)` llega al host por `onMessage`, y `ref.post(datos)` llega dentro por `nexPortal.onMessage(fn)`. Las comprobaciones son las de la consola: el mensaje viene del frame de esta sesión y lleva su token, y del lado del sandbox `event.source === parent`. `nexPortal` es una propiedad congelada que el contenido no puede reemplazar. El contenido de `data` sigue siendo no confiable y lo valida quien lo recibe. `reload()` crea un documento nuevo, lo que termina sus Workers aunque estén en un bucle infinito.
+
+**Lo que se mantiene.** El origen sigue siendo opaco. No hay acceso a cookies, `localStorage`, IndexedDB del sitio ni al DOM del host, y `allow-same-origin` nunca se concede a un sandbox aunque se pida. Las pruebas `web-runtime.test.ts` y `portal-runtime.test.tsx` lo comprueban. En Chromium real con Pyodide lo verifica `tests/e2e/nexpod.spec.ts` de Nextudio.
+
+**Alternativa considerada.** `mode="embedded"` hacia un reproductor publicado en un **origen separado** (dominio propio) da además aislamiento de sitio y de proceso. Requiere infraestructura (dominio y despliegue) y queda como endurecimiento posterior. El contrato de NexPortal no cambia.
+
 ## 3. Lo que no se puede saber (y no se finge)
 
 - **Bloqueo de incrustación** (`X-Frame-Options`, CSP `frame-ancestors`): el

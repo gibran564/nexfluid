@@ -33,7 +33,7 @@ export type { NexViewSection, NexViewItem, NexViewRole, ComposeOptions } from '.
 export { placeFloating, spaceAround, anchorClipped } from './anchor.ts';
 export type { NexSide, NexAlign, AnchorRect, PlaceFloatingInput, FloatingPlacement } from './anchor.ts';
 export {
-  resolveWebAddress, frameSandbox, sandboxDocument, isPortalMessage, navHistoryStart, navHistoryPush, navHistoryGo,
+  resolveWebAddress, frameSandbox, sandboxDocument, sandboxResource, isPortalMessage, isPortalChannelMessage, portalHostMessage, navHistoryStart, navHistoryPush, navHistoryGo,
   WEB_PAGE_PERMISSIONS, SANDBOX_PERMISSIONS, PORTAL_MESSAGE_MAX,
 } from './web.ts';
-export type { WebAddress, NexWebPermissions, SandboxSource, PortalConsoleMessage, NavHistory } from './web.ts';
+export type { WebAddress, NexWebPermissions, SandboxSource, SandboxResources, PortalConsoleMessage, PortalChannelMessage, PortalHostMessage, NavHistory } from './web.ts';
