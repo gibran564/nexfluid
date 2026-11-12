@@ -10,9 +10,9 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const EXPECTED: Record<string, string[]> = {
   '@nexfluid/foundation': ['THEMES', 'TYPE_SCALE', 'SPACE', 'DENSITY', 'MOTION', 'ICONS', 'ICON_POSES', 'contrastRatio', 'renderTokensCss', 'hostContrast'],
   '@nexfluid/core': ['stepSpring', 'FluidValue', 'MOTION_PRESETS', 'sharedClock', 'createFluidBlob', 'sampleContour'],
-  '@nexfluid/components': ['cx', 'rovingIndex', 'safeUrl', 'tokenize', 'CLASS', 'resolveSpace', 'reorderSlot', 'moveItem', 'keyboardMove', 'normalizeNexViewEvents', 'createSessionStore', 'fromNexBookOutputs', 'composeNexView', 'columnsFor'],
+  '@nexfluid/components': ['cx', 'rovingIndex', 'safeUrl', 'tokenize', 'CLASS', 'resolveSpace', 'reorderSlot', 'moveItem', 'keyboardMove', 'normalizeGridLayout', 'gridKeyboardMove', 'gridReorderSlot', 'normalizeNexViewEvents', 'createSessionStore', 'fromNexBookOutputs', 'composeNexView', 'columnsFor'],
   '@nexfluid/sheets': ['createWorkbook', 'evaluateSheet', 'pasteGrid', 'csvToSheet', 'toCsv', 'createHistory', 'moveSelection', 'fillRange', 'createAxis', 'parseWorkbook'],
-  '@nexfluid/react': ['NexProvider', 'NexButton', 'NexIconButton', 'NexBadge', 'NexCard', 'NexCardTitle', 'NexTabs', 'NexTab', 'NexTabsList', 'NexTabsPanel', 'NexFrame', 'NexFrameRegion', 'NexCodeBlock', 'NexIcon', 'NexMenu', 'NexCommandMenu', 'NexFlow', 'NexEditorialBlock', 'useNexFlow', 'NexConsole', 'NexLiveConsole'],
+  '@nexfluid/react': ['NexProvider', 'NexButton', 'NexIconButton', 'NexBadge', 'NexCard', 'NexCardTitle', 'NexTabs', 'NexTab', 'NexTabsList', 'NexTabsPanel', 'NexFrame', 'NexFrameRegion', 'NexCodeBlock', 'NexIcon', 'NexMenu', 'NexCommandMenu', 'NexFlow', 'NexEditorialBlock', 'useNexFlow', 'NexConsole', 'NexLiveConsole', 'NexGrid', 'NexGridItem'],
   '@nexfluid/react/markdown': ['NexMarkdown', 'NexMarkdownField'],
   '@nexfluid/react/widgets': ['NexMarkdownWidget', 'NexPropertiesWidget'],
   '@nexfluid/react/motion': ['FluidBlob'],

@@ -2,6 +2,19 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
+## 0.5.0 — sin publicar (preparada el 2026-11-11)
+
+Compatible hacia atrás con 0.4.0: sólo añade exportaciones y props opcionales. Mientras NexFluid esté en `0.x`, Nextudio debe tratar cualquier subida como potencialmente incompatible (ADR 0001 §6.3).
+
+- **Añade NexGrid** (`NexGrid`, `NexGridItem` en `@nexfluid/react`). Es una cuadrícula editorial con columnas (1–12), separación por tokens, `span`, `rowSpan` y `spanCompact`. Se adapta al ancho del **contenedor**, no al de la ventana. Su edición es opcional: arrastre 2D, flechas para mover, Mayús+flechas para cambiar el ancho, anuncios en región viva y FLIP sin movimiento cuando está reducido. Las cuadrículas anidadas tienen un tope y la interior se apila. Dentro de NexFlow vive en un `NexEditorialBlock`: cada nivel tiene un único dueño del orden. Ver `docs/NEXGRID.md`.
+- **Añade** en `@nexfluid/components` el contrato serializable de cuadrícula: `normalizeGridLayout`, `gridKeyboardMove`, `gridResizeStep`, `gridReorderSlot`, `gridRowsOf`, `gridGapValue`, `clampSpan`, `clampColumns`, `NEX_GRID_LIMITS` y `NEX_GRID_GAPS`, con los tipos `NexGridLayout`, `NexGridItemLayout`, `NexGridGap` y `GridRect`.
+- **NexPortal · sandbox para runtimes.** El modo `sandbox` puede alojar un runtime como Pyodide sin abrir `allow-same-origin`. Ver `docs/NEXPORTAL.md` §2.1.
+  - `permissions.workers` permite Workers de módulo desde `data:` y nada más: ni `blob:` ni rutas del host.
+  - `permissions.wasm` añade `'wasm-unsafe-eval'`, nunca `'unsafe-eval'`.
+  - `resources` (`SandboxResources`) admite prefijos http(s) exactos para `script-src` y `connect-src`. `sandboxResource()` descarta los comodines, las credenciales, la consulta y el fragmento.
+  - Nuevo canal de datos en ambos sentidos: `onMessage` en el host, `nexPortal.send` y `nexPortal.onMessage` dentro. Se apoya en `isPortalChannelMessage` y `portalHostMessage`, y valida el origen del frame y el token de la sesión.
+  - Control imperativo por `ref` (`NexPortalHandle`): `post` espera a que cargue el documento y `reload` crea un documento nuevo, lo que también termina sus Workers. `chrome={false}` oculta la etiqueta del sandbox.
+
 ## 0.4.0 — 2026-11-04
 
 Primera versión que se puede reconstruir desde un commit. `npm run release:pack` compila dos veces y verifica que la integridad sha512 coincida (ver `docs/RELEASE.md`).

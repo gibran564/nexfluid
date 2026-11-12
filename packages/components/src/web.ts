@@ -70,6 +70,15 @@ export interface NexWebPermissions {
   ownOrigin?: boolean;
   /** Sólo `sandbox`: peticiones de red (fetch, XHR, imágenes https). Por defecto, ninguna. */
   network?: boolean;
+  /**
+   * sandbox: permite Workers de MÓDULO creados desde una URL `data:` (CSP
+   * `worker-src data:`). Un Worker `data:` nace en otro origen opaco y hereda
+   * esta política; no abre `blob:` ni rutas del host. Para runtimes como
+   * Pyodide que necesitan un hilo propio.
+   */
+  workers?: boolean;
+  /** sandbox: permite compilar WebAssembly (`'wasm-unsafe-eval'`). Nunca habilita `eval` de JavaScript. */
+  wasm?: boolean;
 }
 
 /** Página de otro sitio: lo necesario para que funcione, nada más. */
@@ -94,6 +103,32 @@ export function frameSandbox(permissions: NexWebPermissions, kind: 'page' | 'cod
   return tokens.join(' ');
 }
 
+/**
+ * Recursos externos EXPLÍCITOS de un sandbox: prefijos http(s) exactos (sin
+ * comodines, credenciales, consulta ni fragmento). `scripts` entra en
+ * `script-src` (p. ej. el runtime que importa un Worker); `connect` en
+ * `connect-src` (`fetch`). Un valor que no cumple se DESCARTA.
+ */
+export interface SandboxResources {
+  scripts?: readonly string[];
+  connect?: readonly string[];
+}
+
+/** Un prefijo de recurso admisible para la CSP del sandbox, o `null`. */
+export function sandboxResource(value: string): string | null {
+  if (typeof value !== 'string' || /[\s;,'"*]/.test(value)) return null;
+  try {
+    const url = new URL(value);
+    if (!SAFE.has(url.protocol) || !url.hostname || url.username || url.password || url.search || url.hash) return null;
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+const resources = (list: readonly string[] | undefined) =>
+  [...new Set((list ?? []).map(sandboxResource).filter((value): value is string => value !== null))];
+
 export interface SandboxSource {
   html?: string;
   css?: string;
@@ -101,6 +136,9 @@ export interface SandboxSource {
   /** Token de la sesión: el host sólo acepta mensajes que lo lleven. */
   token: string;
   network?: boolean;
+  workers?: boolean;
+  wasm?: boolean;
+  resources?: SandboxResources;
   /** Idioma del documento. */
   lang?: string;
 }
@@ -112,6 +150,37 @@ export interface PortalConsoleMessage {
   type: 'console';
   level: 'log' | 'info' | 'warn' | 'error';
   text: string;
+}
+
+/**
+ * Canal de datos del sandbox (además de la consola): el contenido llama
+ * `nexPortal.send(datos)` y el host lo recibe en `onMessage`. Sólo se acepta
+ * desde el frame de ESTA sesión y con su token; el contenido de `data` es DATO
+ * no confiable y quien lo recibe debe validarlo.
+ */
+export interface PortalChannelMessage {
+  nexPortal: 1;
+  token: string;
+  type: 'message';
+  data: unknown;
+}
+
+/** Del host al sandbox: `nexPortal.onMessage(fn)` lo recibe dentro. */
+export interface PortalHostMessage {
+  nexPortal: 1;
+  token: string;
+  type: 'host';
+  data: unknown;
+}
+
+export function isPortalChannelMessage(data: unknown, token: string): data is PortalChannelMessage {
+  if (!data || typeof data !== 'object') return false;
+  const m = data as Record<string, unknown>;
+  return m.nexPortal === 1 && typeof token === 'string' && token.length > 0 && m.token === token && m.type === 'message' && 'data' in m;
+}
+
+export function portalHostMessage(token: string, data: unknown): PortalHostMessage {
+  return { nexPortal: 1, token, type: 'host', data };
 }
 
 const LEVELS = new Set(['log', 'info', 'warn', 'error']);
@@ -129,16 +198,20 @@ export function isPortalMessage(data: unknown, token: string): data is PortalCon
 const guard = (text: string, tag: 'script' | 'style') => text.replace(new RegExp(`</(${tag})`, 'gi'), '<\\/$1');
 
 /** El documento completo de un sandbox (para `srcdoc`). */
-export function sandboxDocument({ html = '', css = '', javascript = '', token, network = false, lang = 'es' }: SandboxSource): string {
+export function sandboxDocument({ html = '', css = '', javascript = '', token, network = false, workers = false, wasm = false, resources: allowed, lang = 'es' }: SandboxSource): string {
   const remote = network ? ' https:' : '';
+  const scripts = resources(allowed?.scripts);
+  const connect = resources(allowed?.connect);
+  const connectSrc = [...(network ? ['https:'] : []), ...connect];
   const csp = [
     "default-src 'none'",
-    "script-src 'unsafe-inline'",
+    ["script-src 'unsafe-inline'", ...(wasm ? ["'wasm-unsafe-eval'"] : []), ...scripts].join(' '),
+    ...(workers ? ['worker-src data:'] : []),
     "style-src 'unsafe-inline'",
     `img-src data: blob:${remote}`,
     `media-src data: blob:${remote}`,
     'font-src data:',
-    `connect-src ${network ? 'https:' : "'none'"}`,
+    `connect-src ${connectSrc.length ? connectSrc.join(' ') : "'none'"}`,
     "form-action 'none'",
     "base-uri 'none'",
   ].join('; ');
@@ -152,6 +225,17 @@ export function sandboxDocument({ html = '', css = '', javascript = '', token, n
     console[level] = (...parts) => { send(level, parts); original(...parts); };
   }
   addEventListener('error', (e) => send('error', [e.message || 'Error']));
+  // Canal de datos: \`nexPortal.send\` hacia el host y \`nexPortal.onMessage\` desde él (sólo del padre y con el token).
+  const handlers = [];
+  addEventListener('message', (e) => {
+    const m = e.data;
+    if (e.source !== parent || !m || m.nexPortal !== 1 || m.token !== token || m.type !== 'host') return;
+    for (const handler of handlers.slice()) { try { handler(m.data); } catch (error) { send('error', [String(error && error.message || error)]); } }
+  });
+  Object.defineProperty(window, 'nexPortal', { value: Object.freeze({
+    send: (data) => { try { parent.postMessage({ nexPortal: 1, token, type: 'message', data }, '*'); return true; } catch { return false; } },
+    onMessage: (handler) => { if (typeof handler === 'function') handlers.push(handler); },
+  }), configurable: false, writable: false });
   addEventListener('unhandledrejection', (e) => send('error', ['Promesa rechazada: ' + show(e.reason && e.reason.message || e.reason)]));
 })();`;
   return `<!doctype html>

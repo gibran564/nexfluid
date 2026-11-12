@@ -16,13 +16,33 @@
  */
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const ORDER = ['foundation', 'core', 'components', 'sheets', 'react'] as const;
 const DRAFT = process.argv.includes('--draft');
 const run = (cmd: string, args: string[], cwd = root) => execFileSync(cmd, args, { cwd, encoding: 'utf8' }).trim();
+
+/**
+ * Windows no ejecuta npm.cmd mediante execFileSync sin shell. Invocamos
+ * npm-cli.js con Node directamente, sin shell ni reinterpretar argumentos.
+ * npm_execpath lo proporciona `npm run`; la ruta junto a node.exe permite
+ * también `node scripts/release-pack.ts` en instalaciones estándar de Windows.
+ */
+function runNpm(args: string[], cwd = root): string {
+  const candidates = [
+    process.env.npm_execpath,
+    join(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js'),
+  ];
+  const cli = candidates.find((candidate) => candidate && /npm-cli\.[cm]?js$/i.test(candidate) && existsSync(candidate));
+  if (cli) return run(process.execPath, [cli, ...args], cwd);
+  if (process.platform === 'win32') {
+    throw new Error('No se encontró npm-cli.js. Ejecuta el script con npm run release:pack, o instala npm junto a Node.js.');
+  }
+  return run('npm', args, cwd);
+}
 
 const versions = new Set(ORDER.map((p) => JSON.parse(readFileSync(`${root}packages/${p}/package.json`, 'utf8')).version as string));
 if (versions.size !== 1) throw new Error(`Los paquetes no comparten versión: ${[...versions].join(', ')}`);
@@ -42,7 +62,7 @@ function packAll(outDir: string): Record<string, { file: string; integrity: stri
   execFileSync(process.execPath, [`${root}scripts/build-lib.ts`], { cwd: root, stdio: 'ignore' });
   const out: Record<string, { file: string; integrity: string }> = {};
   for (const pkg of ORDER) {
-    const name = run('npm', ['pack', '--silent', '--pack-destination', outDir], `${root}packages/${pkg}`).split('\n').pop()!;
+    const name = runNpm(['pack', '--silent', '--pack-destination', outDir], `${root}packages/${pkg}`).split('\n').pop()!;
     out[`@nexfluid/${pkg}`] = { file: name, integrity: integrity(`${outDir}/${name}`) };
   }
   return out;
