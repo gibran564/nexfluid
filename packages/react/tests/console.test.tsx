@@ -89,6 +89,17 @@ describe('NexConsole', () => {
     expect(onInterrupt).toHaveBeenCalledOnce();
   });
 
+  it('`viewToggle={false}` retira el selector; `chrome={false}` retira la barra entera', () => {
+    act(() => root.render(<NexConsole outputs={OUT} state="completed" view="nexview" viewToggle={false} />));
+    expect(container.querySelector('.nx-console__views')).toBeNull();
+    expect($('.nx-console__bar')).not.toBeNull();
+    expect($('.nx-console').getAttribute('data-view')).toBe('nexview');
+    act(() => root.render(<NexConsole outputs={OUT} state="completed" view="nexview" chrome={false} />));
+    expect(container.querySelector('.nx-console__bar')).toBeNull();
+    expect($('.nx-console').getAttribute('data-state')).toBe('completed');
+    expect($('[role="log"]').getAttribute('aria-label')).toBe('Resultados (NexView)');
+  });
+
   it('sin entrada que esperar no hay campo; desconectada, tampoco', () => {
     act(() => root.render(<NexConsole outputs={[]} state="running" onSubmitInput={() => true} />));
     expect($('.nx-console__input')).toBeNull();
