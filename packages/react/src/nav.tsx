@@ -64,13 +64,19 @@ export interface NexNavItemProps extends Omit<HTMLAttributes<HTMLElement>, 'chil
   as?: ElementType;
   /** Rama plegable: muestra un cursor y anuncia aria-expanded. */
   expanded?: boolean;
+  /**
+   * Contenido HERMANO del elemento, dentro de su fila (p. ej. un menú de
+   * acciones). A diferencia de `trailing`, no queda dentro del botón: así un
+   * control interactivo no se anida en otro.
+   */
+  aside?: ReactNode;
   children?: ReactNode;
 }
 
-export function NexNavItem({ href, current, icon, trailing, level = 0, as, expanded, className, children, style, ...rest }: NexNavItemProps) {
+export function NexNavItem({ href, current, icon, trailing, level = 0, as, expanded, aside, className, children, style, ...rest }: NexNavItemProps) {
   const Tag: ElementType = as ?? (href ? 'a' : 'button');
   return (
-    <li>
+    <li className={aside ? 'nx-nav__row' : undefined}>
       <Tag
         {...rest}
         href={href}
@@ -85,6 +91,7 @@ export function NexNavItem({ href, current, icon, trailing, level = 0, as, expan
         <span>{children}</span>
         {trailing && <span className="nx-nav__trailing">{trailing}</span>}
       </Tag>
+      {aside && <span className="nx-nav__aside">{aside}</span>}
     </li>
   );
 }
