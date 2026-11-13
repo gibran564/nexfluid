@@ -36,7 +36,8 @@ const OUT: NexConsoleOutput[] = [
 describe('NexConsole', () => {
   it('ordena por seq y conserva la entrada en su sitio; lo no textual queda marcado en su lugar', () => {
     act(() => root.render(<NexConsole outputs={OUT} state="completed" />));
-    expect($('.nx-console__text').textContent).toBe('¿Nombre? Ana\nHola, Ana\n⟨tabla 1×1 · en NexView⟩\n');
+    expect($('.nx-console__text').textContent).toBe('¿Nombre? Ana\nHola, Ana\n⟨tabla 1×1⟩Vista previa\n');
+    expect($('.nx-console__marker').textContent).toBe('⟨tabla 1×1⟩');
     expect($('[data-stream="input"]').textContent).toBe('Ana');
   });
 
@@ -98,6 +99,27 @@ describe('NexConsole', () => {
     expect(container.querySelector('.nx-console__bar')).toBeNull();
     expect($('.nx-console').getAttribute('data-state')).toBe('completed');
     expect($('[role="log"]').getAttribute('aria-label')).toBe('Resultados (NexView)');
+  });
+
+  it('referencias compactas: tipo y dimensiones, vista previa en el sitio sólo al pedirla, sin remitir a NexView', () => {
+    const outputs: NexConsoleOutput[] = [
+      { seq: 0, stream: 'stdout', text: 'antes\n' },
+      { seq: 1, stream: 'table', columns: ['a', 'b', 'c'], rows: [[1, 2, 3], [4, 5, 6]], totalRows: 2, display: { kind: 'matrix', pythonType: 'ndarray', shape: [2, 3] } },
+      { seq: 2, stream: 'json', value: { curso: 'NEXUM', n: 3 }, display: { kind: 'collection', pythonType: 'dict' } },
+      { seq: 3, stream: 'stdout', text: 'después\n' },
+    ];
+    act(() => root.render(<NexConsole outputs={outputs} state="completed" />));
+    expect($$('.nx-console__marker').map((m) => m.textContent)).toEqual(['⟨ndarray 2×3⟩', '⟨dict · 2 claves⟩']);
+    expect(container.textContent).not.toContain('en NexView');
+    // El orden real se conserva: texto, matriz, JSON, texto.
+    expect($('.nx-console__text').textContent).toBe('antes\n⟨ndarray 2×3⟩Vista previa\n⟨dict · 2 claves⟩Vista previa\ndespués\n');
+    expect(container.querySelector('table')).toBeNull();
+    const toggle = $<HTMLButtonElement>('button[aria-label="Vista previa de ndarray 2×3"]');
+    act(() => toggle.click());
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect($('.nx-console__ref-preview table')).not.toBeNull();
+    // La consola sigue siendo el historial: la línea no desaparece al desplegar.
+    expect($$('.nx-console__marker')).toHaveLength(2);
   });
 
   it('sin entrada que esperar no hay campo; desconectada, tampoco', () => {
