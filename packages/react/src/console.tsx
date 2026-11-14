@@ -68,6 +68,28 @@ export interface NexConsoleProps {
   maxInputChars?: number;
   /** Alto de la zona de salida (px o CSS). Por defecto crece hasta 420 px. */
   height?: number | string;
+  /**
+   * Ocupa el alto de su contenedor (un panel acoplado, un panel redimensionable):
+   * la barra queda fija y la zona de salida crece y se desplaza dentro, sin el
+   * tope de 420 px. El contenedor debe tener un alto definido. Ignora `height`.
+   */
+  fill?: boolean;
+  /**
+   * `false` cuando la aplicación ya tiene su propio botón «Detener»: no se pinta
+   * otro en la barra. Ctrl+C en la línea de entrada sigue llamando a `onInterrupt`.
+   */
+  interruptButton?: boolean;
+  /**
+   * `false`: sin selector Consola | NexView (la aplicación muestra NexView en
+   * otro sitio, p. ej. un panel lateral). La vista sigue la prop `view`.
+   */
+  viewToggle?: boolean;
+  /**
+   * `false`: sin barra (ejecutar, estado, selector). Para una NexView incrustada
+   * en una superficie que ya tiene su propia cabecera. El estado sigue en
+   * `data-state` para estilos.
+   */
+  chrome?: boolean;
   label?: string;
   emptyHint?: ReactNode;
   /** Sesión viva: estado de la conexión. Desconectada, no se puede escribir. */
@@ -102,7 +124,7 @@ const cellText = (v: NexConsoleCellValue) => (v === null ? '—' : typeof v === 
 export function NexConsole({
   outputs, state, view: controlled, defaultView = 'console', onViewChange, onSubmitInput, onInterrupt, stdin, durationMs, truncated, queued = 0,
   renderers, maxRows = 50, maxInputChars = 10_000, height, label = 'Consola del programa', emptyHint = 'Ejecuta el programa para ver su salida.',
-  connection, dropped = 0, terminal, actions, onRun, runLabel, runDisabled, onFocusOutput, motion, className,
+  connection, dropped = 0, terminal, actions, onRun, runLabel, runDisabled, onFocusOutput, motion, className, fill = false, interruptButton = true, viewToggle = true, chrome = true,
 }: NexConsoleProps) {
   const defaults = useNex();
   const [inner, setInner] = useState<NexConsoleView>(defaultView);
@@ -213,16 +235,16 @@ export function NexConsole({
         {durationMs !== undefined && !running && <span className="nx-console__hint">{formatDuration(durationMs)}</span>}
       </p>
       {actions}
-      {onInterrupt && running && (
+      {onInterrupt && interruptButton && running && (
         <button type="button" className="nx-console__stop" onClick={onInterrupt} aria-keyshortcuts="Control+C">Detener</button>
       )}
-      <NexSegmented className="nx-console__views" aria-label="Presentación de la salida" density="compact" motion={motion} value={view} onValueChange={(v) => setView(v as NexConsoleView)}
-        options={[{ value: 'console', label: 'Consola' }, { value: 'nexview', label: 'NexView' }]} />
+      {viewToggle && <NexSegmented className="nx-console__views" aria-label="Presentación de la salida" density="compact" motion={motion} value={view} onValueChange={(v) => setView(v as NexConsoleView)}
+        options={[{ value: 'console', label: 'Consola' }, { value: 'nexview', label: 'NexView' }]} />}
     </header>
   );
   return (
-    <section className={cx('nx-console', className)} aria-label={label} data-view={view} data-state={state} data-connection={connection} data-nx-empty={empty ? '' : undefined} data-nx-motion={level}>
-      {bar}
+    <section className={cx('nx-console', className)} aria-label={label} data-view={view} data-state={state} data-connection={connection} data-nx-empty={empty ? '' : undefined} data-nx-fill={fill ? '' : undefined} data-nx-motion={level}>
+      {chrome && bar}
       {stdin && !RUNNING.has(state) && (
         <details className="nx-console__stdin" open={stdin.value !== '' || undefined}>
           <summary>{stdin.label ?? 'Entrada anticipada'}{stdin.value && <span> · {stdin.value.split('\n').length} líneas</span>}</summary>
@@ -236,7 +258,7 @@ export function NexConsole({
         role="log"
         aria-live="polite"
         aria-label={view === 'console' ? 'Salida del programa' : 'Resultados (NexView)'}
-        style={height !== undefined ? { height: typeof height === 'number' ? `${height}px` : height } : undefined}
+        style={height !== undefined && !fill ? { height: typeof height === 'number' ? `${height}px` : height } : undefined}
         onScroll={(e) => { const n = e.currentTarget; stuck.current = n.scrollHeight - n.scrollTop - n.clientHeight < 24; }}
         onMouseUp={() => { if (waiting && !getSelection()?.toString()) field.current?.focus({ preventScroll: true }); }}
       >

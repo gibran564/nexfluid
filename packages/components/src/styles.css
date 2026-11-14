@@ -1518,6 +1518,9 @@
 @media (hover: none) { .nx-view__expand { opacity: 1; } }
 /* En NexView la ejecución se compone: más alto disponible que la consola de texto. */
 .nx-console[data-view='nexview'] .nx-console__log { max-height: min(80vh, 880px); }
+/* `fill`: el alto lo pone el contenedor; la barra queda fija y la salida se desplaza dentro. Va después de los topes para ganarles. */
+.nx-console[data-nx-fill] { display: flex; flex-direction: column; block-size: 100%; min-block-size: 0; }
+.nx-console[data-nx-fill] .nx-console__log { flex: 1 1 0; min-height: 0; max-height: none; }
 [data-nx-motion-pref='reduce'] .nx-view__item, [data-nx-motion-pref='reduce'] .nx-view__expand { animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .nx-view__item:not([data-nx-motion-pref='full'] *), .nx-view__expand:not([data-nx-motion-pref='full'] *) { animation: none !important; transition: none !important; }
