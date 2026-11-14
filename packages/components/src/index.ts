@@ -23,6 +23,8 @@ export type { NexViewEvent } from './console/model.ts';
 export { diagnoseOutput, pythonLocation } from './console/diagnostics.ts';
 export type { NexViewDiagnostic } from './console/diagnostics.ts';
 export { recognizePrintedStructures } from './console/printed.ts';
+export { textForm, splitPrompt } from './console/text-form.ts';
+export type { NexTextForm } from './console/text-form.ts';
 export type { PrintedStructure } from './console/printed.ts';
 export { consoleTranscript, splitInputLines, consoleStateLabel, consoleStatus, pendingPrompt, fromNexBookOutputs, fromTerminalSegments } from './console/session.ts';
 export type { NexConsoleSegment } from './console/session.ts';

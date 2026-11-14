@@ -1530,6 +1530,16 @@
 .nx-view__exchange { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 0; font: 450 13px / 1.65 var(--nx-font-mono); }
 .nx-view__exchange-label { color: var(--nx-fg-subtle); font: 500 var(--nx-text-micro) / 1 var(--nx-font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
 .nx-view__answer { padding: 2px 10px; border-radius: 9999px; background: var(--nx-accent-soft); color: var(--nx-accent); font-weight: 500; }
+/*
+ * Texto editorial: los MISMOS bytes (pre-wrap conserva saltos y espacios) con
+ * la tipografía de lectura. Lo que depende de la rejilla (tablas dibujadas,
+ * arte ASCII, código, barras) se queda en monoespaciada (data-form="literal").
+ */
+.nx-view__text[data-form='prose'] { font: 400 var(--nx-text-body, 15px) / 1.6 var(--nx-font-text); letter-spacing: -0.003em; }
+/* input(): pregunta y respuesta como un intercambio, no como líneas de terminal. */
+.nx-view__exchange[data-answered], .nx-view__exchange[data-pending] { flex-direction: column; align-items: stretch; gap: 6px; font-family: var(--nx-font-text); }
+.nx-view__question { margin: 0; color: var(--nx-fg); font: 600 var(--nx-text-body, 15px) / 1.45 var(--nx-font-text); }
+.nx-view__exchange[data-answered] .nx-view__answer { align-self: flex-start; }
 .nx-view__table, .nx-view__figure { margin: 0; min-width: 0; }
 .nx-view__caption { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 6px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.4 var(--nx-font-mono); }
 .nx-view__caption strong { color: var(--nx-fg); font-weight: 600; }

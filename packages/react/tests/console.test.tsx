@@ -100,6 +100,32 @@ describe('NexConsole', () => {
     expect($('[role="log"]').getAttribute('aria-label')).toBe('Resultados (NexView)');
   });
 
+  it('NexView editorial: prosa con tipografía de lectura, rejilla en monoespaciada, mismos bytes', () => {
+    const outputs: NexConsoleOutput[] = [
+      { seq: 0, stream: 'stdout', text: 'Análisis completado\nPromedio: 18.4\n' },
+      { seq: 1, stream: 'stdout', text: '+---+\n| a |\n+---+\n' },
+    ];
+    act(() => root.render(<NexConsole outputs={outputs} state="completed" view="nexview" />));
+    const texts = $$('.nx-view__text');
+    expect(texts.map((el) => el.dataset.form)).toEqual(['prose', 'literal']);
+    expect(texts[0]!.textContent).toBe('Análisis completado\nPromedio: 18.4\n');
+    expect(texts[1]!.textContent).toBe('+---+\n| a |\n+---+\n');
+  });
+
+  it('NexView: input() pendiente como pregunta con su campo; respondida, pregunta y respuesta', () => {
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: '¿Cómo te llamas? ' }]} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    expect($('.nx-view__exchange[data-pending] .nx-view__question').textContent).toBe('¿Cómo te llamas?');
+    expect($('.nx-console__input')).not.toBeNull();
+    // La pregunta no se repite como texto suelto encima del campo.
+    expect($$('.nx-view__text')).toHaveLength(0);
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: '¿Cómo te llamas? ' }, { seq: 1, stream: 'input', text: 'Ana' }, { seq: 2, stream: 'stdout', text: 'Bienvenido, Ana\n' }]} state="completed" view="nexview" />));
+    expect($('.nx-view__exchange[data-answered] .nx-view__question').textContent).toBe('¿Cómo te llamas?');
+    expect($('.nx-view__exchange[data-answered] .nx-view__answer').textContent).toBe('Respuesta: Ana');
+    // La Consola sigue literal (misma salida, otra presentación).
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: '¿Cómo te llamas? ' }, { seq: 1, stream: 'input', text: 'Ana' }, { seq: 2, stream: 'stdout', text: 'Bienvenido, Ana\n' }]} state="completed" view="console" />));
+    expect($('.nx-console__text').textContent).toBe('¿Cómo te llamas? Ana\nBienvenido, Ana\n');
+  });
+
   it('sin entrada que esperar no hay campo; desconectada, tampoco', () => {
     act(() => root.render(<NexConsole outputs={[]} state="running" onSubmitInput={() => true} />));
     expect($('.nx-console__input')).toBeNull();
