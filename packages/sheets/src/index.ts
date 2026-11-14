@@ -34,6 +34,8 @@ export type { History, HistoryEntry } from './history.ts';
 export { selectionAt, selectionRange, clampAddress, clampSelection, edgeOf, moveSelection, stepInside, selectAll } from './selection.ts';
 export type { Selection, MoveOptions } from './selection.ts';
 export { shiftFormula, fillDirection, fillTarget, fillRange } from './fill.ts';
+export { DEFAULT_SHEET_EXTENT, viewExtent, withExtent } from './extent.ts';
+export type { SheetExtent } from './extent.ts';
 export { createAxis } from './axis.ts';
 export type { Axis } from './axis.ts';
 export { serializeWorkbook, parseWorkbook, WorkbookRejected } from './json.ts';
