@@ -69,6 +69,37 @@ describe('NexConsole', () => {
     expect(stop).toHaveBeenCalledTimes(1);
   });
 
+  it('`fill` delega el alto en el contenedor e ignora `height`; sin `fill`, `height` se aplica', () => {
+    act(() => root.render(<NexConsole outputs={OUT} state="completed" fill height={300} />));
+    expect($('.nx-console').hasAttribute('data-nx-fill')).toBe(true);
+    expect($('.nx-console__log').style.height).toBe('');
+    act(() => root.render(<NexConsole outputs={OUT} state="completed" height={300} />));
+    expect($('.nx-console').hasAttribute('data-nx-fill')).toBe(false);
+    expect($('.nx-console__log').style.height).toBe('300px');
+  });
+
+  it('`interruptButton={false}` no pinta otro «Detener», pero Ctrl+C sigue interrumpiendo', () => {
+    const onInterrupt = vi.fn();
+    act(() => root.render(<NexConsole outputs={OUT} state="running" onInterrupt={onInterrupt} />));
+    expect($('.nx-console__stop')).not.toBeNull();
+    act(() => root.render(<NexConsole outputs={OUT} state="waiting_for_input" onSubmitInput={() => true} onInterrupt={onInterrupt} interruptButton={false} />));
+    expect(container.querySelector('.nx-console__stop')).toBeNull();
+    const input = $<HTMLInputElement>('.nx-console__input');
+    act(() => { input.dispatchEvent(new KeyboardEvent('keydown', { key: 'c', ctrlKey: true, bubbles: true, cancelable: true })); });
+    expect(onInterrupt).toHaveBeenCalledOnce();
+  });
+
+  it('`viewToggle={false}` retira el selector; `chrome={false}` retira la barra entera', () => {
+    act(() => root.render(<NexConsole outputs={OUT} state="completed" view="nexview" viewToggle={false} />));
+    expect(container.querySelector('.nx-console__views')).toBeNull();
+    expect($('.nx-console__bar')).not.toBeNull();
+    expect($('.nx-console').getAttribute('data-view')).toBe('nexview');
+    act(() => root.render(<NexConsole outputs={OUT} state="completed" view="nexview" chrome={false} />));
+    expect(container.querySelector('.nx-console__bar')).toBeNull();
+    expect($('.nx-console').getAttribute('data-state')).toBe('completed');
+    expect($('[role="log"]').getAttribute('aria-label')).toBe('Resultados (NexView)');
+  });
+
   it('sin entrada que esperar no hay campo; desconectada, tampoco', () => {
     act(() => root.render(<NexConsole outputs={[]} state="running" onSubmitInput={() => true} />));
     expect($('.nx-console__input')).toBeNull();
