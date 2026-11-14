@@ -2,6 +2,10 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
+## Sin publicar
+
+- **NexTab · `onClose` y `closeLabel`.** Pestañas cerrables para editores (archivos abiertos): aspa visible que no es un botón anidado ni recibe foco; Supr sobre la pestaña y el clic central también cierran. Quien la usa decide qué pestaña queda activa. Sin `onClose`, nada cambia. Origen: las pestañas de archivos de NexCode.
+
 ## 0.5.0 — sin publicar (preparada el 2026-11-11)
 
 Compatible hacia atrás con 0.4.0: sólo añade exportaciones y props opcionales. Mientras NexFluid esté en `0.x`, Nextudio debe tratar cualquier subida como potencialmente incompatible (ADR 0001 §6.3).

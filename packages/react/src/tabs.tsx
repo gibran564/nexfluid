@@ -173,9 +173,18 @@ export interface NexTabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   trailing?: ReactNode;
   /** Para la reserva de ancho en negrita cuando `children` no es texto plano. */
   textValue?: string;
+  /**
+   * Pestaña cerrable (p. ej. archivos abiertos de un editor). El aspa es
+   * visible pero NO es un botón anidado (no recibe foco): con el teclado se
+   * cierra con Supr sobre la pestaña, y con el ratón también con el clic central.
+   * Quien usa la pestaña decide qué pasa después (qué pestaña queda activa).
+   */
+  onClose?: () => void;
+  /** Nombre del aspa (su `title`). Por defecto, «Cerrar <textValue>». */
+  closeLabel?: string;
 }
 
-export function NexTab({ value, icon, trailing, textValue, disabled, className, children, onClick, onKeyDown, ...rest }: NexTabProps) {
+export function NexTab({ value, icon, trailing, textValue, onClose, closeLabel, disabled, className, children, onClick, onKeyDown, onAuxClick, ...rest }: NexTabProps) {
   const ctx = useTabs('NexTab');
   const selected = ctx.value === value;
   const label = textValue ?? (typeof children === 'string' ? children : undefined);
@@ -191,19 +200,39 @@ export function NexTab({ value, icon, trailing, textValue, disabled, className, 
       tabIndex={selected && !disabled ? 0 : -1}
       data-value={value}
       className={cx('nx-tab', className)}
+      data-closable={onClose ? '' : undefined}
       onClick={(e) => {
         onClick?.(e);
         if (disabled || e.defaultPrevented) return;
         // detail === 0: activación por teclado (Intro/Espacio) de un botón.
         ctx.select(value, e.detail === 0 ? 'keyboard' : 'pointer');
       }}
-      onKeyDown={onKeyDown}
+      onKeyDown={(e) => {
+        onKeyDown?.(e);
+        if (onClose && !disabled && !e.defaultPrevented && e.key === 'Delete') {
+          e.preventDefault();
+          onClose();
+        }
+      }}
+      onAuxClick={(e) => {
+        onAuxClick?.(e);
+        if (onClose && !disabled && !e.defaultPrevented && e.button === 1) {
+          e.preventDefault();
+          onClose();
+        }
+      }}
     >
       {icon}
       <span className="nx-tab__label" data-label={label}>
         <span>{children}</span>
       </span>
       {trailing}
+      {onClose && (
+        <span className="nx-tab__close" aria-hidden="true" title={closeLabel ?? `Cerrar ${label ?? value}`}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (!disabled) onClose(); }}>
+          <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
+        </span>
+      )}
     </button>
   );
 }
