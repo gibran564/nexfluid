@@ -166,6 +166,36 @@ describe('NexTabs', () => {
     expect(tabs()[3]!.getAttribute('aria-selected')).toBe('true');
   });
 
+  it('cerrables: el aspa no selecciona ni es un botón anidado; Supr y el clic central cierran', async () => {
+    const onClose = vi.fn();
+    const onChange = vi.fn();
+    render(
+      <NexTabs defaultValue="a" onValueChange={onChange}>
+        <NexTabs.List aria-label="Archivos">
+          <NexTab value="a" onClose={() => onClose('a')}>a.py</NexTab>
+          <NexTab value="b" onClose={() => onClose('b')} closeLabel="Cerrar b.py">b.py</NexTab>
+          <NexTab value="c">c.py</NexTab>
+        </NexTabs.List>
+      </NexTabs>,
+    );
+    const [a, b, c] = tabs();
+    expect(a!.querySelector('button')).toBeNull();
+    const close = b!.querySelector<HTMLElement>('.nx-tab__close')!;
+    expect(close.getAttribute('aria-hidden')).toBe('true');
+    expect(close.getAttribute('title')).toBe('Cerrar b.py');
+    expect(c!.querySelector('.nx-tab__close')).toBeNull();
+    click(close);
+    expect(onClose).toHaveBeenLastCalledWith('b');
+    expect(onChange).not.toHaveBeenCalled();
+    key(a!, 'Delete');
+    expect(onClose).toHaveBeenLastCalledWith('a');
+    act(() => { b!.dispatchEvent(new MouseEvent('auxclick', { bubbles: true, cancelable: true, button: 1 })); });
+    expect(onClose).toHaveBeenCalledTimes(3);
+    key(c!, 'Delete');
+    expect(onClose).toHaveBeenCalledTimes(3);
+    expect(await violations()).toEqual([]);
+  });
+
   it('manual: las flechas mueven el foco sin seleccionar; Intro selecciona', () => {
     render(<Tabs activation="manual" />);
     act(() => tabs()[0]!.focus());

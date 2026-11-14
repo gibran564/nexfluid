@@ -781,6 +781,12 @@
 .nx-preview__stage { display: flex; justify-content: center; padding: 16px; overflow: hidden; }
 .nx-preview__viewport { width: var(--nx-preview-w, 100%); max-width: 100%; min-height: 220px; overflow: auto; }
 .nx-explorer { padding: 8px; }
+/* Pestaña cerrable: aspa visible, sin foco propio (Supr y clic central cierran). */
+.nx-tab__close { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-inline-start: 6px; border-radius: 9999px; color: var(--nx-fg-muted); opacity: 0; cursor: pointer; transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing), background var(--nx-motion-state-duration) var(--nx-motion-state-easing); }
+.nx-tab:is(:hover, :focus-visible, [aria-selected='true']) > .nx-tab__close { opacity: 1; }
+.nx-tab__close:hover { background: var(--nx-surface-raised); color: var(--nx-fg); }
+@media (hover: none) { .nx-tab__close { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .nx-tab__close { transition: none; } }
 .nx-md-widget .nx-tabs__panel { padding-top: var(--nx-space-5); }
 
 /* ---- FluidBlob dentro de NexFluidUI ---------------------------------------- */

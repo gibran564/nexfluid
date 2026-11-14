@@ -4,6 +4,7 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ## Sin publicar
 
+- **NexTab · `onClose` y `closeLabel`.** Pestañas cerrables para editores (archivos abiertos): aspa visible que no es un botón anidado ni recibe foco; Supr sobre la pestaña y el clic central también cierran. Quien la usa decide qué pestaña queda activa. Sin `onClose`, nada cambia. Origen: las pestañas de archivos de NexCode.
 Compatible hacia atrás con 0.5.0: sólo añade props opcionales. Origen: la integración de `NexConsole` en NexCode (Nextudio), donde la consola vive en un panel inferior redimensionable junto a un botón «Detener» propio.
 
 - **NexConsole · `fill`.** Ocupa el alto de su contenedor: la barra queda fija y la zona de salida crece y se desplaza dentro. Antes la salida tenía un tope fijo de 420 px (880 px en NexView) que `height` no podía superar, así que en un panel más bajo la línea de `input()` quedaba fuera de la vista y en uno más alto sobraba hueco. Con `fill` se ignora `height`; el contenedor debe tener un alto definido.
