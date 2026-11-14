@@ -266,7 +266,7 @@ export function NexConsole({
           <div className="nx-console__body" key={view}>
             {dropped > 0 && <p className="nx-console__note">Se descartaron {dropped} salidas antiguas (límite de memoria de la sesión).</p>}
             {view === 'console'
-              ? terminal ?? <ConsoleTranscript outputs={ordered} input={input} />
+              ? terminal ?? <ConsoleTranscript outputs={ordered} input={input} state={state} renderers={renderers} maxRows={maxRows} id={id} />
               : <NexViewEvents outputs={ordered} state={state} input={input} renderers={renderers} maxRows={maxRows} id={id} onFocusOutput={onFocusOutput} motion={level} />}
           </div>
         )}
@@ -276,15 +276,72 @@ export function NexConsole({
   );
 }
 
-function ConsoleTranscript({ outputs, input }: { outputs: readonly NexConsoleOutput[]; input: ReactNode }) {
+function ConsoleTranscript({ outputs, input, state, renderers, maxRows, id }: {
+  outputs: readonly NexConsoleOutput[]; input: ReactNode; state: NexConsoleState; renderers?: NexConsoleRenderers; maxRows: number; id: string;
+}) {
   const segments = consoleTranscript(outputs);
   return (
     <div className="nx-console__text">
       {/* Clave por el primer seq del tramo: un fragmento nuevo sólo vuelve a pintar el último. */}
-      {segments.map((s) => <Segment key={s.seq} stream={s.stream} text={s.stream === 'rich' ? `⟨${richName(s.output)} · en NexView⟩\n` : s.text} />)}
+      {segments.map((s) => s.stream === 'rich'
+        ? <RichReference key={s.seq} output={s.output} state={state} renderers={renderers} maxRows={maxRows} id={`${id}-ref-${s.seq}`} />
+        : <Segment key={s.seq} stream={s.stream} text={s.text} />)}
       {input}
     </div>
   );
+}
+
+/**
+ * Un resultado estructurado en la consola: referencia compacta, en su sitio de
+ * la transcripción, con tipo y dimensiones (`⟨DataFrame 8×14⟩`). El texto se
+ * selecciona y se copia como el resto. «Vista previa» lo despliega aquí mismo
+ * con el renderizador de NexView, y sólo cuando se pide (no se pintan tablas
+ * grandes ni figuras por adelantado). La consola sigue siendo el historial
+ * técnico: la vista previa no sustituye a la línea.
+ */
+function RichReference({ output, state, renderers, maxRows, id }: {
+  output: NexConsoleOutput; state: NexConsoleState; renderers?: NexConsoleRenderers; maxRows: number; id: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const label = richLabel(output);
+  const preview = `${id}-preview`;
+  return (
+    <span className="nx-console__ref" data-stream="rich" data-open={open ? '' : undefined}>
+      <span className="nx-console__marker">⟨{label}⟩</span>
+      <button type="button" className="nx-console__ref-toggle" aria-expanded={open} aria-controls={open ? preview : undefined}
+        aria-label={`${open ? 'Ocultar' : 'Vista previa de'} ${label}`} onClick={() => setOpen((value) => !value)}>
+        {open ? 'Ocultar' : 'Vista previa'}
+      </button>
+      {'\n'}
+      {open && (
+        <span className="nx-console__ref-preview" id={preview} role="group" aria-label={`Vista previa de ${label}`}>
+          {eventsOf(output, consoleStatus(state)).map((event, index) => (
+            <NexViewEventView key={index} event={event} renderers={renderers} maxRows={maxRows} id={`${preview}-${index}`} />
+          ))}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** Nombre, tipo y dimensiones de un resultado, sin remitir a otra vista. */
+function richLabel(o: NexConsoleOutput): string {
+  switch (o.stream) {
+    case 'table': {
+      const type = o.display?.pythonType ?? (o.display?.kind === 'matrix' ? 'matriz' : 'tabla');
+      const title = o.title ? ` «${o.title}»` : '';
+      return `${type}${title} ${o.totalRows}×${o.columns.length}`;
+    }
+    case 'image': return o.width && o.height ? `imagen ${o.width}×${o.height}` : 'imagen';
+    case 'json': {
+      const type = o.display?.pythonType ?? 'JSON';
+      const size = Array.isArray(o.value) ? ` · ${o.value.length} elementos` : o.value && typeof o.value === 'object' ? ` · ${Object.keys(o.value).length} claves` : '';
+      return `${type}${size}`;
+    }
+    case 'figure': return o.title ? `figura ${o.format} «${o.title}»` : `figura ${o.format}`;
+    case 'custom': return o.mime;
+    default: return 'salida';
+  }
 }
 
 const Segment = memo(function Segment({ stream, text }: { stream: string; text: string }) {
