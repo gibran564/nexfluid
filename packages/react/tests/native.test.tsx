@@ -1,7 +1,7 @@
 import { act, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NexCard, NexFrame, NexIcon, NexNav, NexPanel, NexProvider, NexSegmented, NexSurface } from '@nexfluid/react';
 import { NexMarkdown } from '@nexfluid/react/markdown';
 import { NexExplorerWidget, NexInspectorWidget, NexPreviewWidget } from '@nexfluid/react/widgets';
@@ -25,6 +25,11 @@ const $ = <T extends Element = HTMLElement>(sel: string, scope: ParentNode = con
 const $$ = <T extends Element = HTMLElement>(sel: string, scope: ParentNode = container) => Array.from(scope.querySelectorAll<T>(sel));
 const key = (el: Element, k: string) => act(() => { el.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true })); });
 const click = (el: Element) => act(() => { (el as HTMLElement).click(); });
+const keydown = (el: Element, k: string) => key(el, k);
+const type = (el: HTMLInputElement, value: string) => act(() => {
+  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(el, value);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+});
 const pointer = (el: Element, type: string) => act(() => { el.dispatchEvent(new PointerEvent(type, { bubbles: true, button: 0, clientX: 10, clientY: 10 })); });
 async function violations(node: Element = container) {
   const r = await axe.run(node, { rules: { 'color-contrast': { enabled: false }, region: { enabled: false } } });
@@ -189,6 +194,94 @@ describe('NexWidgets nativos', () => {
     click($$('.nx-nav__item').find((b) => b.textContent === 'a.ts')!);
     expect($('[aria-current="true"]').textContent).toBe('a.ts');
     expect(await violations()).toEqual([]);
+  });
+
+  it('NexExplorerWidget: teclado de árbol, F2 y Supr piden a la aplicación', () => {
+    const onRenameRequest = vi.fn();
+    const onDeleteRequest = vi.fn();
+    render(
+      <NexExplorerWidget
+        aria-label="Archivos"
+        nodes={[{ id: 'src', label: 'src', children: [{ id: 'src/a.py', label: 'a.py' }] }, { id: 'b.py', label: 'b.py' }]}
+        onRenameRequest={onRenameRequest}
+        onDeleteRequest={onDeleteRequest}
+      />,
+    );
+    const src = $('[data-nx-explorer-id="src"]');
+    src.focus();
+    keydown(src, 'ArrowRight');
+    expect(src.getAttribute('aria-expanded')).toBe('true');
+    keydown(src, 'ArrowDown');
+    expect(document.activeElement?.textContent).toBe('a.py');
+    keydown(document.activeElement as HTMLElement, 'ArrowLeft');
+    expect(document.activeElement).toBe(src);
+    keydown(src, 'End');
+    expect(document.activeElement?.textContent).toBe('b.py');
+    keydown(document.activeElement as HTMLElement, 'F2');
+    expect(onRenameRequest).toHaveBeenCalledWith('b.py');
+    keydown(document.activeElement as HTMLElement, 'Delete');
+    expect(onDeleteRequest).toHaveBeenCalledWith('b.py');
+  });
+
+  it('NexExplorerWidget: renombrar y crear en línea; Intro confirma, Escape cancela, un nombre inválido deja el campo', () => {
+    const onRenameCommit = vi.fn(() => true);
+    const onDraftCommit = vi.fn((label: string) => label !== 'malo');
+    const onDraftCancel = vi.fn();
+    const nodes = [{ id: 'src', label: 'src', branch: true, children: [] }, { id: 'main.py', label: 'main.py' }];
+    render(<NexExplorerWidget aria-label="Archivos" nodes={nodes} renaming="main.py" onRenameCommit={onRenameCommit} />);
+    const rename = $<HTMLInputElement>('input[aria-label="Nuevo nombre de main.py"]');
+    expect(document.activeElement).toBe(rename);
+    expect([rename.selectionStart, rename.selectionEnd]).toEqual([0, 4]);
+    type(rename, 'app.py');
+    keydown(rename, 'Enter');
+    expect(onRenameCommit).toHaveBeenCalledWith('main.py', 'app.py');
+
+    render(<NexExplorerWidget aria-label="Archivos" nodes={nodes} draft={{ parent: null, kind: 'leaf', label: 'Nombre del archivo nuevo' }} onDraftCommit={onDraftCommit} onDraftCancel={onDraftCancel} />);
+    const create = $<HTMLInputElement>('input[aria-label="Nombre del archivo nuevo"]');
+    type(create, 'malo');
+    keydown(create, 'Enter');
+    expect(onDraftCommit).toHaveBeenLastCalledWith('malo');
+    expect(container.querySelector('input[aria-label="Nombre del archivo nuevo"]')).not.toBeNull();
+    keydown(create, 'Escape');
+    expect(onDraftCancel).toHaveBeenCalledOnce();
+  });
+
+  it('NexExplorerWidget: acciones por fila en un menú hermano (sin botones anidados), accesible', async () => {
+    const onSelect = vi.fn();
+    render(
+      <NexExplorerWidget
+        aria-label="Archivos"
+        nodes={[{ id: 'main.py', label: 'main.py' }]}
+        actions={(node) => [{ id: 'del', label: `Eliminar ${node.label}`, tone: 'danger', onSelect }]}
+      />,
+    );
+    const trigger = $('button[aria-label="Acciones de main.py"]');
+    expect(trigger.closest('.nx-nav__item')).toBeNull();
+    expect(trigger.closest('li')?.querySelector('.nx-nav__item')?.textContent).toBe('main.py');
+    expect(await violations()).toEqual([]);
+  });
+
+  it('NexExplorerWidget: arrastrar a una rama mueve; nunca dentro de sí misma', () => {
+    const onMove = vi.fn();
+    render(
+      <NexExplorerWidget
+        aria-label="Archivos"
+        defaultExpanded={['src']}
+        nodes={[{ id: 'src', label: 'src', children: [{ id: 'src/lib', label: 'lib', branch: true }] }, { id: 'a.py', label: 'a.py' }]}
+        onMove={onMove}
+      />,
+    );
+    const drag = (from: HTMLElement, to: HTMLElement) => {
+      const data = { types: [] as string[], files: { length: 0 }, effectAllowed: '', dropEffect: '' };
+      act(() => { from.dispatchEvent(Object.assign(new Event('dragstart', { bubbles: true }), { dataTransfer: data })); });
+      act(() => { to.dispatchEvent(Object.assign(new Event('dragover', { bubbles: true, cancelable: true }), { dataTransfer: data })); });
+      act(() => { to.dispatchEvent(Object.assign(new Event('drop', { bubbles: true, cancelable: true }), { dataTransfer: data })); });
+    };
+    drag($('[data-nx-explorer-id="a.py"]'), $('[data-nx-explorer-id="src"]'));
+    expect(onMove).toHaveBeenCalledWith('a.py', 'src');
+    onMove.mockClear();
+    drag($('[data-nx-explorer-id="src"]'), $('[data-nx-explorer-id="src/lib"]'));
+    expect(onMove).not.toHaveBeenCalled();
   });
 
   it('NexInspectorWidget: secciones plegables independientes', () => {
