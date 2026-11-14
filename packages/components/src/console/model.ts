@@ -1,12 +1,17 @@
 import type { NexConsoleInputOutput, NexConsoleStatus, NexConsoleOutput, NexConsoleTextOutput } from './types.ts';
 import { diagnoseOutput, type NexViewDiagnostic } from './diagnostics.ts';
 import { recognizePrintedStructures, type PrintedStructure } from './printed.ts';
+import { splitPrompt } from './text-form.ts';
 
 export type NexViewEvent =
   | { kind: 'diagnostic'; output: NexConsoleTextOutput; diagnostic: NexViewDiagnostic }
   | { kind: 'text'; output: NexConsoleTextOutput }
-  /** Lo que se escribió en stdin, en su sitio de la ejecución. */
-  | { kind: 'input'; output: NexConsoleInputOutput }
+  /**
+   * Lo que se escribió en stdin, en su sitio de la ejecución. `prompt`: la
+   * pregunta del `input()` (lo impreso justo antes en la misma línea), que
+   * NexView presenta como pregunta; la Consola la sigue mostrando literal.
+   */
+  | { kind: 'input'; output: NexConsoleInputOutput; prompt?: string }
   | { kind: 'printed'; confidence: 'parsed'; output: NexConsoleTextOutput; structure: PrintedStructure; label?: string }
   | { kind: 'structured'; confidence: 'confirmed'; output: Exclude<NexConsoleOutput, NexConsoleTextOutput | NexConsoleInputOutput> };
 
@@ -44,7 +49,8 @@ export function normalizeNexViewEvents(outputs: readonly NexConsoleOutput[], sta
 }
 
 /** Join short print captions to their values, without changing normalized bytes. */
-export function layoutNexViewEvents(events: NexViewEvent[]): NexViewEvent[] {
+export function layoutNexViewEvents(input: NexViewEvent[]): NexViewEvent[] {
+  const events = pairPrompts(input);
   if (!events.some((event) => event.kind === 'printed')) return events;
   const laidOut: NexViewEvent[] = [];
   for (const event of events) {
@@ -69,4 +75,28 @@ export function layoutNexViewEvents(events: NexViewEvent[]): NexViewEvent[] {
     const text = event.output.text.replace(/^(?:[ \t]*\n)+|(?:\n[ \t]*)+$/g, '');
     return text.trim() ? [{ ...event, output: { ...event.output, text } }] : [];
   });
+}
+
+/**
+ * Une cada respuesta de stdin a su pregunta: el trozo final, sin salto de
+ * línea, de lo impreso justo antes. Ningún byte se pierde: lo anterior a la
+ * pregunta queda como texto y la pregunta viaja con la entrada.
+ */
+function pairPrompts(events: NexViewEvent[]): NexViewEvent[] {
+  if (!events.some((event) => event.kind === 'input')) return events;
+  const paired: NexViewEvent[] = [];
+  for (const event of events) {
+    const previous = paired.at(-1);
+    if (event.kind === 'input' && previous?.kind === 'text' && previous.output.stream === 'stdout') {
+      const split = splitPrompt(previous.output.text);
+      if (split) {
+        paired.pop();
+        if (split.before) paired.push({ ...previous, output: { ...previous.output, text: split.before } });
+        paired.push({ ...event, prompt: split.prompt });
+        continue;
+      }
+    }
+    paired.push(event);
+  }
+  return paired;
 }

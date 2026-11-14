@@ -4,6 +4,8 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ## Sin publicar
 
+- **NexView · texto editorial.** El texto ordinario de stdout se presenta con la tipografía de lectura (`data-form="prose"`) y conserva TODOS sus bytes (`pre-wrap`: saltos y espacios intactos). Lo que depende de la rejilla —tablas dibujadas, arte ASCII, código impreso, columnas alineadas, barras de progreso, tabuladores— se queda en monoespaciada (`data-form="literal"`). Reglas conservadoras y verificables (`textForm`); ante la duda, literal. La Consola no cambia.
+- **NexView · `input()` como intercambio.** La pregunta de un `input()` (lo impreso justo antes en la misma línea) se presenta como pregunta: con el campo mientras espera y con la respuesta cuando se contestó. `NexViewEvent` de tipo `input` gana `prompt` (opcional); `splitPrompt` y `textForm` se exportan desde `@nexfluid/components`. Ningún byte se pierde: lo anterior a la pregunta sigue como texto.
 - **NexTab · `onClose` y `closeLabel`.** Pestañas cerrables para editores (archivos abiertos): aspa visible que no es un botón anidado ni recibe foco; Supr sobre la pestaña y el clic central también cierran. Quien la usa decide qué pestaña queda activa. Sin `onClose`, nada cambia. Origen: las pestañas de archivos de NexCode.
 Compatible hacia atrás con 0.5.0: sólo añade props opcionales. Origen: la integración de `NexConsole` en NexCode (Nextudio), donde la consola vive en un panel inferior redimensionable junto a un botón «Detener» propio.
 

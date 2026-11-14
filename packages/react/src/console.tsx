@@ -22,7 +22,7 @@
  */
 import { memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
-  columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, layoutNexViewEvents, normalizeNexViewEvents, safeUrl,
+  columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, layoutNexViewEvents, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
   type NexConsoleCellValue, type NexConsoleFigureOutput, type NexConsoleCustomOutput, type NexConsoleImageOutput, type NexConsoleJsonValue,
   type NexConsoleOutput, type NexConsoleState, type NexConsoleStatus, type NexConsoleTableOutput, type NexMotion, type NexViewDiagnostic, type NexViewEvent, type NexViewItem,
   type NexSessionConnection, type NexSessionStore, type NexSessionTransport, type NexTerminalEmulator,
@@ -362,7 +362,18 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
   const status = consoleStatus(state);
   const host = useRef<HTMLDivElement>(null);
   const columns = useComposition(host, motion);
-  const events = useMemo(() => layoutNexViewEvents(outputs.flatMap((o) => eventsOf(o, status))), [outputs, status]);
+  const laid = useMemo(() => layoutNexViewEvents(outputs.flatMap((o) => eventsOf(o, status))), [outputs, status]);
+  // Con un input() pendiente, la última línea impresa sin salto es SU pregunta:
+  // se presenta junto al campo, no como texto suelto encima.
+  const { events, pendingPrompt } = useMemo(() => {
+    const last = laid.at(-1);
+    if (!input || last?.kind !== 'text' || last.output.stream !== 'stdout') return { events: laid, pendingPrompt: null };
+    const split = splitPrompt(last.output.text);
+    if (!split) return { events: laid, pendingPrompt: null };
+    const rest = laid.slice(0, -1);
+    if (split.before.trim()) rest.push({ ...last, output: { ...last.output, text: split.before } });
+    return { events: rest, pendingPrompt: split.prompt };
+  }, [laid, input]);
   const sections = useMemo(() => composeNexView(events, { columns }), [events, columns]);
   const cell = (item: NexViewItem) => (
     <div key={item.key} className="nx-view__item" data-nx-view-item={item.key} data-role={item.role}
@@ -388,7 +399,12 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
           </div>
         );
       })}
-      {input && <div className="nx-view__exchange" data-pending=""><span className="nx-view__exchange-label">Entrada</span>{input}</div>}
+      {input && (
+        <div className="nx-view__exchange" data-pending="">
+          {pendingPrompt ? <p className="nx-view__question">{pendingPrompt.trim()}</p> : <span className="nx-view__exchange-label">Entrada</span>}
+          {input}
+        </div>
+      )}
     </div>
   );
 }
@@ -396,9 +412,17 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
 function NexViewEventView({ event, renderers, maxRows, id }: { event: NexViewEvent; renderers?: NexConsoleRenderers; maxRows: number; id: string }) {
   switch (event.kind) {
     case 'text':
-      return <pre className="nx-view__text" data-stream={event.output.stream}>{event.output.text}</pre>;
+      // Mismos bytes; la tipografía según la forma (prosa editorial o texto literal).
+      return <pre className="nx-view__text" data-stream={event.output.stream} data-form={event.output.stream === 'stdout' ? textForm(event.output.text) : 'literal'}>{event.output.text}</pre>;
     case 'input':
-      return <p className="nx-view__exchange"><span className="nx-view__exchange-label">Entrada</span><span className="nx-view__answer">{event.output.text}</span></p>;
+      return event.prompt ? (
+        <div className="nx-view__exchange" data-answered="">
+          <p className="nx-view__question">{event.prompt.trim()}</p>
+          <span className="nx-view__answer"><span className="nx-visually-hidden">Respuesta: </span>{event.output.text}</span>
+        </div>
+      ) : (
+        <p className="nx-view__exchange"><span className="nx-view__exchange-label">Entrada</span><span className="nx-view__answer">{event.output.text}</span></p>
+      );
     case 'diagnostic':
       return <Diagnostic d={event.diagnostic} id={id} />;
     case 'printed':
