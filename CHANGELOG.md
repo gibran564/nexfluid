@@ -2,7 +2,21 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
-## Sin publicar
+## 0.6.0 — sin publicar (preparada el 2026-11-15)
+
+Reúne #8–#13. Compatible hacia atrás con 0.5.0 en API (sólo añade exportaciones y props opcionales); dos cambios VISIBLES por defecto, anotados en la matriz.
+
+### Compatibilidad con Nextudio (verificada con los paquetes locales, `npm install --no-save`)
+
+| Superficie de Nextudio | Resultado con 0.6.0 | Acción al integrar |
+|---|---|---|
+| `tsc --noEmit` | 0 errores | ninguna |
+| NexCode · Consola / NexView (`nexcode-console`) | 18/18 | la prueba del prompt de `input()` ya acepta ambas versiones (NexView no conserva el espacio final del prompt) |
+| NexCode · hojas CSV (`workspace-sheet`) | rejilla 101 × 27 en un CSV vacío; ceros iniciales conservados; sin filas añadidas al guardar | ninguna (`workbookToCsv` ya guarda sólo el rango usado) |
+| NexCode · pestañas, Explorer, inspector, paquetes | unitarias en verde | retirar los shims propios cuando se adopten `NexTab onClose` y `NexExplorerWidget` |
+| NexBook / Vivlio | unitarias en verde | ninguna |
+
+Cambios visibles por defecto: (1) NexView presenta el texto ordinario con tipografía de lectura y `input()` como pregunta; (2) NexSheets muestra una rejilla mayor que los datos (`extent={false}` recupera las dimensiones exactas).
 
 - **NexSheets · rejilla de hoja de cálculo desde el inicio.** Un CSV nuevo o vacío ya no muestra una sola celda: la hoja tiene una **extensión visible** distinta del rango con datos (por defecto 26 columnas × 100 filas, `DEFAULT_SHEET_EXTENT`) que crece sola al acercarse al borde, con los topes de `limits`. Es vista, no datos: sólo se guardan las celdas con contenido y `sheetValueRows`/`toCsv` exportan el rango usado, sin filas de relleno. `viewExtent` y `withExtent` en `@nexfluid/sheets`; `NexSheets`/`NexSheetsProvider` aceptan `extent` (`false` = dimensiones exactas del libro). Compatible hacia atrás salvo que la rejilla visible por defecto es mayor que los datos.
 - **NexView · texto editorial.** El texto ordinario de stdout se presenta con la tipografía de lectura (`data-form="prose"`) y conserva TODOS sus bytes (`pre-wrap`: saltos y espacios intactos). Lo que depende de la rejilla —tablas dibujadas, arte ASCII, código impreso, columnas alineadas, barras de progreso, tabuladores— se queda en monoespaciada (`data-form="literal"`). Reglas conservadoras y verificables (`textForm`); ante la duda, literal. La Consola no cambia.
@@ -14,7 +28,7 @@ Compatible hacia atrás con 0.5.0: sólo añade props opcionales. Origen: la int
 - **NexConsole · `viewToggle` y `chrome`.** `viewToggle={false}` retira el selector Consola | NexView (la aplicación muestra NexView en otro sitio, como el panel lateral de NexCode); `chrome={false}` retira la barra entera para incrustar NexView en una superficie con su propia cabecera. Por defecto, `true`: nada cambia.
 - **NexConsole · `interruptButton`.** Con `false` no se pinta «Detener» en la barra (la aplicación ya tiene el suyo); Ctrl+C en la línea de entrada sigue llamando a `onInterrupt`. Por defecto `true`: nada cambia.
 
-## 0.5.0 — sin publicar (preparada el 2026-11-11)
+## 0.5.0 — 2026-11-12
 
 Compatible hacia atrás con 0.4.0: sólo añade exportaciones y props opcionales. Mientras NexFluid esté en `0.x`, Nextudio debe tratar cualquier subida como potencialmente incompatible (ADR 0001 §6.3).
 
