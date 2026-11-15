@@ -4,7 +4,7 @@ import { renderToString } from 'react-dom/server';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { NexProvider, NexScroll } from '@nexfluid/react';
-import { NexSheets, cellKey, createWorkbook, sheetFromRows, type Workbook } from '@nexfluid/react/sheets';
+import { NexSheets, cellKey, createWorkbook, sheetFromRows, sheetValueRows, type Workbook } from '@nexfluid/react/sheets';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -27,9 +27,11 @@ const type = (el: HTMLInputElement, value: string) => act(() => {
 });
 const book = () => createWorkbook([sheetFromRows('Datos', [['a', 1], ['b', 2], ['Total', '=SUMA(B1:B2)']], { rows: 10, columns: 4 })]);
 
+// Estas pruebas fijan la lógica de datos con las dimensiones exactas del libro
+// (`extent={false}`); la extensión visible tiene su propio bloque al final.
 function mount(onChange?: (wb: Workbook) => void) {
   let latest = book();
-  act(() => root.render(<NexProvider reducedMotion="reduce"><NexSheets defaultWorkbook={latest} onChange={(wb) => { latest = wb; onChange?.(wb); }} height={300} /></NexProvider>));
+  act(() => root.render(<NexProvider reducedMotion="reduce"><NexSheets defaultWorkbook={latest} onChange={(wb) => { latest = wb; onChange?.(wb); }} height={300} extent={false} /></NexProvider>));
   return { get workbook() { return latest; } };
 }
 
@@ -157,5 +159,51 @@ describe('NexScroll 2.0', () => {
     ));
     act(() => container.querySelectorAll<HTMLButtonElement>('.nx-scroll__marker button')[1]!.click());
     expect(document.activeElement?.id).toBe('h2');
+  });
+});
+
+describe('NexSheets · rejilla de hoja de cálculo desde el inicio', () => {
+  const empty = (): Workbook => createWorkbook([sheetFromRows('datos.csv', [], { rows: 1, columns: 1 })]);
+  function mountEmpty() {
+    let latest = empty();
+    act(() => root.render(<NexProvider reducedMotion="reduce"><NexSheets defaultWorkbook={latest} onChange={(wb) => { latest = wb; }} height={300} /></NexProvider>));
+    return { get workbook() { return latest; } };
+  }
+
+  it('un CSV vacío (1 × 1) se ve como A–Z × 100, no como una sola celda', () => {
+    mountEmpty();
+    const grid = $('[role="grid"]');
+    expect(grid.getAttribute('aria-rowcount')).toBe('101');
+    expect(grid.getAttribute('aria-colcount')).toBe('27');
+    expect([...container.querySelectorAll('[role="columnheader"]')].map((el) => el.textContent)).toContain('C');
+  });
+
+  it('las flechas recorren la rejilla y escribir lejos funciona sin «Añadir fila»; sólo se guarda lo escrito', () => {
+    const state = mountEmpty();
+    const grid = $('[role="grid"]');
+    act(() => grid.focus());
+    for (let i = 0; i < 59; i++) key(grid, 'ArrowDown');
+    for (let i = 0; i < 3; i++) key(grid, 'ArrowRight');
+    key(grid, '4');
+    const editor = $<HTMLInputElement>('input.nx-sheet__editor');
+    type(editor, '42');
+    key(editor, 'Enter');
+    const sheet = state.workbook.sheets[0]!;
+    expect(sheet.cells[cellKey(59, 3)]!.input).toBe('42');
+    expect(Object.keys(sheet.cells)).toEqual([cellKey(59, 3)]);
+    // La exportación es el rango usado: ninguna fila ni columna de relleno.
+    const rows = sheetValueRows(sheet);
+    expect(rows).toHaveLength(60);
+    expect(rows[59]).toHaveLength(4);
+  });
+
+  it('al acercarse al borde la rejilla crece sola', () => {
+    mountEmpty();
+    const grid = $('[role="grid"]');
+    act(() => grid.focus());
+    for (let i = 0; i < 95; i++) key(grid, 'ArrowDown');
+    expect(Number(grid.getAttribute('aria-rowcount'))).toBeGreaterThan(101);
+    for (let i = 0; i < 25; i++) key(grid, 'ArrowRight');
+    expect(Number(grid.getAttribute('aria-colcount'))).toBeGreaterThan(27);
   });
 });

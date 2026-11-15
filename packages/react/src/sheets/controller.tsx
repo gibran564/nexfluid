@@ -15,7 +15,8 @@ import {
   activeSheet, addSheet as addSheetOp, clampSelection, clearRange, createHistory, csvToSheet, DEFAULT_SHEET_LIMITS, evaluateSheet, fillRange,
   formatReference, getSheet, moveSelection, parseClipboardGrid, pasteGrid, quickFormula, rangeLabel, rangeToText, removeSheet as removeSheetOp,
   renameSheet as renameSheetOp, selectAll, selectionAt, selectionRange, setActiveSheet, setCellInput, setColumnWidth, sheetValueRows, stepInside,
-  toCsv, updateSheet, createSheet, type CellAddress, type CellRange, type CellValue, type Selection, type Sheet, type SheetLimits, type Workbook,
+  toCsv, updateSheet, createSheet, DEFAULT_SHEET_EXTENT, viewExtent, withExtent, type CellAddress, type CellRange, type CellValue, type Selection, type Sheet,
+  type SheetExtent, type SheetLimits, type Workbook,
 } from '@nexfluid/sheets';
 import type { NexMotion } from '@nexfluid/components';
 import { useNex } from '../provider.tsx';
@@ -115,23 +116,57 @@ export interface NexSheetsProviderProps {
   readOnly?: boolean;
   motion?: NexMotion;
   limits?: SheetLimits;
+  /**
+   * Rejilla visible mínima (por defecto 26 columnas × 100 filas), que además
+   * crece sola al acercarse al borde. Es vista, no datos: sólo se guardan las
+   * celdas con contenido. `false` = exactamente las dimensiones del libro.
+   */
+  extent?: SheetExtent | false;
   children?: ReactNode;
 }
 
 const label = (r: CellRange) => rangeLabel(r);
 
-export function NexSheetsProvider({ workbook: controlled, defaultWorkbook, onChange, readOnly = false, motion, limits = DEFAULT_SHEET_LIMITS, children }: NexSheetsProviderProps) {
+export function NexSheetsProvider({ workbook: controlled, defaultWorkbook, onChange, readOnly = false, motion, limits = DEFAULT_SHEET_LIMITS, extent = DEFAULT_SHEET_EXTENT, children }: NexSheetsProviderProps) {
   const defaults = useNex();
   const [inner, setInner] = useState<Workbook>(() => controlled ?? defaultWorkbook ?? { version: 1, sheets: [createSheet('Hoja 1')], active: '' });
   const workbook = controlled ?? inner;
   const fixed = workbook.active ? workbook : { ...workbook, active: workbook.sheets[0]!.id };
-  const sheet = activeSheet(fixed);
   const history = useRef(createHistory<Record<string, Selection>>()).current;
   const [, bump] = useState(0);
   const store = useRef<Store | null>(null);
   if (!store.current) store.current = createStore({ selections: {}, editing: null, notice: '' });
   const latest = useRef(fixed);
   latest.current = fixed;
+
+  /**
+   * La hoja tal como se ve y se recorre: con su extensión visible (ver
+   * `viewExtent`). Una vista por hoja y extensión, para que la evaluación en
+   * caché (por objeto) no se repita al moverse.
+   */
+  const settings = useRef({ extent, limits });
+  settings.current = { extent, limits };
+  const views = useRef(new WeakMap<Sheet, Sheet>());
+  const extentOf = (base: Sheet): SheetExtent => {
+    const { extent: minimum, limits: caps } = settings.current;
+    if (minimum === false) return { rows: base.rows, columns: base.columns };
+    const sel = store.current!.get().selections[base.id];
+    const focus = sel ? { row: Math.max(sel.active.row, sel.extent.row), column: Math.max(sel.active.column, sel.extent.column) } : null;
+    return viewExtent(base, focus, minimum, caps);
+  };
+  const viewOf = (base: Sheet): Sheet => {
+    const wanted = extentOf(base);
+    if (wanted.rows === base.rows && wanted.columns === base.columns) return base;
+    const cached = views.current.get(base);
+    if (cached && cached.rows === wanted.rows && cached.columns === wanted.columns) return cached;
+    const view = withExtent(base, wanted);
+    views.current.set(base, view);
+    return view;
+  };
+  // Se vuelve a pintar sólo cuando la extensión cambia (no en cada movimiento).
+  const extentKey = () => { const e = extentOf(activeSheet(latest.current)); return `${e.rows}x${e.columns}`; };
+  useSyncExternalStore(store.current.subscribe, extentKey, extentKey);
+  const sheet = viewOf(activeSheet(fixed));
 
   // Una evaluación por hoja y versión de la hoja (las operaciones son inmutables).
   const cache = useRef(new WeakMap<Sheet, Map<string, CellValue>>());
@@ -155,7 +190,7 @@ export function NexSheetsProvider({ workbook: controlled, defaultWorkbook, onCha
   const controller = useMemo<NexSheetsController>(() => {
     const s = store.current!;
     const wb = () => latest.current;
-    const cur = () => activeSheet(wb());
+    const cur = () => viewOf(activeSheet(wb()));
     const selOf = (id: string) => s.get().selections[id] ?? selectionAt(0, 0);
     const setSel = (sel: Selection) => {
       const sh = cur();
@@ -164,7 +199,9 @@ export function NexSheetsProvider({ workbook: controlled, defaultWorkbook, onCha
     const announce = (notice: string) => s.set({ notice });
     const writeSheet = (fn: (sh: Sheet) => Sheet, historyLabel: string) => {
       const sh = cur();
-      commitWorkbook(updateSheet(wb(), sh.id, (x) => fn(x as Sheet)), historyLabel);
+      // Lo escrito en la zona visible ampliada conserva esa extensión (el esquema
+      // rechaza celdas fuera de la rejilla). Las celdas vacías no se guardan.
+      commitWorkbook(updateSheet(wb(), sh.id, (x) => fn(withExtent(x as Sheet, sh))), historyLabel);
     };
     const api: NexSheetsController = {
       get workbook() { return wb(); },
