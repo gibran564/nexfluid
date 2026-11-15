@@ -33,6 +33,8 @@ export type { NexNavProps, NexNavItemProps } from './nav.tsx';
 export { NexSegmented } from './segmented.tsx';
 export type { NexSegmentedProps, NexSegmentedOption } from './segmented.tsx';
 export { NexFrame, NexFrameRegion, useNexFrame } from './frame.tsx';
+export { useNexLayoutTransition, layoutKeyframes } from './layout-transition.ts';
+export type { NexLayoutTransitionOptions } from './layout-transition.ts';
 export type { NexFrameProps, NexFrameRegionName } from './frame.tsx';
 export { NexCodeBlock } from './code-block.tsx';
 export type { NexCodeBlockProps } from './code-block.tsx';
