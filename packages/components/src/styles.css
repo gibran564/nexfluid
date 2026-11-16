@@ -1490,7 +1490,8 @@
 .nx-view > .nx-view__item { min-width: 0; }
 .nx-view__row > .nx-view__item[data-role='data'] { min-width: min(100%, 180px); }
 /* Una visualización sola no ocupa todo el ancho: tamaño útil, centrado en la lectura. */
-.nx-view__row[data-count="1"] > .nx-view__item[data-role="visual"] { max-width: min(100%, 560px); }
+/* Una figura sola: centrada, a su tamaño natural (nunca ampliada) y con más sitio antes de reducirse. */
+.nx-view__row[data-count="1"] > .nx-view__item[data-role="visual"] { max-width: min(100%, 760px); margin-inline: auto; }
 /* Una tabla sola se integra a su anchura natural. */
 .nx-view__row[data-count='1'] > .nx-view__item[data-role='data'] { flex-grow: 0 !important; flex-basis: auto; max-width: 100%; }
 @keyframes nx-view-in { from { opacity: 0; transform: translateY(4px); } }
@@ -1501,7 +1502,7 @@
 .nx-view__figure { margin: 0; }
 .nx-view__figure > :first-child:not(img):not(p) { display: block; width: 100%; aspect-ratio: var(--nx-aspect, 1.6); max-height: min(50vh, 320px); }
 .nx-view__figure > :first-child:not(img):not(p) > svg { display: block; width: 100%; height: 100%; }
-.nx-view__figure img { display: block; max-width: 100%; max-height: min(50vh, 360px); width: auto; height: auto; object-fit: contain; border-radius: 12px; }
+.nx-view__figure img { display: block; margin-inline: auto; max-width: 100%; max-height: min(65vh, 560px); width: auto; height: auto; object-fit: contain; border-radius: 12px; }
 /* Tablas grandes: se exploran dentro, con encabezado fijo; las pequeñas, a su tamaño. */
 .nx-view__scroll { max-height: min(55vh, 360px); overflow: auto; }
 .nx-view__scroll table { width: auto; min-width: 100%; }
@@ -1536,8 +1537,17 @@
  * arte ASCII, código, barras) se queda en monoespaciada (data-form="literal").
  */
 .nx-view__text[data-form='prose'] { font: 400 var(--nx-text-body, 15px) / 1.6 var(--nx-font-text); letter-spacing: -0.003em; }
-/* input(): pregunta y respuesta como un intercambio, no como líneas de terminal. */
-.nx-view__exchange[data-answered], .nx-view__exchange[data-pending] { flex-direction: column; align-items: stretch; gap: 6px; font-family: var(--nx-font-text); }
+/*
+ * input(): la pregunta y su campo en la MISMA línea (`Nombre: ____`) si caben;
+ * si no, el campo baja solo (flex-wrap). Una pregunta larga (data-long) deja el
+ * campo debajo a lo ancho. Respondida: `Nombre: Ana`.
+ */
+.nx-view__exchange[data-answered], .nx-view__exchange[data-pending] { align-items: baseline; column-gap: 10px; row-gap: 6px; font-family: var(--nx-font-text); }
+.nx-view__exchange[data-long] { flex-direction: column; align-items: stretch; }
+.nx-view__exchange[data-pending] .nx-console__input { flex: 1 1 12rem; width: auto; max-width: 32rem; min-height: 32px; font: 500 var(--nx-text-body, 15px) / 1.45 var(--nx-font-text); }
+.nx-view__exchange[data-pending][data-long] .nx-console__input { max-width: none; }
+.nx-view__exchange[data-pending] .nx-console__input:focus-visible { box-shadow: 0 2px 0 0 var(--nx-accent); }
+.nx-view__exchange[data-answered] .nx-view__answer { padding: 0; border-radius: 0; background: none; color: var(--nx-accent); font: 600 var(--nx-text-body, 15px) / 1.45 var(--nx-font-text); overflow-wrap: anywhere; }
 .nx-view__diag-message { margin: 2px 0 4px; }
 .nx-view__diag-message code { padding: 2px 6px; border-radius: 6px; background: color-mix(in srgb, var(--nx-danger) 10%, transparent); color: var(--nx-fg); font: 500 var(--nx-text-small, 0.875rem) / 1.5 var(--nx-font-mono); overflow-wrap: anywhere; }
 .nx-view__title { margin: 0 0 4px; color: var(--nx-fg); font: 650 var(--nx-text-subhead, 1.25rem) / 1.2 var(--nx-font-heading, var(--nx-font-text)); letter-spacing: -0.015em; }
@@ -1548,7 +1558,7 @@
 .nx-view__fact dd { margin: 0; color: var(--nx-fg); font: 600 var(--nx-text-body, 15px) / 1.5 var(--nx-font-text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 @media (max-width: 480px) { .nx-view__fact { grid-template-columns: 1fr; gap: 2px; } }
 .nx-view__question { margin: 0; color: var(--nx-fg); font: 600 var(--nx-text-body, 15px) / 1.45 var(--nx-font-text); }
-.nx-view__exchange[data-answered] .nx-view__answer { align-self: flex-start; }
+.nx-view__exchange[data-answered][data-long] .nx-view__answer { align-self: flex-start; }
 .nx-view__table, .nx-view__figure { margin: 0; min-width: 0; }
 .nx-view__caption { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 6px; color: var(--nx-fg-muted); font: 450 var(--nx-text-micro) / 1.4 var(--nx-font-mono); }
 .nx-view__caption strong { color: var(--nx-fg); font-weight: 600; }

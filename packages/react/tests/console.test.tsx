@@ -60,6 +60,55 @@ describe('NexConsole', () => {
     expect($('.nx-console__text').textContent).toBe('otra vez\n');
   });
 
+  it('input() en NexView: la pregunta y su campo en la misma línea, sin «Entrada»; respondida, «Nombre: Ana»', () => {
+    const asked: NexConsoleOutput[] = [
+      { seq: 0, stream: 'stdout', text: 'Bienvenido al registro\n' },
+      { seq: 1, stream: 'stdout', text: 'Nombre: ' },
+    ];
+    const sent: string[] = [];
+    act(() => root.render(<NexConsole outputs={asked} state="waiting_for_input" view="nexview" onSubmitInput={(t) => { sent.push(t); return true; }} />));
+    const pending = $('.nx-view__exchange[data-pending]');
+    const label = pending.querySelector('label.nx-view__question')!;
+    const field = pending.querySelector<HTMLInputElement>('.nx-console__input')!;
+    // La pregunta se ve UNA vez, junto a su campo, y es su etiqueta.
+    expect(label.textContent).toBe('Nombre:');
+    expect(label.getAttribute('for')).toBe(field.id);
+    expect(pending.hasAttribute('data-long')).toBe(false);
+    expect(document.querySelector(".nx-view")!.textContent!.match(/Nombre:/g)).toHaveLength(1);
+    expect(document.querySelector(".nx-view")!.textContent).not.toMatch(/entrada/i);
+    expect(document.activeElement).toBe(field);
+    // Intro entrega la respuesta una vez.
+    type(field, 'Ana');
+    key(field, 'Enter');
+    expect(sent).toEqual(['Ana']);
+    // Respondida: en una línea, seguida de lo que imprimió después.
+    act(() => root.render(<NexConsole outputs={[...asked, { seq: 2, stream: 'input', text: 'Ana' }, { seq: 3, stream: 'stdout', text: 'Hola, Ana\n' }]} state="completed" view="nexview" />));
+    const answered = $('.nx-view__exchange[data-answered]');
+    expect(answered.textContent).toBe('Nombre:Respuesta: Ana');
+    expect($$('.nx-console__input')).toHaveLength(0);
+    expect(document.querySelector(".nx-view")!.textContent).not.toMatch(/entrada/i);
+  });
+
+  it('una pregunta larga deja el campo debajo; sin pregunta, sólo el campo', () => {
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Describe brevemente el problema que encontraste: ' }]} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    expect($('.nx-view__exchange[data-pending]').hasAttribute('data-long')).toBe(true);
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Listo\n' }]} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    const pending = $('.nx-view__exchange[data-pending]');
+    expect(pending.querySelector('label')).toBeNull();
+    expect(pending.textContent).toBe('');
+    expect($<HTMLInputElement>('.nx-console__input').getAttribute('aria-label')).toBe('Entrada para el programa');
+  });
+
+  it('una pregunta nueva no le quita el foco a otro control que se está usando (un deslizador)', () => {
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    document.body.append(slider);
+    slider.focus();
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Nombre: ' }]} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    expect(document.activeElement).toBe(slider);
+    slider.remove();
+  });
+
   it('cambiar de vista no vuelve a pedir la ejecución ni pierde la entrada pendiente', () => {
     const onRun = vi.fn();
     act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Edad: ' }]} state="waiting_for_input" onSubmitInput={() => true} onRun={onRun} />));

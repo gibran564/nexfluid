@@ -159,8 +159,11 @@ export function NexConsole({
   });
 
   // Cada pregunta empieza vacía y con el foco en su línea, sin desplazar la página.
+  // Sin robarlo: si la persona está usando otro control (un deslizador de un
+  // widget, el editor), la pregunta espera a que vuelva.
   useEffect(() => {
     if (!waiting) return;
+    if (focusedElsewhere(field.current)) return;
     field.current?.focus({ preventScroll: true });
   }, [waiting, ordered.length, view]);
 
@@ -190,6 +193,7 @@ export function NexConsole({
     <input
       ref={field}
       type="text"
+      id={`${id}-stdin`}
       className="nx-console__input"
       aria-label="Entrada para el programa"
       value={value}
@@ -466,8 +470,10 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
         );
       })}
       {input && (
-        <div className="nx-view__exchange" data-pending="">
-          {pendingPrompt ? <p className="nx-view__question">{pendingPrompt.trim()}</p> : <span className="nx-view__exchange-label">Entrada</span>}
+        // La pregunta y su campo, en la misma línea si caben (`Nombre: ____`);
+        // una pregunta larga deja el campo debajo. Sin pregunta, sólo el campo.
+        <div className="nx-view__exchange" data-pending="" data-long={pendingPrompt && isLongPrompt(pendingPrompt) ? '' : undefined}>
+          {pendingPrompt && <label className="nx-view__question" htmlFor={`${id}-stdin`}>{pendingPrompt.trim()}</label>}
           {input}
         </div>
       )}
@@ -475,18 +481,30 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
   );
 }
 
+/** Una pregunta larga no comparte línea con su campo (o su respuesta). */
+function isLongPrompt(prompt: string): boolean {
+  return prompt.trim().length > 40;
+}
+
+/** ¿Alguien está usando OTRO control (no el campo de la pregunta)? Entonces no se le quita el foco. */
+function focusedElsewhere(field: HTMLInputElement | null): boolean {
+  if (typeof document === 'undefined') return false;
+  const active = document.activeElement;
+  if (!active || active === document.body || active === field) return false;
+  return active.matches('input, select, textarea, [contenteditable=""], [contenteditable="true"], [role="slider"], [role="textbox"]');
+}
+
 function NexViewEventView({ event, renderers, maxRows, id, lead = false }: { event: NexViewEvent; renderers?: NexConsoleRenderers; maxRows: number; id: string; lead?: boolean }) {
   switch (event.kind) {
     case 'text':
       return <TextEvent text={event.output.text} stream={event.output.stream} lead={lead} />;
     case 'input':
-      return event.prompt ? (
-        <div className="nx-view__exchange" data-answered="">
-          <p className="nx-view__question">{event.prompt.trim()}</p>
+      // `Nombre: Ana`: la pregunta y lo que se contestó, como quedaron en la terminal.
+      return (
+        <p className="nx-view__exchange" data-answered="" data-long={event.prompt && isLongPrompt(event.prompt) ? '' : undefined}>
+          {event.prompt && <span className="nx-view__question">{event.prompt.trim()}</span>}
           <span className="nx-view__answer"><span className="nx-visually-hidden">Respuesta: </span>{event.output.text}</span>
-        </div>
-      ) : (
-        <p className="nx-view__exchange"><span className="nx-view__exchange-label">Entrada</span><span className="nx-view__answer">{event.output.text}</span></p>
+        </p>
       );
     case 'diagnostic':
       return <Diagnostic d={event.diagnostic} id={id} />;
