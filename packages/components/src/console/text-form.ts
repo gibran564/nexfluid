@@ -90,12 +90,24 @@ export function factLines(text: string): Array<{ label: string; value: string }>
   const lines = text.replace(/\n$/, '').split('\n');
   if (lines.length < 2) return null;
   const facts: Array<{ label: string; value: string }> = [];
+  const kinds = new Set<string>();
   for (const line of lines) {
     const match = FACT.exec(line);
     if (!match || /^(error|warning|traceback|advertencia)\b/i.test(match[1]!)) return null;
+    // Una ENUMERACIÓN (`Paso 1: listo`, `Paso 2: listo`…) es un registro de
+    // progreso, no datos: la misma etiqueta salvo un número no es un campo nuevo.
+    const kind = match[1]!.toLowerCase().replace(/[\p{N}\s.#()-]+/gu, ' ').trim();
+    if (kinds.has(kind)) return null;
+    kinds.add(kind);
     facts.push({ label: match[1]!, value: match[2]! });
   }
   return facts;
+}
+
+/** ¿Esta línea TIENE la forma `Etiqueta: valor`? (Que sean datos lo decide `factLines` sobre la racha.) */
+export function isFactLine(line: string): boolean {
+  const match = FACT.exec(line.replace(/\n$/, ''));
+  return Boolean(match) && !/^(error|warning|traceback|advertencia)\b/i.test(match![1]!);
 }
 
 export type NexTextSegment = { kind: 'text'; text: string } | { kind: 'facts'; facts: Array<{ label: string; value: string }> };

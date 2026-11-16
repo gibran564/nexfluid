@@ -81,6 +81,11 @@ describe('factLines: datos Etiqueta: valor', () => {
     assert.equal(factLines('Error: algo\nTotal: 3\n'), null);
     assert.equal(factLines('https://a.b: x\nTotal: 3\n'), null);
   });
+  it('una enumeración (la misma etiqueta salvo un número) es un registro, no datos', () => {
+    assert.equal(factLines('Paso 1: listo\nPaso 2: listo\nPaso 3: listo\n'), null);
+    assert.equal(factLines('Intento #1: falló\nIntento #2: bien\n'), null);
+    assert.deepEqual(factLines('Nombre: Ana\nEdad: 24\n')?.map((f) => f.label), ['Nombre', 'Edad']);
+  });
 });
 
 describe('factSegments: datos dentro de un texto mayor', () => {

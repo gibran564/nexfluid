@@ -22,7 +22,7 @@
  */
 import { memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
-  applyTerminalControls, columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, factLines, factSegments, layoutNexViewEvents, leadingTitle, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
+  applyTerminalControls, columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, factLines, factSegments, isFactLine, layoutNexViewEvents, leadingTitle, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
   type NexConsoleCellValue, type NexConsoleFigureOutput, type NexConsoleCustomOutput, type NexConsoleImageOutput, type NexConsoleJsonValue,
   type NexConsoleOutput, type NexConsoleState, type NexConsoleStatus, type NexConsoleTableOutput, type NexMotion, type NexViewDiagnostic, type NexViewEvent, type NexViewItem,
   type NexSessionConnection, type NexSessionStore, type NexSessionTransport, type NexTerminalEmulator,
@@ -407,7 +407,7 @@ function groupFactRuns(events: NexViewEvent[]): NexViewEvent[] {
     run = [];
   };
   for (const event of events) {
-    if (event.kind === 'text' && event.output.stream === 'stdout' && /^[^\n]+\n?$/.test(event.output.text) && factLines(`${event.output.text.replace(/\n?$/, '\n')}${event.output.text.replace(/\n?$/, '\n')}`)) {
+    if (event.kind === 'text' && event.output.stream === 'stdout' && /^[^\n]+\n?$/.test(event.output.text) && isFactLine(event.output.text)) {
       run.push(event);
       continue;
     }

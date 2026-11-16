@@ -24,7 +24,7 @@ export type { NexViewEvent } from './console/model.ts';
 export { diagnoseOutput, pythonLocation } from './console/diagnostics.ts';
 export type { NexViewDiagnostic } from './console/diagnostics.ts';
 export { recognizePrintedStructures } from './console/printed.ts';
-export { textForm, splitPrompt, leadingTitle, factLines, factSegments } from './console/text-form.ts';
+export { textForm, splitPrompt, leadingTitle, factLines, factSegments, isFactLine } from './console/text-form.ts';
 export type { NexTextSegment } from './console/text-form.ts';
 export type { NexTextForm } from './console/text-form.ts';
 export type { PrintedStructure } from './console/printed.ts';

@@ -426,4 +426,12 @@ describe('NexView · datos impresos línea a línea', () => {
     expect(container.textContent).toContain('Pedido calculado correctamente');
     expect(container.textContent).toContain('Nota: única');
   });
+
+  it('un registro de progreso (Paso 1: listo, Paso 2: listo…) sigue siendo texto, en una salida o en varias', () => {
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Paso 1: listo\nPaso 2: listo\nPaso 3: listo\n' }]} state="completed" view="nexview" />));
+    expect(container.querySelector('.nx-view__facts')).toBeNull();
+    act(() => root.render(<NexConsole outputs={[1, 2, 3].map((n) => ({ seq: n, stream: 'stdout' as const, text: `Paso ${n}: listo\n` }))} state="completed" view="nexview" />));
+    expect(container.querySelector('.nx-view__facts')).toBeNull();
+    expect(container.textContent).toContain('Paso 3: listo');
+  });
 });
