@@ -22,7 +22,7 @@
  */
 import { memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
-  columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, layoutNexViewEvents, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
+  columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, factLines, layoutNexViewEvents, leadingTitle, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
   type NexConsoleCellValue, type NexConsoleFigureOutput, type NexConsoleCustomOutput, type NexConsoleImageOutput, type NexConsoleJsonValue,
   type NexConsoleOutput, type NexConsoleState, type NexConsoleStatus, type NexConsoleTableOutput, type NexMotion, type NexViewDiagnostic, type NexViewEvent, type NexViewItem,
   type NexSessionConnection, type NexSessionStore, type NexSessionTransport, type NexTerminalEmulator,
@@ -355,6 +355,34 @@ function useComposition(host: React.RefObject<HTMLDivElement | null>, level: Nex
   return columns;
 }
 
+/**
+ * Texto impreso en NexView: los MISMOS bytes con la tipografía de su forma
+ * (prosa editorial o literal). Lo que el programa escribió como título (su
+ * primera línea) o como datos `Etiqueta: valor` se presenta con esa jerarquía,
+ * sin cambiar ni inventar texto (`leadingTitle`, `factLines`). Ante la duda,
+ * texto fiel. La Consola no cambia.
+ */
+function TextEvent({ text, stream, lead }: { text: string; stream: string; lead: boolean }) {
+  if (stream !== 'stdout') return <pre className="nx-view__text" data-stream={stream} data-form="literal">{text}</pre>;
+  const head = lead ? leadingTitle(text) : null;
+  const body = head ? head.rest : text;
+  const facts = body ? factLines(body) : null;
+  return (
+    <>
+      {head && <h3 className="nx-view__title">{head.title}</h3>}
+      {facts ? (
+        <dl className="nx-view__facts">
+          {facts.map((fact, index) => (
+            <div key={index} className="nx-view__fact"><dt>{fact.label}</dt><dd>{fact.value}</dd></div>
+          ))}
+        </dl>
+      ) : body ? (
+        <pre className="nx-view__text" data-stream={stream} data-form={textForm(body)}>{body}</pre>
+      ) : null}
+    </>
+  );
+}
+
 function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusOutput, motion }: {
   outputs: readonly NexConsoleOutput[]; state: NexConsoleState; input: ReactNode; renderers?: NexConsoleRenderers; maxRows: number; id: string;
   onFocusOutput?: (output: NexConsoleOutput) => void; motion: NexMotion;
@@ -375,10 +403,14 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
     return { events: rest, pendingPrompt: split.prompt };
   }, [laid, input]);
   const sections = useMemo(() => composeNexView(events, { columns }), [events, columns]);
+  // El título del programa: sólo su primer texto, y sólo si DESPUÉS pregunta algo
+  // (la cabecera de un programa interactivo). Un informe que sólo imprime, no.
+  const asks = Boolean(pendingPrompt) || events.some((event) => event.kind === 'input');
+  const titled = events[0]?.kind === 'text' && asks ? events[0] : null;
   const cell = (item: NexViewItem) => (
     <div key={item.key} className="nx-view__item" data-nx-view-item={item.key} data-role={item.role}
       style={{ flexGrow: item.weight, ...(item.aspect ? { '--nx-aspect': String(item.aspect) } : {}) } as React.CSSProperties}>
-      <NexViewEventView event={item.event} renderers={renderers} maxRows={maxRows} id={`${id}-${item.key}`} />
+      <NexViewEventView event={item.event} renderers={renderers} maxRows={maxRows} id={`${id}-${item.key}`} lead={item.event === titled} />
       {onFocusOutput && item.event.kind === 'structured' && (
         <button type="button" className="nx-view__expand" aria-label={`Ampliar ${richName(item.event.output)}`} title="Ampliar"
           onClick={() => onFocusOutput((item.event as Extract<NexViewEvent, { kind: 'structured' }>).output)}>
@@ -409,11 +441,10 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
   );
 }
 
-function NexViewEventView({ event, renderers, maxRows, id }: { event: NexViewEvent; renderers?: NexConsoleRenderers; maxRows: number; id: string }) {
+function NexViewEventView({ event, renderers, maxRows, id, lead = false }: { event: NexViewEvent; renderers?: NexConsoleRenderers; maxRows: number; id: string; lead?: boolean }) {
   switch (event.kind) {
     case 'text':
-      // Mismos bytes; la tipografía según la forma (prosa editorial o texto literal).
-      return <pre className="nx-view__text" data-stream={event.output.stream} data-form={event.output.stream === 'stdout' ? textForm(event.output.text) : 'literal'}>{event.output.text}</pre>;
+      return <TextEvent text={event.output.text} stream={event.output.stream} lead={lead} />;
     case 'input':
       return event.prompt ? (
         <div className="nx-view__exchange" data-answered="">

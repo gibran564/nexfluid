@@ -293,3 +293,41 @@ describe('NexView compuesto', () => {
     expect(focused).toEqual(['figure']);
   });
 });
+
+describe('NexView · un programa de consola como pequeña aplicación', () => {
+  const run: NexConsoleOutput[] = [
+    { seq: 0, stream: 'stdout', text: 'Cotizador de pedidos\nNombre del cliente: ' },
+    { seq: 1, stream: 'input', text: 'Ana' },
+    { seq: 2, stream: 'stdout', text: 'Cantidad de productos: ' },
+    { seq: 3, stream: 'input', text: '5' },
+    { seq: 4, stream: 'stdout', text: 'Cliente: Ana\nTotal: $625\n' },
+    { seq: 5, stream: 'stdout', text: 'Pedido calculado correctamente\n' },
+  ];
+
+  it('título, preguntas respondidas y datos con el texto del programa; la última línea, texto fiel', () => {
+    act(() => root.render(<NexConsole outputs={run} state="completed" view="nexview" />));
+    expect(container.querySelector('.nx-view__title')?.textContent).toBe('Cotizador de pedidos');
+    const questions = [...container.querySelectorAll('.nx-view__exchange[data-answered] .nx-view__question')].map((q) => q.textContent);
+    expect(questions).toEqual(['Nombre del cliente:', 'Cantidad de productos:']);
+    const facts = [...container.querySelectorAll('.nx-view__fact')].map((f) => [f.querySelector('dt')!.textContent, f.querySelector('dd')!.textContent]);
+    expect(facts).toEqual([['Cliente', 'Ana'], ['Total', '$625']]);
+    expect(container.textContent).toContain('Pedido calculado correctamente');
+    // No se inventa nada: ni botones ni formularios que el programa no definió.
+    expect(container.querySelectorAll('button:not(.nx-view__expand):not([role="radio"])').length).toBe(0);
+  });
+
+  it('con una pregunta pendiente: el título y la pregunta junto a su campo', () => {
+    act(() => root.render(<NexConsole outputs={run.slice(0, 1)} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    expect(container.querySelector('.nx-view__title')?.textContent).toBe('Cotizador de pedidos');
+    expect(container.querySelector('.nx-view__exchange[data-pending] .nx-view__question')?.textContent).toBe('Nombre del cliente:');
+    expect(container.querySelector('input[aria-label="Entrada para el programa"]')).not.toBeNull();
+  });
+
+  it('un programa que sólo imprime una línea no gana un título; la Consola no cambia', () => {
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Hola mundo\n' }]} state="completed" view="nexview" />));
+    expect(container.querySelector('.nx-view__title')).toBeNull();
+    act(() => root.render(<NexConsole outputs={run} state="completed" view="console" />));
+    expect(container.querySelector('.nx-view__title, .nx-view__facts')).toBeNull();
+    expect(container.textContent).toContain('Cliente: Ana');
+  });
+});
