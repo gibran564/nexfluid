@@ -1449,8 +1449,13 @@
   display: flex; flex-wrap: wrap; align-items: center; gap: var(--nx-space-3) var(--nx-space-4); padding: var(--nx-space-3) var(--nx-space-3) var(--nx-space-3) var(--nx-space-4);
   box-shadow: inset 0 -1px var(--nx-border);
 }
-.nx-console__status { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; margin: 0; font: 500 var(--nx-text-micro) / 1.4 var(--nx-font-mono); color: var(--nx-fg-muted); }
+/* El estado mide lo que mide su texto (base `auto`, no 0): si no cabe junto a los
+   controles, la BARRA pasa a otra fila. Con base 0 nunca la forzaba: se encogía
+   hasta partir su contenido («Finalizado» / «75» / «ms»). Cada dato va entero. */
+.nx-console__status { display: flex; flex: 1 1 auto; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; margin: 0; font: 500 var(--nx-text-micro) / 1.4 var(--nx-font-mono); color: var(--nx-fg-muted); }
+.nx-console__status > span { white-space: nowrap; }
 .nx-console__hint { color: var(--nx-fg-subtle); font-weight: 450; }
+.nx-console__hint::before { content: '·'; margin-inline-end: 10px; }
 .nx-console__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--nx-fg-subtle); }
 .nx-console:is([data-state='running'], [data-state='starting']) .nx-console__dot { background: var(--nx-accent); animation: nx-flow-pulse 1.2s ease-in-out infinite; }
 .nx-console[data-state='waiting_for_input'] .nx-console__dot { background: var(--nx-accent); }
