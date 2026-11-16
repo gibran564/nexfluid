@@ -111,7 +111,19 @@ export interface NexConsoleCustomOutput {
   data: unknown;
 }
 
+/**
+ * `clear_output()` (IPython): limpia la salida anterior de la ejecución; con
+ * `wait`, cuando llega la siguiente. No se pinta: lo aplica
+ * `applyTerminalControls`, igual que los controles de terminal del texto.
+ */
+export interface NexConsoleClearOutput {
+  seq: number;
+  stream: 'clear';
+  wait?: boolean;
+}
+
 export type NexConsoleOutput =
+  | NexConsoleClearOutput
   | NexConsoleTextOutput
   | NexConsoleInputOutput
   | NexConsoleTableOutput

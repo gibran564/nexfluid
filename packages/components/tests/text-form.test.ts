@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { splitPrompt, textForm } from '../src/console/text-form.ts';
+import { factLines, factSegments, leadingTitle, splitPrompt, textForm } from '../src/console/text-form.ts';
 import { layoutNexViewEvents, normalizeNexViewEvents } from '../src/console/model.ts';
 import type { NexConsoleOutput } from '../src/console/types.ts';
 
@@ -57,5 +57,46 @@ describe('layoutNexViewEvents empareja pregunta y respuesta', () => {
     ];
     const events = layoutNexViewEvents(normalizeNexViewEvents(outputs, 'ok'));
     assert.deepEqual(events.map((event) => (event.kind === 'input' ? event.prompt : event.kind)), ['Nombre: ', 'Edad: ']);
+  });
+});
+
+describe('leadingTitle: el título que el programa escribió', () => {
+  it('una primera línea corta en prosa, seguida de más salida', () => {
+    assert.deepEqual(leadingTitle('Cotizador de pedidos\nNombre del cliente: '), { title: 'Cotizador de pedidos', rest: 'Nombre del cliente: ' });
+  });
+  it('no: preguntas, etiquetas, frases, una sola línea, literal o indentado', () => {
+    for (const text of ['¿Cuántos?\nx', 'Total:\n3', 'Listo.\nx', 'Solo una línea', '  Sangrado\nx', 'a = 1; b = 2;\nx', '====\nx', 'ab\nx']) {
+      assert.equal(leadingTitle(text), null, text);
+    }
+  });
+});
+
+describe('factLines: datos Etiqueta: valor', () => {
+  it('dos o más líneas seguidas, todas con la forma', () => {
+    assert.deepEqual(factLines('Cliente: Ana\nTotal: $625\n'), [{ label: 'Cliente', value: 'Ana' }, { label: 'Total', value: '$625' }]);
+  });
+  it('una sola línea, una línea distinta o errores: no son datos', () => {
+    assert.equal(factLines('Total: 3\n'), null);
+    assert.equal(factLines('Cliente: Ana\nPedido calculado correctamente\n'), null);
+    assert.equal(factLines('Error: algo\nTotal: 3\n'), null);
+    assert.equal(factLines('https://a.b: x\nTotal: 3\n'), null);
+  });
+  it('una enumeración (la misma etiqueta salvo un número) es un registro, no datos', () => {
+    assert.equal(factLines('Paso 1: listo\nPaso 2: listo\nPaso 3: listo\n'), null);
+    assert.equal(factLines('Intento #1: falló\nIntento #2: bien\n'), null);
+    assert.deepEqual(factLines('Nombre: Ana\nEdad: 24\n')?.map((f) => f.label), ['Nombre', 'Edad']);
+  });
+});
+
+describe('factSegments: datos dentro de un texto mayor', () => {
+  it('la racha de datos se separa; el resto queda como texto, en orden y con sus bytes', () => {
+    assert.deepEqual(factSegments('Resumen\nCliente: Ana\nTotal: $625\nPedido calculado correctamente\n'), [
+      { kind: 'text', text: 'Resumen\n' },
+      { kind: 'facts', facts: [{ label: 'Cliente', value: 'Ana' }, { label: 'Total', value: '$625' }] },
+      { kind: 'text', text: 'Pedido calculado correctamente\n' },
+    ]);
+  });
+  it('una línea suelta con dos puntos no es un dato', () => {
+    assert.deepEqual(factSegments('Nota: única\nfin\n'), [{ kind: 'text', text: 'Nota: única\nfin\n' }]);
   });
 });

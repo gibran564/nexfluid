@@ -4,7 +4,7 @@ import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { NexInk, NexAnchoredLayer, matchesShortcut, type NexInkAdapter, type NexInkCommand, type NexInkState } from '@nexfluid/react';
 import {
-  NexMarkdownField, applyMarkdownCommand, createRichTextInkAdapter, createTextareaInkAdapter, markdownCommandState, renderRichText,
+  NexMarkdownField, applyMarkdownCommand, createRichTextInkAdapter, createTextareaInkAdapter, markdownCommandState, renderRichText, richTextToMarkdown,
 } from '@nexfluid/react/markdown';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -329,5 +329,12 @@ describe('NexMarkdownField · perspectivas', () => {
     go('Visual');
     expect($('[role="textbox"]').querySelector('strong')?.textContent).toBe('fuerte');
     expect(new Set(seen)).toEqual(new Set([md]));
+  });
+
+  it('una lista que el navegador deja dentro de un párrafo (o de un div) se guarda como lista', () => {
+    // Chromium, al convertir un párrafo en lista: <p><ul>…</ul></p>; en una línea recién escrita, <div><ul>…</ul></div>.
+    const editor = document.createElement('div');
+    editor.innerHTML = '<h2>Pasos</h2><p><ul><li>uno</li><li>dos</li></ul></p><div><ol><li>tres</li></ol></div><p>fin</p>';
+    expect(richTextToMarkdown(editor)).toBe('## Pasos\n\n- uno\n- dos\n\n1. tres\n\nfin');
   });
 });

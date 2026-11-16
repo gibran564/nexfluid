@@ -56,3 +56,97 @@ export function splitPrompt(text: string): { before: string; prompt: string } | 
   if (!prompt.trim() || prompt.length > 300) return null;
   return { before: text.slice(0, cut + 1), prompt };
 }
+
+/**
+ * El TÍTULO de un programa de consola: su primera línea, cuando el propio
+ * programa la escribió como tal. Reglas estrictas (ante la duda, `null`):
+ * una sola línea terminada en salto, de 3 a 60 caracteres, en prosa, que no
+ * termina en `:` ni `?` (no es una pregunta ni la etiqueta de un dato) ni en
+ * `.` (es una frase). Quien lo presenta exige además que el programa pregunte
+ * algo después (cabecera de un programa interactivo). Devuelve el título (sin el salto)
+ * y el resto, intacto. Nada se inventa: es el texto del programa.
+ */
+export function leadingTitle(text: string): { title: string; rest: string } | null {
+  const cut = text.indexOf('\n');
+  if (cut < 0) return null;
+  const line = text.slice(0, cut);
+  const title = line.trim();
+  if (title !== line || title.length < 3 || title.length > 60) return null;
+  if (/[:?.,;]$/.test(title) || !/\p{L}/u.test(title)) return null;
+  if (textForm(`${line}\n`) !== 'prose') return null;
+  return { title, rest: text.slice(cut + 1) };
+}
+
+/** `Etiqueta: valor` escrito por el programa (la etiqueta es corta y empieza por letra). */
+const FACT = /^(\p{L}[\p{L}\p{N} ()/%.-]{0,31}):[ \t]+(\S.{0,120})$/u;
+
+/**
+ * Datos que el programa imprimió como `Etiqueta: valor`, dos o más líneas
+ * SEGUIDAS y todas con esa forma (si una no la tiene, no hay datos: texto).
+ * Se presentan como lista de definiciones con el MISMO texto; no se renombra,
+ * reordena ni calcula nada. `Error:`/`Traceback` no cuentan como dato.
+ */
+export function factLines(text: string): Array<{ label: string; value: string }> | null {
+  const lines = text.replace(/\n$/, '').split('\n');
+  if (lines.length < 2) return null;
+  const facts: Array<{ label: string; value: string }> = [];
+  const kinds = new Set<string>();
+  for (const line of lines) {
+    const match = FACT.exec(line);
+    if (!match || /^(error|warning|traceback|advertencia)\b/i.test(match[1]!)) return null;
+    // Una ENUMERACIÓN (`Paso 1: listo`, `Paso 2: listo`…) es un registro de
+    // progreso, no datos: la misma etiqueta salvo un número no es un campo nuevo.
+    const kind = match[1]!.toLowerCase().replace(/[\p{N}\s.#()-]+/gu, ' ').trim();
+    if (kinds.has(kind)) return null;
+    kinds.add(kind);
+    facts.push({ label: match[1]!, value: match[2]! });
+  }
+  return facts;
+}
+
+/** ¿Esta línea TIENE la forma `Etiqueta: valor`? (Que sean datos lo decide `factLines` sobre la racha.) */
+export function isFactLine(line: string): boolean {
+  const match = FACT.exec(line.replace(/\n$/, ''));
+  return Boolean(match) && !/^(error|warning|traceback|advertencia)\b/i.test(match![1]!);
+}
+
+export type NexTextSegment = { kind: 'text'; text: string } | { kind: 'facts'; facts: Array<{ label: string; value: string }> };
+
+/**
+ * Un texto en tramos: las RACHAS de dos o más líneas `Etiqueta: valor` seguidas
+ * son datos; todo lo demás queda como texto, en su orden y con sus bytes.
+ */
+export function factSegments(text: string): NexTextSegment[] {
+  const lines = text.split('\n');
+  const trailing = text.endsWith('\n');
+  if (trailing) lines.pop();
+  const segments: NexTextSegment[] = [];
+  let buffer: string[] = [];
+  let run: string[] = [];
+  const pushText = () => {
+    if (buffer.length) segments.push({ kind: 'text', text: `${buffer.join('\n')}\n` });
+    buffer = [];
+  };
+  const closeRun = () => {
+    const facts = run.length >= 2 ? factLines(run.join('\n')) : null;
+    if (facts) {
+      pushText();
+      segments.push({ kind: 'facts', facts });
+    } else buffer.push(...run);
+    run = [];
+  };
+  for (const line of lines) {
+    if (FACT.test(line) && !/^(error|warning|traceback|advertencia)\b/i.test(line)) run.push(line);
+    else {
+      closeRun();
+      buffer.push(line);
+    }
+  }
+  closeRun();
+  pushText();
+  if (!trailing && segments.at(-1)?.kind === 'text') {
+    const last = segments.at(-1) as { kind: 'text'; text: string };
+    last.text = last.text.replace(/\n$/, '');
+  }
+  return segments;
+}

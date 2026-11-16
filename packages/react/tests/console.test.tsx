@@ -40,6 +40,75 @@ describe('NexConsole', () => {
     expect($('[data-stream="input"]').textContent).toBe('Ana');
   });
 
+  it('limpiar la pantalla (ESC[2J ESC[H) y \r se aplican en Consola y en NexView; la pregunta pendiente sigue', () => {
+    const outputs: NexConsoleOutput[] = [
+      { seq: 0, stream: 'stdout', text: 'Menú viejo\n' },
+      { seq: 1, stream: 'stdout', text: '\u001b[2J\u001b[HCargando 10%\rCargando 100%\n' },
+      { seq: 2, stream: 'stdout', text: 'Opción: ' },
+    ];
+    act(() => root.render(<NexConsole outputs={outputs} state="waiting_for_input" onSubmitInput={() => true} />));
+    expect($('.nx-console__text').textContent).toBe('Cargando 100%\nOpción: ');
+    view('NexView');
+    expect(container.textContent).not.toContain('Menú viejo');
+    expect(container.textContent).not.toContain('\u001b');
+    expect(container.textContent).toContain('Cargando 100%');
+    expect($$('.nx-console__input')).toHaveLength(1);
+  });
+
+  it('clear_output() (evento clear) limpia la salida anterior, tablas incluidas', () => {
+    act(() => root.render(<NexConsole outputs={[...OUT, { seq: 4, stream: 'clear' }, { seq: 5, stream: 'stdout', text: 'otra vez\n' }]} state="completed" />));
+    expect($('.nx-console__text').textContent).toBe('otra vez\n');
+  });
+
+  it('input() en NexView: la pregunta y su campo en la misma línea, sin «Entrada»; respondida, «Nombre: Ana»', () => {
+    const asked: NexConsoleOutput[] = [
+      { seq: 0, stream: 'stdout', text: 'Bienvenido al registro\n' },
+      { seq: 1, stream: 'stdout', text: 'Nombre: ' },
+    ];
+    const sent: string[] = [];
+    act(() => root.render(<NexConsole outputs={asked} state="waiting_for_input" view="nexview" onSubmitInput={(t) => { sent.push(t); return true; }} />));
+    const pending = $('.nx-view__exchange[data-pending]');
+    const label = pending.querySelector('label.nx-view__question')!;
+    const field = pending.querySelector<HTMLInputElement>('.nx-console__input')!;
+    // La pregunta se ve UNA vez, junto a su campo, y es su etiqueta.
+    expect(label.textContent).toBe('Nombre:');
+    expect(label.getAttribute('for')).toBe(field.id);
+    expect(pending.hasAttribute('data-long')).toBe(false);
+    expect(document.querySelector(".nx-view")!.textContent!.match(/Nombre:/g)).toHaveLength(1);
+    expect(document.querySelector(".nx-view")!.textContent).not.toMatch(/entrada/i);
+    expect(document.activeElement).toBe(field);
+    // Intro entrega la respuesta una vez.
+    type(field, 'Ana');
+    key(field, 'Enter');
+    expect(sent).toEqual(['Ana']);
+    // Respondida: en una línea, seguida de lo que imprimió después.
+    act(() => root.render(<NexConsole outputs={[...asked, { seq: 2, stream: 'input', text: 'Ana' }, { seq: 3, stream: 'stdout', text: 'Hola, Ana\n' }]} state="completed" view="nexview" />));
+    const answered = $('.nx-view__exchange[data-answered]');
+    expect(answered.textContent).toBe('Nombre:Respuesta: Ana');
+    expect($$('.nx-console__input')).toHaveLength(0);
+    expect(document.querySelector(".nx-view")!.textContent).not.toMatch(/entrada/i);
+  });
+
+  it('una pregunta larga deja el campo debajo; sin pregunta, sólo el campo', () => {
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Describe brevemente el problema que encontraste: ' }]} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    expect($('.nx-view__exchange[data-pending]').hasAttribute('data-long')).toBe(true);
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Listo\n' }]} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    const pending = $('.nx-view__exchange[data-pending]');
+    expect(pending.querySelector('label')).toBeNull();
+    expect(pending.textContent).toBe('');
+    expect($<HTMLInputElement>('.nx-console__input').getAttribute('aria-label')).toBe('Entrada para el programa');
+  });
+
+  it('una pregunta nueva no le quita el foco a otro control que se está usando (un deslizador)', () => {
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    document.body.append(slider);
+    slider.focus();
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Nombre: ' }]} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    expect(document.activeElement).toBe(slider);
+    slider.remove();
+  });
+
   it('cambiar de vista no vuelve a pedir la ejecución ni pierde la entrada pendiente', () => {
     const onRun = vi.fn();
     act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Edad: ' }]} state="waiting_for_input" onSubmitInput={() => true} onRun={onRun} />));
@@ -291,5 +360,78 @@ describe('NexView compuesto', () => {
     expect(container.querySelector('svg[aria-label="gráfica"]')).not.toBeNull();
     act(() => { container.querySelector<HTMLButtonElement>('[aria-label^="Ampliar figura"]')!.click(); });
     expect(focused).toEqual(['figure']);
+  });
+});
+
+describe('NexView · un programa de consola como pequeña aplicación', () => {
+  const run: NexConsoleOutput[] = [
+    { seq: 0, stream: 'stdout', text: 'Cotizador de pedidos\nNombre del cliente: ' },
+    { seq: 1, stream: 'input', text: 'Ana' },
+    { seq: 2, stream: 'stdout', text: 'Cantidad de productos: ' },
+    { seq: 3, stream: 'input', text: '5' },
+    { seq: 4, stream: 'stdout', text: 'Cliente: Ana\nTotal: $625\n' },
+    { seq: 5, stream: 'stdout', text: 'Pedido calculado correctamente\n' },
+  ];
+
+  it('título, preguntas respondidas y datos con el texto del programa; la última línea, texto fiel', () => {
+    act(() => root.render(<NexConsole outputs={run} state="completed" view="nexview" />));
+    expect(container.querySelector('.nx-view__title')?.textContent).toBe('Cotizador de pedidos');
+    const questions = [...container.querySelectorAll('.nx-view__exchange[data-answered] .nx-view__question')].map((q) => q.textContent);
+    expect(questions).toEqual(['Nombre del cliente:', 'Cantidad de productos:']);
+    const facts = [...container.querySelectorAll('.nx-view__fact')].map((f) => [f.querySelector('dt')!.textContent, f.querySelector('dd')!.textContent]);
+    expect(facts).toEqual([['Cliente', 'Ana'], ['Total', '$625']]);
+    expect(container.textContent).toContain('Pedido calculado correctamente');
+    // No se inventa nada: ni botones ni formularios que el programa no definió.
+    expect(container.querySelectorAll('button:not(.nx-view__expand):not([role="radio"])').length).toBe(0);
+  });
+
+  it('con una pregunta pendiente: el título y la pregunta junto a su campo', () => {
+    act(() => root.render(<NexConsole outputs={run.slice(0, 1)} state="waiting_for_input" view="nexview" onSubmitInput={() => true} />));
+    expect(container.querySelector('.nx-view__title')?.textContent).toBe('Cotizador de pedidos');
+    expect(container.querySelector('.nx-view__exchange[data-pending] .nx-view__question')?.textContent).toBe('Nombre del cliente:');
+    expect(container.querySelector('input[aria-label="Entrada para el programa"]')).not.toBeNull();
+  });
+
+  it('un programa que sólo imprime una línea no gana un título; la Consola no cambia', () => {
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Hola mundo\n' }]} state="completed" view="nexview" />));
+    expect(container.querySelector('.nx-view__title')).toBeNull();
+    act(() => root.render(<NexConsole outputs={run} state="completed" view="console" />));
+    expect(container.querySelector('.nx-view__title, .nx-view__facts')).toBeNull();
+    expect(container.textContent).toContain('Cliente: Ana');
+  });
+});
+
+describe('NexView · diagnóstico con el mensaje del programa a la vista', () => {
+  it('ValueError("dato inválido"): explicación y el mensaje escrito por el programa, visible', () => {
+    act(() => root.render(<NexConsole outputs={[
+      { seq: 0, stream: 'stdout', text: 'antes del error\n' },
+      { seq: 1, stream: 'error', text: 'Traceback (most recent call last):\n  File "<exec>", line 4, in <module>\nValueError: dato inválido' },
+    ]} state="failed" view="nexview" />));
+    const message = container.querySelector('.nx-view__diag-message');
+    expect(message?.textContent).toBe('ValueError: dato inválido');
+    expect(container.querySelector('.nx-view__original')).not.toBeNull();
+  });
+});
+
+describe('NexView · datos impresos línea a línea', () => {
+  it('print() por línea (eventos separados) también forma datos; una línea suelta no', () => {
+    act(() => root.render(<NexConsole outputs={[
+      { seq: 0, stream: 'stdout', text: 'Cliente: Ana\n' },
+      { seq: 1, stream: 'stdout', text: 'Total: $625\n' },
+      { seq: 2, stream: 'stdout', text: 'Pedido calculado correctamente\n' },
+      { seq: 3, stream: 'stdout', text: 'Nota: única\n' },
+    ]} state="completed" view="nexview" />));
+    const facts = [...container.querySelectorAll('.nx-view__fact')].map((f) => f.textContent);
+    expect(facts).toEqual(['ClienteAna', 'Total$625']);
+    expect(container.textContent).toContain('Pedido calculado correctamente');
+    expect(container.textContent).toContain('Nota: única');
+  });
+
+  it('un registro de progreso (Paso 1: listo, Paso 2: listo…) sigue siendo texto, en una salida o en varias', () => {
+    act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Paso 1: listo\nPaso 2: listo\nPaso 3: listo\n' }]} state="completed" view="nexview" />));
+    expect(container.querySelector('.nx-view__facts')).toBeNull();
+    act(() => root.render(<NexConsole outputs={[1, 2, 3].map((n) => ({ seq: n, stream: 'stdout' as const, text: `Paso ${n}: listo\n` }))} state="completed" view="nexview" />));
+    expect(container.querySelector('.nx-view__facts')).toBeNull();
+    expect(container.textContent).toContain('Paso 3: listo');
   });
 });

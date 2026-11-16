@@ -22,7 +22,7 @@
  */
 import { memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
-  columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, layoutNexViewEvents, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
+  applyTerminalControls, columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, factLines, factSegments, isFactLine, layoutNexViewEvents, leadingTitle, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
   type NexConsoleCellValue, type NexConsoleFigureOutput, type NexConsoleCustomOutput, type NexConsoleImageOutput, type NexConsoleJsonValue,
   type NexConsoleOutput, type NexConsoleState, type NexConsoleStatus, type NexConsoleTableOutput, type NexMotion, type NexViewDiagnostic, type NexViewEvent, type NexViewItem,
   type NexSessionConnection, type NexSessionStore, type NexSessionTransport, type NexTerminalEmulator,
@@ -138,7 +138,9 @@ export function NexConsole({
   const log = useRef<HTMLDivElement | null>(null);
   const stuck = useRef(true);
   const id = useId();
-  const ordered = useMemo(() => [...outputs].sort((a, b) => a.seq - b.seq), [outputs]);
+  // Lo que una terminal haría con los controles del programa (limpiar la
+  // pantalla, \r, clear_output): Consola y NexView leen el mismo resultado.
+  const ordered = useMemo(() => [...applyTerminalControls(outputs)].sort((a, b) => a.seq - b.seq), [outputs]);
   const preference = useMotionPreference();
   const level = motion ?? defaults.motion;
   const shown = useRef({ view, height: 0 });
@@ -157,8 +159,11 @@ export function NexConsole({
   });
 
   // Cada pregunta empieza vacía y con el foco en su línea, sin desplazar la página.
+  // Sin robarlo: si la persona está usando otro control (un deslizador de un
+  // widget, el editor), la pregunta espera a que vuelva.
   useEffect(() => {
     if (!waiting) return;
+    if (focusedElsewhere(field.current)) return;
     field.current?.focus({ preventScroll: true });
   }, [waiting, ordered.length, view]);
 
@@ -188,6 +193,7 @@ export function NexConsole({
     <input
       ref={field}
       type="text"
+      id={`${id}-stdin`}
       className="nx-console__input"
       aria-label="Entrada para el programa"
       value={value}
@@ -355,6 +361,63 @@ function useComposition(host: React.RefObject<HTMLDivElement | null>, level: Nex
   return columns;
 }
 
+/**
+ * Texto impreso en NexView: los MISMOS bytes con la tipografía de su forma
+ * (prosa editorial o literal). Lo que el programa escribió como título (su
+ * primera línea) o como datos `Etiqueta: valor` se presenta con esa jerarquía,
+ * sin cambiar ni inventar texto (`leadingTitle`, `factLines`). Ante la duda,
+ * texto fiel. La Consola no cambia.
+ */
+function TextEvent({ text, stream, lead }: { text: string; stream: string; lead: boolean }) {
+  if (stream !== 'stdout') return <pre className="nx-view__text" data-stream={stream} data-form="literal">{text}</pre>;
+  const head = lead ? leadingTitle(text) : null;
+  const body = head ? head.rest : text;
+  const segments = body ? factSegments(body) : [];
+  return (
+    <>
+      {head && <h3 className="nx-view__title">{head.title}</h3>}
+      {segments.map((segment, index) =>
+        segment.kind === 'facts' ? (
+          <dl key={index} className="nx-view__facts">
+            {segment.facts.map((fact, row) => (
+              <div key={row} className="nx-view__fact"><dt>{fact.label}</dt><dd>{fact.value}</dd></div>
+            ))}
+          </dl>
+        ) : (
+          <pre key={index} className="nx-view__text" data-stream={stream} data-form={textForm(segment.text)}>{segment.text}</pre>
+        )
+      )}
+    </>
+  );
+}
+
+function groupFactRuns(events: NexViewEvent[]): NexViewEvent[] {
+  const out: NexViewEvent[] = [];
+  let run: Extract<NexViewEvent, { kind: 'text' }>[] = [];
+  const flush = () => {
+    if (run.length > 1) {
+      const text = run.map((event) => (event.output.text.endsWith('\n') ? event.output.text : `${event.output.text}\n`)).join('');
+      if (factLines(text)) {
+        out.push({ ...run[0]!, output: { ...run[0]!.output, text } });
+        run = [];
+        return;
+      }
+    }
+    out.push(...run);
+    run = [];
+  };
+  for (const event of events) {
+    if (event.kind === 'text' && event.output.stream === 'stdout' && /^[^\n]+\n?$/.test(event.output.text) && isFactLine(event.output.text)) {
+      run.push(event);
+      continue;
+    }
+    flush();
+    out.push(event);
+  }
+  flush();
+  return out;
+}
+
 function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusOutput, motion }: {
   outputs: readonly NexConsoleOutput[]; state: NexConsoleState; input: ReactNode; renderers?: NexConsoleRenderers; maxRows: number; id: string;
   onFocusOutput?: (output: NexConsoleOutput) => void; motion: NexMotion;
@@ -374,11 +437,18 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
     if (split.before.trim()) rest.push({ ...last, output: { ...last.output, text: split.before } });
     return { events: rest, pendingPrompt: split.prompt };
   }, [laid, input]);
-  const sections = useMemo(() => composeNexView(events, { columns }), [events, columns]);
+  // `print()` por línea llega como eventos separados: una racha de stdout que,
+  // JUNTA, son datos `Etiqueta: valor` se presenta como un bloque. Nada más se une.
+  const grouped = useMemo(() => groupFactRuns(events), [events]);
+  const sections = useMemo(() => composeNexView(grouped, { columns }), [grouped, columns]);
+  // El título del programa: sólo su primer texto, y sólo si DESPUÉS pregunta algo
+  // (la cabecera de un programa interactivo). Un informe que sólo imprime, no.
+  const asks = Boolean(pendingPrompt) || events.some((event) => event.kind === 'input');
+  const titled = grouped[0]?.kind === 'text' && asks ? grouped[0] : null;
   const cell = (item: NexViewItem) => (
     <div key={item.key} className="nx-view__item" data-nx-view-item={item.key} data-role={item.role}
       style={{ flexGrow: item.weight, ...(item.aspect ? { '--nx-aspect': String(item.aspect) } : {}) } as React.CSSProperties}>
-      <NexViewEventView event={item.event} renderers={renderers} maxRows={maxRows} id={`${id}-${item.key}`} />
+      <NexViewEventView event={item.event} renderers={renderers} maxRows={maxRows} id={`${id}-${item.key}`} lead={item.event === titled} />
       {onFocusOutput && item.event.kind === 'structured' && (
         <button type="button" className="nx-view__expand" aria-label={`Ampliar ${richName(item.event.output)}`} title="Ampliar"
           onClick={() => onFocusOutput((item.event as Extract<NexViewEvent, { kind: 'structured' }>).output)}>
@@ -400,8 +470,10 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
         );
       })}
       {input && (
-        <div className="nx-view__exchange" data-pending="">
-          {pendingPrompt ? <p className="nx-view__question">{pendingPrompt.trim()}</p> : <span className="nx-view__exchange-label">Entrada</span>}
+        // La pregunta y su campo, en la misma línea si caben (`Nombre: ____`);
+        // una pregunta larga deja el campo debajo. Sin pregunta, sólo el campo.
+        <div className="nx-view__exchange" data-pending="" data-long={pendingPrompt && isLongPrompt(pendingPrompt) ? '' : undefined}>
+          {pendingPrompt && <label className="nx-view__question" htmlFor={`${id}-stdin`}>{pendingPrompt.trim()}</label>}
           {input}
         </div>
       )}
@@ -409,19 +481,30 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
   );
 }
 
-function NexViewEventView({ event, renderers, maxRows, id }: { event: NexViewEvent; renderers?: NexConsoleRenderers; maxRows: number; id: string }) {
+/** Una pregunta larga no comparte línea con su campo (o su respuesta). */
+function isLongPrompt(prompt: string): boolean {
+  return prompt.trim().length > 40;
+}
+
+/** ¿Alguien está usando OTRO control (no el campo de la pregunta)? Entonces no se le quita el foco. */
+function focusedElsewhere(field: HTMLInputElement | null): boolean {
+  if (typeof document === 'undefined') return false;
+  const active = document.activeElement;
+  if (!active || active === document.body || active === field) return false;
+  return active.matches('input, select, textarea, [contenteditable=""], [contenteditable="true"], [role="slider"], [role="textbox"]');
+}
+
+function NexViewEventView({ event, renderers, maxRows, id, lead = false }: { event: NexViewEvent; renderers?: NexConsoleRenderers; maxRows: number; id: string; lead?: boolean }) {
   switch (event.kind) {
     case 'text':
-      // Mismos bytes; la tipografía según la forma (prosa editorial o texto literal).
-      return <pre className="nx-view__text" data-stream={event.output.stream} data-form={event.output.stream === 'stdout' ? textForm(event.output.text) : 'literal'}>{event.output.text}</pre>;
+      return <TextEvent text={event.output.text} stream={event.output.stream} lead={lead} />;
     case 'input':
-      return event.prompt ? (
-        <div className="nx-view__exchange" data-answered="">
-          <p className="nx-view__question">{event.prompt.trim()}</p>
+      // `Nombre: Ana`: la pregunta y lo que se contestó, como quedaron en la terminal.
+      return (
+        <p className="nx-view__exchange" data-answered="" data-long={event.prompt && isLongPrompt(event.prompt) ? '' : undefined}>
+          {event.prompt && <span className="nx-view__question">{event.prompt.trim()}</span>}
           <span className="nx-view__answer"><span className="nx-visually-hidden">Respuesta: </span>{event.output.text}</span>
-        </div>
-      ) : (
-        <p className="nx-view__exchange"><span className="nx-view__exchange-label">Entrada</span><span className="nx-view__answer">{event.output.text}</span></p>
+        </p>
       );
     case 'diagnostic':
       return <Diagnostic d={event.diagnostic} id={id} />;
@@ -518,6 +601,7 @@ function Diagnostic({ d, id }: { d: NexViewDiagnostic; id: string }) {
         <span className="nx-view__diag-mark" aria-hidden="true">{d.severity === 'warning' ? '!' : d.severity === 'interrupted' ? '■' : d.severity === 'info' ? 'i' : '×'}</span>
         {d.title}
       </p>
+      {d.message && <p className="nx-view__diag-message"><code>{d.type ? `${d.type}: ` : ''}{d.message}</code></p>}
       {d.explanation && <p className="nx-view__diag-text">{d.explanation}</p>}
       {d.action && <p className="nx-view__diag-text">{d.action}</p>}
       {(d.location || d.suggestions.length > 0) && (

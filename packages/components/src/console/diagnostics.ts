@@ -7,6 +7,8 @@ export interface NexViewDiagnostic {
   explanation?: string;
   action?: string;
   type?: string;
+  /** El mensaje de la excepción tal como lo escribió el programa (visible: es lo que más informa). */
+  message?: string;
   location?: { file: string; line: number };
   suggestions: string[];
   original: string;
@@ -154,7 +156,8 @@ export function diagnoseOutput(output: NexConsoleTextOutput, status: NexConsoleS
     const moduleName = message.match(/No module named ['"]([^'"\n]+)['"]/)?.[1];
     if (moduleName) title = `No encontramos la biblioteca «${moduleName}».`;
   }
-  return { ...base, type, title, action, category, suggestions,
+  return { ...base, type, ...(message.trim() ? { message: message.trim().slice(0, 300) } : {}), title, action, category, suggestions,
     severity: warning ? 'warning' : type === 'KeyboardInterrupt' ? 'interrupted' : type === 'SystemExit' ? 'info' : 'error',
-    explanation: !PYTHON[type] ? message : undefined };
+    // El mensaje ya se muestra en su línea (`message`): sin repetirlo como explicación.
+    explanation: !PYTHON[type] && !message.trim() ? message : undefined };
 }

@@ -19,11 +19,13 @@ export { resolveSpace, columnsToFold, SPACES, DEFAULT_SPACE_THRESHOLDS } from '.
 export type { NexSpace, SpaceThresholds, ColumnFit } from './space.ts';
 export * from './console/types.ts';
 export { normalizeNexViewEvents, layoutNexViewEvents } from './console/model.ts';
+export { applyTerminalControls } from './console/terminal.ts';
 export type { NexViewEvent } from './console/model.ts';
 export { diagnoseOutput, pythonLocation } from './console/diagnostics.ts';
 export type { NexViewDiagnostic } from './console/diagnostics.ts';
 export { recognizePrintedStructures } from './console/printed.ts';
-export { textForm, splitPrompt } from './console/text-form.ts';
+export { textForm, splitPrompt, leadingTitle, factLines, factSegments, isFactLine } from './console/text-form.ts';
+export type { NexTextSegment } from './console/text-form.ts';
 export type { NexTextForm } from './console/text-form.ts';
 export type { PrintedStructure } from './console/printed.ts';
 export { consoleTranscript, splitInputLines, consoleStateLabel, consoleStatus, pendingPrompt, fromNexBookOutputs, fromTerminalSegments } from './console/session.ts';
