@@ -2,6 +2,10 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
+## 0.7.0 — sin publicar
+
+- **`useNexLayoutTransition(ref, clave, opciones)`.** Transición de disposición genérica: cuando un contenedor se recompone (un panel que se abre o se cierra, un lienzo que pasa de una columna a dos, una superficie que se amplía), cada elemento con `data-nx-layout-id` viaja desde su caja anterior. FLIP sin reescalar: la disposición final se calcula una vez (un editor de código dentro mide su tamaño final una sola vez) y sólo se animan `transform` y `clip-path`; lo que crece se descubre con un recorte desde su tamaño anterior, lo que encoge se desplaza, lo que llega emerge con opacidad. Duración y curva de la familia `surface`. Interrumpible (un cambio nuevo cancela el anterior y parte de la última disposición); inmediata con movimiento reducido, `motion="none"` o un cambio hecho con el teclado (`data-nx-input="keyboard"`). `layoutKeyframes` se exporta para quien anime a mano. Ejemplo vivo en NexDocs → Motion. Origen: NexCode V2 (Nextudio), donde `NexFrame` no servía porque anima la rejilla en cada fotograma y el editor se redimensionaría 60 veces por segundo. Sólo añade exportaciones.
+
 ## 0.6.0 — sin publicar (preparada el 2026-11-15)
 
 Reúne #8–#13. Compatible hacia atrás con 0.5.0 en API (sólo añade exportaciones y props opcionales); dos cambios VISIBLES por defecto, anotados en la matriz.

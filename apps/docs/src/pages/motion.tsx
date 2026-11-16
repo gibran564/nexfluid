@@ -1,7 +1,10 @@
 import { dampingRatio, measureStepResponse, MOTION_PRESETS, type MotionPresetName } from '@nexfluid/core';
 import { NexBadge, NexCard } from '@nexfluid/react';
 import { FluidBlob } from '@nexfluid/react/motion';
-import { PageHeader, Section } from '../docs/kit.tsx';
+import { LiveExample, PageHeader, Section } from '../docs/kit.tsx';
+import { example } from '../examples/index.ts';
+
+const layoutTransition = example('layout-transition');
 import { href } from '../router.ts';
 
 const NAMES = Object.keys(MOTION_PRESETS) as MotionPresetName[];
@@ -40,6 +43,11 @@ export function MotionOverviewPage() {
           </ul>
         </div>
       </div>
+      <Section title="Transición de disposición" lead="useNexLayoutTransition(ref, clave): cuando la clave cambia, cada superficie marcada con data-nx-layout-id viaja desde su caja anterior. FLIP sin reescalar: un solo layout, sólo transform y clip-path en el compositor; una superficie que crece se descubre con un recorte, una que encoge se desplaza, una que llega emerge. Interrumpible; inmediata con movimiento reducido, motion=none o un cambio hecho con el teclado.">
+        <LiveExample title="Código · Dividido · Resultados" description="El contenido de cada superficie (un editor de código, por ejemplo) mide su tamaño final una sola vez: nunca se deforma ni se redimensiona en cada fotograma." source={layoutTransition.source}>
+          <layoutTransition.Component />
+        </LiveExample>
+      </Section>
       <Section title="Presets medidos" lead="Respuesta a un salto unitario calculada en el navegador con measureStepResponse(). La línea discontinua marca el asentamiento a ±0.1 %.">
         <div className="doc-card-grid">
           {NAMES.map((name) => {
