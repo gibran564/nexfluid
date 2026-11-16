@@ -2,7 +2,10 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
-## 0.7.0 — sin publicar
+## 0.7.0 — preparada el 2026-11-16 (sin publicar)
+
+Primera versión publicable después de 0.5.0: **0.6.0 nunca se publicó** y todo su contenido (sección siguiente) llega con 0.7.0. Compatible hacia atrás con 0.5.0 en API: sólo añade exportaciones y props opcionales; los cambios visibles por defecto de 0.6.0 siguen anotados abajo.
+
 
 - **`useNexLayoutTransition(ref, clave, opciones)`.** Transición de disposición genérica: cuando un contenedor se recompone (un panel que se abre o se cierra, un lienzo que pasa de una columna a dos, una superficie que se amplía), cada elemento con `data-nx-layout-id` viaja desde su caja anterior. FLIP sin reescalar: la disposición final se calcula una vez (un editor de código dentro mide su tamaño final una sola vez) y sólo se animan `transform` y `clip-path`; lo que crece se descubre con un recorte desde su tamaño anterior, lo que encoge se desplaza, lo que llega emerge con opacidad. Duración y curva de la familia `surface`. Interrumpible (un cambio nuevo cancela el anterior y parte de la última disposición); inmediata con movimiento reducido, `motion="none"` o un cambio hecho con el teclado (`data-nx-input="keyboard"`). `layoutKeyframes` se exporta para quien anime a mano. Ejemplo vivo en NexDocs → Motion. Origen: NexCode V2 (Nextudio), donde `NexFrame` no servía porque anima la rejilla en cada fotograma y el editor se redimensionaría 60 veces por segundo. Sólo añade exportaciones.
 - **NexView · un programa de consola como pequeña aplicación.** Lo que el propio programa escribió se presenta con jerarquía, sin cambiar ni inventar texto: su primera línea como **título** (`leadingTitle`: una sola línea corta en prosa, sin `:`/`?`/`.` final, y sólo si después el programa pregunta algo) y las líneas seguidas `Etiqueta: valor` como **datos** (`factLines`: dos o más, todas con esa forma; `Error:`/`Traceback` no cuentan; una enumeración —`Paso 1: listo`, `Paso 2: listo`— es un registro y sigue siendo texto). Ante la duda, texto fiel. Las preguntas de `input()` ya se presentaban como pregunta y respuesta (0.6). La Consola no cambia. Origen: NexCode V2 (Nextudio), donde NexView pasa a ser la presentación por defecto.
@@ -13,7 +16,7 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 - **NexConsole · la barra de estado se reparte entera.** En un contenedor estrecho el estado ya no se encoge hasta partir su contenido («Finalizado» / «75» / «ms»): mide lo que mide su texto, cada dato va en una línea y los datos secundarios llevan separador («Finalizado · 75 ms»).
 - **NexMarkdownField · una lista dentro de un párrafo se guarda como lista.** Chromium deja la lista dentro del párrafo al convertirlo (`<p><ul>…</ul></p>`, o `<div><ul>…`); `richTextToMarkdown` guardaba ese envoltorio como texto y el Markdown perdía los marcadores.
 
-## 0.6.0 — sin publicar (preparada el 2026-11-15)
+## 0.6.0 — no publicada (su contenido se publica en 0.7.0)
 
 Reúne #8–#13. Compatible hacia atrás con 0.5.0 en API (sólo añade exportaciones y props opcionales); dos cambios VISIBLES por defecto, anotados en la matriz.
 
