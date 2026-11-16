@@ -343,3 +343,18 @@ describe('NexView · diagnóstico con el mensaje del programa a la vista', () =>
     expect(container.querySelector('.nx-view__original')).not.toBeNull();
   });
 });
+
+describe('NexView · datos impresos línea a línea', () => {
+  it('print() por línea (eventos separados) también forma datos; una línea suelta no', () => {
+    act(() => root.render(<NexConsole outputs={[
+      { seq: 0, stream: 'stdout', text: 'Cliente: Ana\n' },
+      { seq: 1, stream: 'stdout', text: 'Total: $625\n' },
+      { seq: 2, stream: 'stdout', text: 'Pedido calculado correctamente\n' },
+      { seq: 3, stream: 'stdout', text: 'Nota: única\n' },
+    ]} state="completed" view="nexview" />));
+    const facts = [...container.querySelectorAll('.nx-view__fact')].map((f) => f.textContent);
+    expect(facts).toEqual(['ClienteAna', 'Total$625']);
+    expect(container.textContent).toContain('Pedido calculado correctamente');
+    expect(container.textContent).toContain('Nota: única');
+  });
+});

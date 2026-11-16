@@ -383,6 +383,34 @@ function TextEvent({ text, stream, lead }: { text: string; stream: string; lead:
   );
 }
 
+/** Une rachas de stdout consecutivas sólo cuando juntas forman datos (`factLines`). */
+function groupFactRuns(events: NexViewEvent[]): NexViewEvent[] {
+  const out: NexViewEvent[] = [];
+  let run: Extract<NexViewEvent, { kind: 'text' }>[] = [];
+  const flush = () => {
+    if (run.length > 1) {
+      const text = run.map((event) => (event.output.text.endsWith('\n') ? event.output.text : `${event.output.text}\n`)).join('');
+      if (factLines(text)) {
+        out.push({ ...run[0]!, output: { ...run[0]!.output, text } });
+        run = [];
+        return;
+      }
+    }
+    out.push(...run);
+    run = [];
+  };
+  for (const event of events) {
+    if (event.kind === 'text' && event.output.stream === 'stdout' && /^[^\n]+\n?$/.test(event.output.text) && factLines(`${event.output.text.replace(/\n?$/, '\n')}${event.output.text.replace(/\n?$/, '\n')}`)) {
+      run.push(event);
+      continue;
+    }
+    flush();
+    out.push(event);
+  }
+  flush();
+  return out;
+}
+
 function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusOutput, motion }: {
   outputs: readonly NexConsoleOutput[]; state: NexConsoleState; input: ReactNode; renderers?: NexConsoleRenderers; maxRows: number; id: string;
   onFocusOutput?: (output: NexConsoleOutput) => void; motion: NexMotion;
@@ -402,11 +430,14 @@ function NexViewEvents({ outputs, state, input, renderers, maxRows, id, onFocusO
     if (split.before.trim()) rest.push({ ...last, output: { ...last.output, text: split.before } });
     return { events: rest, pendingPrompt: split.prompt };
   }, [laid, input]);
-  const sections = useMemo(() => composeNexView(events, { columns }), [events, columns]);
+  // `print()` por línea llega como eventos separados: una racha de stdout que,
+  // JUNTA, son datos `Etiqueta: valor` se presenta como un bloque. Nada más se une.
+  const grouped = useMemo(() => groupFactRuns(events), [events]);
+  const sections = useMemo(() => composeNexView(grouped, { columns }), [grouped, columns]);
   // El título del programa: sólo su primer texto, y sólo si DESPUÉS pregunta algo
   // (la cabecera de un programa interactivo). Un informe que sólo imprime, no.
   const asks = Boolean(pendingPrompt) || events.some((event) => event.kind === 'input');
-  const titled = events[0]?.kind === 'text' && asks ? events[0] : null;
+  const titled = grouped[0]?.kind === 'text' && asks ? grouped[0] : null;
   const cell = (item: NexViewItem) => (
     <div key={item.key} className="nx-view__item" data-nx-view-item={item.key} data-role={item.role}
       style={{ flexGrow: item.weight, ...(item.aspect ? { '--nx-aspect': String(item.aspect) } : {}) } as React.CSSProperties}>
