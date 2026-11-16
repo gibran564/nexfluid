@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { factLines, leadingTitle, splitPrompt, textForm } from '../src/console/text-form.ts';
+import { factLines, factSegments, leadingTitle, splitPrompt, textForm } from '../src/console/text-form.ts';
 import { layoutNexViewEvents, normalizeNexViewEvents } from '../src/console/model.ts';
 import type { NexConsoleOutput } from '../src/console/types.ts';
 
@@ -80,5 +80,18 @@ describe('factLines: datos Etiqueta: valor', () => {
     assert.equal(factLines('Cliente: Ana\nPedido calculado correctamente\n'), null);
     assert.equal(factLines('Error: algo\nTotal: 3\n'), null);
     assert.equal(factLines('https://a.b: x\nTotal: 3\n'), null);
+  });
+});
+
+describe('factSegments: datos dentro de un texto mayor', () => {
+  it('la racha de datos se separa; el resto queda como texto, en orden y con sus bytes', () => {
+    assert.deepEqual(factSegments('Resumen\nCliente: Ana\nTotal: $625\nPedido calculado correctamente\n'), [
+      { kind: 'text', text: 'Resumen\n' },
+      { kind: 'facts', facts: [{ label: 'Cliente', value: 'Ana' }, { label: 'Total', value: '$625' }] },
+      { kind: 'text', text: 'Pedido calculado correctamente\n' },
+    ]);
+  });
+  it('una línea suelta con dos puntos no es un dato', () => {
+    assert.deepEqual(factSegments('Nota: única\nfin\n'), [{ kind: 'text', text: 'Nota: única\nfin\n' }]);
   });
 });

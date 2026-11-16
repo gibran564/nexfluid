@@ -97,3 +97,44 @@ export function factLines(text: string): Array<{ label: string; value: string }>
   }
   return facts;
 }
+
+export type NexTextSegment = { kind: 'text'; text: string } | { kind: 'facts'; facts: Array<{ label: string; value: string }> };
+
+/**
+ * Un texto en tramos: las RACHAS de dos o más líneas `Etiqueta: valor` seguidas
+ * son datos; todo lo demás queda como texto, en su orden y con sus bytes.
+ */
+export function factSegments(text: string): NexTextSegment[] {
+  const lines = text.split('\n');
+  const trailing = text.endsWith('\n');
+  if (trailing) lines.pop();
+  const segments: NexTextSegment[] = [];
+  let buffer: string[] = [];
+  let run: string[] = [];
+  const pushText = () => {
+    if (buffer.length) segments.push({ kind: 'text', text: `${buffer.join('\n')}\n` });
+    buffer = [];
+  };
+  const closeRun = () => {
+    const facts = run.length >= 2 ? factLines(run.join('\n')) : null;
+    if (facts) {
+      pushText();
+      segments.push({ kind: 'facts', facts });
+    } else buffer.push(...run);
+    run = [];
+  };
+  for (const line of lines) {
+    if (FACT.test(line) && !/^(error|warning|traceback|advertencia)\b/i.test(line)) run.push(line);
+    else {
+      closeRun();
+      buffer.push(line);
+    }
+  }
+  closeRun();
+  pushText();
+  if (!trailing && segments.at(-1)?.kind === 'text') {
+    const last = segments.at(-1) as { kind: 'text'; text: string };
+    last.text = last.text.replace(/\n$/, '');
+  }
+  return segments;
+}

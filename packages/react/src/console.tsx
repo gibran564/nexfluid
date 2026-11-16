@@ -22,7 +22,7 @@
  */
 import { memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
-  columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, factLines, layoutNexViewEvents, leadingTitle, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
+  columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, factLines, factSegments, layoutNexViewEvents, leadingTitle, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
   type NexConsoleCellValue, type NexConsoleFigureOutput, type NexConsoleCustomOutput, type NexConsoleImageOutput, type NexConsoleJsonValue,
   type NexConsoleOutput, type NexConsoleState, type NexConsoleStatus, type NexConsoleTableOutput, type NexMotion, type NexViewDiagnostic, type NexViewEvent, type NexViewItem,
   type NexSessionConnection, type NexSessionStore, type NexSessionTransport, type NexTerminalEmulator,
@@ -366,24 +366,25 @@ function TextEvent({ text, stream, lead }: { text: string; stream: string; lead:
   if (stream !== 'stdout') return <pre className="nx-view__text" data-stream={stream} data-form="literal">{text}</pre>;
   const head = lead ? leadingTitle(text) : null;
   const body = head ? head.rest : text;
-  const facts = body ? factLines(body) : null;
+  const segments = body ? factSegments(body) : [];
   return (
     <>
       {head && <h3 className="nx-view__title">{head.title}</h3>}
-      {facts ? (
-        <dl className="nx-view__facts">
-          {facts.map((fact, index) => (
-            <div key={index} className="nx-view__fact"><dt>{fact.label}</dt><dd>{fact.value}</dd></div>
-          ))}
-        </dl>
-      ) : body ? (
-        <pre className="nx-view__text" data-stream={stream} data-form={textForm(body)}>{body}</pre>
-      ) : null}
+      {segments.map((segment, index) =>
+        segment.kind === 'facts' ? (
+          <dl key={index} className="nx-view__facts">
+            {segment.facts.map((fact, row) => (
+              <div key={row} className="nx-view__fact"><dt>{fact.label}</dt><dd>{fact.value}</dd></div>
+            ))}
+          </dl>
+        ) : (
+          <pre key={index} className="nx-view__text" data-stream={stream} data-form={textForm(segment.text)}>{segment.text}</pre>
+        )
+      )}
     </>
   );
 }
 
-/** Une rachas de stdout consecutivas sólo cuando juntas forman datos (`factLines`). */
 function groupFactRuns(events: NexViewEvent[]): NexViewEvent[] {
   const out: NexViewEvent[] = [];
   let run: Extract<NexViewEvent, { kind: 'text' }>[] = [];
