@@ -187,12 +187,27 @@ export function richTextToMarkdown(root: HTMLElement): string {
     }
     flushLoose();
     if (node.dataset.md !== undefined) { blocks.push(node.dataset.md); return; }
+    // Chromium deja la lista DENTRO del párrafo al convertirlo (`<p><ul>…</ul></p>`,
+    // o `<div><ul>…`): un envoltorio que sólo contiene listas vale por sus listas.
+    const lists = wrappedLists(node);
+    if (lists) {
+      lists.forEach((list) => { const md = blockMd(list); if (md !== null) blocks.push(md); });
+      return;
+    }
     const md = blockMd(node);
     if (md === null) return;
     blocks.push(node.dataset.sig !== undefined && node.dataset.sig === md ? node.dataset.src! : md);
   });
   flushLoose();
   return blocks.join('\n\n');
+}
+
+/** Las listas de un `<p>`/`<div>` que no contiene nada más; `null` si tiene otro contenido. */
+function wrappedLists(node: HTMLElement): HTMLElement[] | null {
+  if (node.tagName !== 'P' && node.tagName !== 'DIV') return null;
+  const content = [...node.childNodes].filter((child) => !(child.nodeType === 3 && !child.textContent?.trim()) && child.nodeName !== 'BR');
+  if (!content.length || !content.every((child) => child.nodeName === 'UL' || child.nodeName === 'OL')) return null;
+  return content as HTMLElement[];
 }
 
 /** El Markdown de UN bloque editable; `null` si está vacío. */
