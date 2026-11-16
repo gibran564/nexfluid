@@ -19,6 +19,7 @@ export { resolveSpace, columnsToFold, SPACES, DEFAULT_SPACE_THRESHOLDS } from '.
 export type { NexSpace, SpaceThresholds, ColumnFit } from './space.ts';
 export * from './console/types.ts';
 export { normalizeNexViewEvents, layoutNexViewEvents } from './console/model.ts';
+export { applyTerminalControls } from './console/terminal.ts';
 export type { NexViewEvent } from './console/model.ts';
 export { diagnoseOutput, pythonLocation } from './console/diagnostics.ts';
 export type { NexViewDiagnostic } from './console/diagnostics.ts';

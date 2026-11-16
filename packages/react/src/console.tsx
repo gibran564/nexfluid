@@ -22,7 +22,7 @@
  */
 import { memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
-  columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, factLines, factSegments, layoutNexViewEvents, leadingTitle, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
+  applyTerminalControls, columnsFor, composeNexView, consoleStateLabel, consoleStatus, consoleTranscript, cx, factLines, factSegments, layoutNexViewEvents, leadingTitle, normalizeNexViewEvents, safeUrl, splitPrompt, textForm,
   type NexConsoleCellValue, type NexConsoleFigureOutput, type NexConsoleCustomOutput, type NexConsoleImageOutput, type NexConsoleJsonValue,
   type NexConsoleOutput, type NexConsoleState, type NexConsoleStatus, type NexConsoleTableOutput, type NexMotion, type NexViewDiagnostic, type NexViewEvent, type NexViewItem,
   type NexSessionConnection, type NexSessionStore, type NexSessionTransport, type NexTerminalEmulator,
@@ -138,7 +138,9 @@ export function NexConsole({
   const log = useRef<HTMLDivElement | null>(null);
   const stuck = useRef(true);
   const id = useId();
-  const ordered = useMemo(() => [...outputs].sort((a, b) => a.seq - b.seq), [outputs]);
+  // Lo que una terminal haría con los controles del programa (limpiar la
+  // pantalla, \r, clear_output): Consola y NexView leen el mismo resultado.
+  const ordered = useMemo(() => [...applyTerminalControls(outputs)].sort((a, b) => a.seq - b.seq), [outputs]);
   const preference = useMotionPreference();
   const level = motion ?? defaults.motion;
   const shown = useRef({ view, height: 0 });

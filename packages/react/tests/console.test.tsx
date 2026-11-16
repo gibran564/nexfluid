@@ -40,6 +40,26 @@ describe('NexConsole', () => {
     expect($('[data-stream="input"]').textContent).toBe('Ana');
   });
 
+  it('limpiar la pantalla (ESC[2J ESC[H) y \r se aplican en Consola y en NexView; la pregunta pendiente sigue', () => {
+    const outputs: NexConsoleOutput[] = [
+      { seq: 0, stream: 'stdout', text: 'Menú viejo\n' },
+      { seq: 1, stream: 'stdout', text: '\u001b[2J\u001b[HCargando 10%\rCargando 100%\n' },
+      { seq: 2, stream: 'stdout', text: 'Opción: ' },
+    ];
+    act(() => root.render(<NexConsole outputs={outputs} state="waiting_for_input" onSubmitInput={() => true} />));
+    expect($('.nx-console__text').textContent).toBe('Cargando 100%\nOpción: ');
+    view('NexView');
+    expect(container.textContent).not.toContain('Menú viejo');
+    expect(container.textContent).not.toContain('\u001b');
+    expect(container.textContent).toContain('Cargando 100%');
+    expect($$('.nx-console__input')).toHaveLength(1);
+  });
+
+  it('clear_output() (evento clear) limpia la salida anterior, tablas incluidas', () => {
+    act(() => root.render(<NexConsole outputs={[...OUT, { seq: 4, stream: 'clear' }, { seq: 5, stream: 'stdout', text: 'otra vez\n' }]} state="completed" />));
+    expect($('.nx-console__text').textContent).toBe('otra vez\n');
+  });
+
   it('cambiar de vista no vuelve a pedir la ejecución ni pierde la entrada pendiente', () => {
     const onRun = vi.fn();
     act(() => root.render(<NexConsole outputs={[{ seq: 0, stream: 'stdout', text: 'Edad: ' }]} state="waiting_for_input" onSubmitInput={() => true} onRun={onRun} />));
