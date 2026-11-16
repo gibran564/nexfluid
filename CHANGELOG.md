@@ -5,6 +5,7 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 ## Sin versión — `feat/nexview-console-app`
 
 - **NexView · un programa de consola como pequeña aplicación.** Lo que el propio programa escribió se presenta con jerarquía, sin cambiar ni inventar texto: su primera línea como **título** (`leadingTitle`: una sola línea corta en prosa, sin `:`/`?`/`.` final, y sólo si después el programa pregunta algo) y las líneas seguidas `Etiqueta: valor` como **datos** (`factLines`: dos o más, todas con esa forma; `Error:`/`Traceback` no cuentan). Ante la duda, texto fiel. Las preguntas de `input()` ya se presentaban como pregunta y respuesta (0.6). La Consola no cambia. Origen: NexCode V2 (Nextudio), donde NexView pasa a ser la presentación por defecto.
+- **NexView · el mensaje del programa a la vista en los diagnósticos.** `NexViewDiagnostic.message` (opcional) lleva el mensaje de la excepción tal como lo escribió el programa y se muestra bajo el título (`ValueError: dato inválido`); antes sólo se veía la explicación genérica y el mensaje quedaba plegado en «Mensaje original». Sin duplicarlo como explicación.
 
 ## 0.6.0 — sin publicar (preparada el 2026-11-15)
 

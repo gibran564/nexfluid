@@ -549,6 +549,7 @@ function Diagnostic({ d, id }: { d: NexViewDiagnostic; id: string }) {
         <span className="nx-view__diag-mark" aria-hidden="true">{d.severity === 'warning' ? '!' : d.severity === 'interrupted' ? '■' : d.severity === 'info' ? 'i' : '×'}</span>
         {d.title}
       </p>
+      {d.message && <p className="nx-view__diag-message"><code>{d.type ? `${d.type}: ` : ''}{d.message}</code></p>}
       {d.explanation && <p className="nx-view__diag-text">{d.explanation}</p>}
       {d.action && <p className="nx-view__diag-text">{d.action}</p>}
       {(d.location || d.suggestions.length > 0) && (

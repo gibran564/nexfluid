@@ -331,3 +331,15 @@ describe('NexView · un programa de consola como pequeña aplicación', () => {
     expect(container.textContent).toContain('Cliente: Ana');
   });
 });
+
+describe('NexView · diagnóstico con el mensaje del programa a la vista', () => {
+  it('ValueError("dato inválido"): explicación y el mensaje escrito por el programa, visible', () => {
+    act(() => root.render(<NexConsole outputs={[
+      { seq: 0, stream: 'stdout', text: 'antes del error\n' },
+      { seq: 1, stream: 'error', text: 'Traceback (most recent call last):\n  File "<exec>", line 4, in <module>\nValueError: dato inválido' },
+    ]} state="failed" view="nexview" />));
+    const message = container.querySelector('.nx-view__diag-message');
+    expect(message?.textContent).toBe('ValueError: dato inválido');
+    expect(container.querySelector('.nx-view__original')).not.toBeNull();
+  });
+});
