@@ -10,6 +10,7 @@ Navegación de aplicación: el riel lateral compacto, sus rótulos y los iconos 
 - **`NexNav` · `density`.** `compact` 32 px, `comfortable` 36 px (por defecto), `spacious` 44 px; siempre 44 px con puntero grueso.
 - **`NexNav` · `landmark={false}`.** Un grupo con nombre (`role="group"`) en vez de un `<nav>`: una barra lateral compone varias listas dentro de UNA navegación sin anidar landmarks.
 - **`NexTooltip`** (nuevo). Rótulo de un control sin texto visible. No añade caja (`display: contents`), aparece con el puntero o con el foco de TECLADO (`:focus-visible`), sube a la capa superior con el posicionamiento de las capas ancladas (ningún contenedor con `overflow` lo recorta) y cumple WCAG 1.4.13: Escape lo descarta, se puede recorrer con el puntero y dura mientras haya puntero o foco. Decorativo por defecto (`aria-hidden`, repite el nombre del control); con `describe` se une con `aria-describedby`. `gap` fija la distancia al control. Sin animación con movimiento reducido.
+- **`NexButton` · `contentAlign`.** `start`: el contenido se lee de izquierda a derecha y `iconEnd` va al extremo, para filas de una barra lateral o de una lista. `center` por defecto: los botones existentes no cambian.
 - **Iconos** `home`, `academic`, `compass`, `chart`, `bell`, `shield` y `user`, en la retícula de 24 px (trazo 1.5, extremos redondos).
 - NexDocs: página de `NexTooltip`; `NexNav` gana el control «Riel compacto» y las filas de API nuevas.
 

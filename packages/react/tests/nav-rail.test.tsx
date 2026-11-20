@@ -4,7 +4,7 @@ import { renderToString } from 'react-dom/server';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ICONS } from '@nexfluid/foundation';
-import { NexIcon, NexIconButton, NexNav, NexTooltip } from '@nexfluid/react';
+import { NexButton, NexIcon, NexIconButton, NexNav, NexTooltip } from '@nexfluid/react';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -108,6 +108,17 @@ describe('NexNav · riel compacto', () => {
       act(() => hydrated.unmount());
       host.remove();
     }
+  });
+});
+
+describe('NexButton · contentAlign', () => {
+  it('start: marca la alineación y lleva iconEnd al extremo; por defecto no cambia nada', () => {
+    act(() => root.render(<><NexButton contentAlign="start" iconEnd={<NexIcon name="arrow-right" />}>Mi estudio</NexButton><NexButton iconEnd={<NexIcon name="arrow-right" />}>Abrir</NexButton></>));
+    const [start, normal] = container.querySelectorAll('button');
+    expect(start!.dataset.nxAlign).toBe('start');
+    expect(start!.querySelector('.nx-button__end [data-nx-icon="arrow-right"]')).not.toBeNull();
+    expect(normal!.hasAttribute('data-nx-align')).toBe(false);
+    expect(normal!.querySelector('.nx-button__end')).toBeNull();
   });
 });
 
