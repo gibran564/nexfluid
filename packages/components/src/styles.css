@@ -504,6 +504,28 @@
 .nx-nav__item:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: -2px; }
 .nx-nav__trailing { margin-left: auto; }
 .nx-nav:not([data-nx-ready]) .nx-nav__item:is([aria-current='page'], [aria-current='true']) { background: var(--nx-accent-soft); }
+.nx-nav__label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nx-nav[data-nx-density='compact'] .nx-nav__item { min-height: 32px; }
+.nx-nav[data-nx-density='spacious'] .nx-nav__item { min-height: 44px; }
+/* Riel compacto: el mismo icono, centrado; la etiqueta es el rótulo (NexTooltip). */
+.nx-nav[data-nx-compact] .nx-nav__item { justify-content: center; padding-inline: 0; }
+.nx-nav[data-nx-compact] .nx-nav__trailing { position: absolute; top: 2px; right: 4px; margin: 0; pointer-events: none; }
+.nx-nav[data-nx-compact] .nx-nav__group-wrap + .nx-nav__group-wrap { margin-top: 6px; padding-top: 6px; box-shadow: inset 0 1px 0 var(--nx-border); }
+@media (pointer: coarse) { .nx-nav__item { min-height: 44px; } }
+
+/* NexTooltip: rótulo en la capa superior, junto a su control. */
+.nx-tooltip-anchor { display: contents; }
+.nx-tooltip {
+  position: fixed; z-index: var(--nx-layer-popover); max-width: min(280px, 100vw - 16px); margin: 0; padding: 5px 10px;
+  border: 0; border-radius: 8px; background: var(--nx-fg); color: var(--nx-bg);
+  font: 500 var(--nx-text-micro) / 1.3 var(--nx-font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  animation: nx-tooltip-in var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-tooltip[data-layer='top'] { position: fixed; inset: auto; margin: 0; border: 0; }
+.nx-tooltip[hidden] { display: none; }
+@keyframes nx-tooltip-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .nx-tooltip:not([data-nx-motion-pref='full'] *) { animation: none; } }
+[data-nx-motion-pref='reduce'] .nx-tooltip { animation: none; }
 .nx-nav__caret { transition: transform var(--nx-motion-state-duration) var(--nx-motion-state-easing); }
 .nx-nav__item[aria-expanded='true'] > .nx-nav__caret { transform: rotate(90deg); }
 
