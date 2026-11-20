@@ -4,7 +4,7 @@ import { buttonDoc } from './pages/docs-actions.tsx';
 import { avatarDoc, badgeDoc, cardDoc } from './pages/docs-surfaces.tsx';
 import { frameDoc, tabsDoc } from './pages/docs-navigation-layout.tsx';
 import { codeBlockDoc, fluidBlobDoc, markdownDoc, markdownWidgetDoc, propertiesWidgetDoc } from './pages/docs-content.tsx';
-import { explorerDoc, inspectorDoc, navDoc, panelDoc, previewDoc, segmentedDoc, surfaceDoc } from './pages/docs-new.tsx';
+import { explorerDoc, inspectorDoc, navDoc, panelDoc, previewDoc, segmentedDoc, surfaceDoc, tooltipDoc } from './pages/docs-new.tsx';
 import { ArchitecturePage, InstallPage, RoadmapPage } from './pages/getting-started.tsx';
 import { ColorPage, IconsPage, MotionTokensPage, SpacingPage, ThemesPage, TypographyPage } from './pages/foundations.tsx';
 import { CoverPage } from './pages/cover.tsx';
@@ -32,7 +32,7 @@ export interface PageDef {
 }
 
 export const COMPONENT_DOCS: readonly ComponentDoc[] = [
-  surfaceDoc, buttonDoc, menuDoc, anchoredLayerDoc, segmentedDoc, inputDoc, textareaDoc, selectDoc, checkboxDoc, badgeDoc, avatarDoc, cardDoc, panelDoc, tabsDoc, navDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
+  surfaceDoc, buttonDoc, menuDoc, anchoredLayerDoc, segmentedDoc, inputDoc, textareaDoc, selectDoc, checkboxDoc, badgeDoc, avatarDoc, cardDoc, panelDoc, tabsDoc, navDoc, tooltipDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
   flowDoc, inkDoc, portalDoc, consoleDoc, markdownFieldDoc, dataViewDoc, markdownWidgetDoc, propertiesWidgetDoc, inspectorDoc, explorerDoc, previewDoc, sheetsDoc, fluidBlobDoc,
 ];
 
@@ -76,7 +76,8 @@ export const PAGES: readonly PageDef[] = [
   component(cardDoc, 'Componentes', 'Superficies', 'tarjeta expandir panel'),
   component(panelDoc, 'Componentes', 'Superficies', 'panel plegable'),
   component(tabsDoc, 'Componentes', 'Navegación', 'pestañas tablist gota'),
-  component(navDoc, 'Componentes', 'Navegación', 'navegacion sidebar'),
+  component(navDoc, 'Componentes', 'Navegación', 'navegacion sidebar riel compacto barra lateral'),
+  component(tooltipDoc, 'Componentes', 'Capas', 'tooltip rotulo etiqueta ayuda icono'),
   component(scrollDoc, 'Componentes', 'Navegación', 'scroll desplazamiento barra progreso secciones lectura'),
   component(codeBlockDoc, 'Componentes', 'Contenido', 'codigo resaltado copiar'),
   component(markdownDoc, 'Componentes', 'Contenido', 'markdown gfm avisos'),
