@@ -1,4 +1,4 @@
-import { NexBadge, NexIcon, NexNav, NexPanel, NexSegmented, NexSurface } from '@nexfluid/react';
+import { NexBadge, NexIcon, NexIconButton, NexNav, NexPanel, NexSegmented, NexSurface, NexTooltip } from '@nexfluid/react';
 import { NexExplorerWidget, NexInspectorWidget } from '@nexfluid/react/widgets';
 import { PreviewPlayground } from './preview-playground.tsx';
 import type { ComponentDoc } from '../docs/component-page.tsx';
@@ -97,28 +97,28 @@ export const navDoc: ComponentDoc = {
   status: 'piloto',
   imports: [{ names: ['NexNav'], from: '@nexfluid/react' }],
   origin: <>barras laterales y listas de navegación de Nextudio</>,
-  controls: [{ kind: 'boolean', name: 'groups', label: 'Con grupos', initial: true }, { kind: 'boolean', name: 'icons', label: 'Con iconos', initial: true }],
+  controls: [{ kind: 'boolean', name: 'groups', label: 'Con grupos', initial: true }, { kind: 'boolean', name: 'icons', label: 'Con iconos', initial: true }, { kind: 'boolean', name: 'compact', label: 'Riel compacto', initial: false }],
   render: (v) => {
     const items = (
       <>
-        <NexNav.Item href="#/componentes/nav" current icon={v.icons ? <NexIcon name="file" /> : undefined}>Mi estudio</NexNav.Item>
-        <NexNav.Item href="#/componentes/nav" icon={v.icons ? <NexIcon name="grid" /> : undefined}>Explorar</NexNav.Item>
-        <NexNav.Item href="#/componentes/nav" icon={v.icons ? <NexIcon name="code" /> : undefined} trailing={<NexBadge density="compact" tone="accent">2</NexBadge>}>Prácticas</NexNav.Item>
+        <NexNav.Item href="#/componentes/nav" current icon={v.icons || v.compact ? <NexIcon name="home" /> : undefined}>Inicio</NexNav.Item>
+        <NexNav.Item href="#/componentes/nav" icon={v.icons || v.compact ? <NexIcon name="academic" /> : undefined}>Aula</NexNav.Item>
+        <NexNav.Item href="#/componentes/nav" icon={v.icons || v.compact ? <NexIcon name="compass" /> : undefined} trailing={<NexBadge density="compact" tone="accent">2</NexBadge>}>Explorar</NexNav.Item>
       </>
     );
     return (
-      <div style={{ width: 260 }}>
-        <NexNav aria-label="Demo">{v.groups ? <><NexNav.Group label="Trabajo">{items}</NexNav.Group><NexNav.Group label="Cuenta"><NexNav.Item href="#/componentes/nav">Ajustes</NexNav.Item></NexNav.Group></> : items}</NexNav>
+      <div style={{ width: v.compact ? 72 : 260, transition: 'width 200ms' }}>
+        <NexNav aria-label="Demo" compact={Boolean(v.compact)} density="compact">{v.groups ? <><NexNav.Group label="Trabajo">{items}</NexNav.Group><NexNav.Group label="Cuenta"><NexNav.Item href="#/componentes/nav" icon={v.icons || v.compact ? <NexIcon name="user" /> : undefined}>Perfil</NexNav.Item></NexNav.Group></> : items}</NexNav>
       </div>
     );
   },
   code: (v) => jsx('NexNav', { 'aria-label': 'Principal' }, v.groups ? [jsx('NexNav.Group', { label: 'Trabajo' }, [jsx('NexNav.Item', { href: '/estudio', current: true }, 'Mi estudio'), jsx('NexNav.Item', { href: '/explorar' }, 'Explorar')])] : [jsx('NexNav.Item', { href: '/estudio', current: true }, 'Mi estudio'), jsx('NexNav.Item', { href: '/explorar' }, 'Explorar')]),
   api: [
-    { component: 'NexNav', rows: [{ name: 'aria-label', type: 'string', description: 'Obligatorio: nombre del landmark navigation.' }, { name: 'motion', type: 'NexMotion', description: 'Nivel de movimiento de la gota.' }] },
+    { component: 'NexNav', rows: [{ name: 'aria-label', type: 'string', description: 'Obligatorio: nombre del landmark navigation (o del grupo).' }, { name: 'motion', type: 'NexMotion', description: 'Nivel de movimiento de la gota.' }, { name: 'compact', type: 'boolean', description: 'Riel de iconos: la etiqueta queda como nombre accesible oculto y aparece como NexTooltip con el puntero o el foco de teclado. Mismo icono en los dos estados. Desde 0.9.0.' }, { name: 'density', type: 'NexDensity', description: 'Alto de cada destino: 32 · 36 · 44 px (44 siempre con puntero grueso). Desde 0.9.0.' }, { name: 'landmark', type: 'boolean', default: 'true', description: 'false: role="group" con nombre, para componer varias listas dentro de UNA navegación sin anidar landmarks. Desde 0.9.0.' }, { name: 'tooltipSide · tooltipGap', type: "'right' | 'left' · number", default: "'right' · 8", description: 'Lado y distancia del rótulo en el riel compacto (más distancia si el riel tiene margen interior y el rótulo debe quedar fuera).' }] },
     { component: 'NexNav.Item (NexNavItem)', rows: [{ name: 'href · as', type: 'string · ElementType', description: 'Enlace o componente de enlace propio (Link de Next.js); sin href es un botón.' }, { name: 'current', type: 'boolean', description: 'aria-current="page" (o "true" en botones).' }, { name: 'icon · trailing · level · expanded', type: '…', description: 'Icono, contenido final, nivel de árbol y rama plegable (aria-expanded).' }] },
     { component: 'NexNav.Group (NexNavGroup)', rows: [{ name: 'label', type: 'string', description: 'Título que nombra la sublista (aria-labelledby).' }] },
   ],
-  a11y: ['Landmark navigation con nombre; el actual se anuncia con aria-current.', 'Grupos como sublistas etiquetadas.', 'La gota es decorativa (aria-hidden).'],
+  a11y: ['Landmark navigation con nombre (o grupo con landmark={false}); el actual se anuncia con aria-current.', 'Grupos como sublistas etiquetadas; en compacto el título queda oculto pero sigue nombrando la sublista.', 'Compacto: la etiqueta es el nombre accesible; el rótulo es decorativo y no se anuncia dos veces.', 'La gota es decorativa (aria-hidden) y no se mueve con movimiento reducido.'],
 };
 
 export const segmentedDoc: ComponentDoc = {
@@ -202,4 +202,41 @@ export const previewDoc: ComponentDoc = {
   code: () => jsx('NexPreviewWidget', { title: 'Página publicada' }, '<PublishedPage />'),
   api: [{ component: 'NexPreviewWidget', rows: [{ name: 'title · children · actions', type: '…', description: 'Cabecera y contenido.' }, { name: 'devices · defaultDevice', type: '{ value; label; width }[]', description: 'Dispositivos (por defecto Fluido, Tableta 768, Móvil 375).' }] }],
   a11y: ['Section con nombre; el selector de dispositivo es un radiogroup.'],
+};
+
+/* ---- NexTooltip ---------------------------------------------------------------- */
+
+export const tooltipDoc: ComponentDoc = {
+  path: 'componentes/tooltip',
+  name: 'NexTooltip',
+  eyebrow: 'Componentes · Capas',
+  summary: 'El rótulo de un control sin texto visible (un botón de icono, un destino del riel compacto). Aparece con el puntero o el foco de teclado, sube a la capa superior y ningún contenedor con overflow lo recorta. Escape lo descarta.',
+  status: 'piloto',
+  imports: [{ names: ['NexTooltip'], from: '@nexfluid/react' }],
+  origin: <>los rótulos de la barra lateral colapsada de Nextudio</>,
+  controls: [
+    { kind: 'select', name: 'side', label: 'Lado', options: ['top', 'right', 'bottom', 'left'], initial: 'right' },
+    { kind: 'boolean', name: 'describe', label: 'Describe (aria-describedby)', initial: false },
+  ],
+  render: (v) => (
+    <div style={{ display: 'flex', gap: 8 }}>
+      <NexTooltip label="Buscar" side={v.side as never} describe={Boolean(v.describe)}><NexIconButton label="Buscar" icon={<NexIcon name="search" />} /></NexTooltip>
+      <NexTooltip label="Notificaciones" side={v.side as never}><NexIconButton label="Notificaciones" icon={<NexIcon name="bell" />} /></NexTooltip>
+      <NexTooltip label="Tu cuenta" side={v.side as never}><NexIconButton label="Tu cuenta" icon={<NexIcon name="user" />} /></NexTooltip>
+    </div>
+  ),
+  code: (v) => jsx('NexTooltip', { label: 'Buscar', side: v.side as string, describe: Boolean(v.describe) || undefined }, [jsx('NexIconButton', { label: 'Buscar', icon: { code: '<NexIcon name="search" />' } })], { side: 'top' }),
+  api: [{
+    component: 'NexTooltip',
+    rows: [
+      { name: 'label', type: 'ReactNode', description: 'El rótulo.' },
+      { name: 'side · align', type: 'NexSide · NexAlign', default: "'top' · 'center'", description: 'Lado preferido; se da la vuelta y se desliza si no cabe.' },
+      { name: 'gap', type: 'number', default: '8', description: 'Distancia al control en px.' },
+      { name: 'describe', type: 'boolean', default: 'false', description: 'Por defecto repite el nombre del control y es aria-hidden. Con true es una descripción unida con aria-describedby.' },
+      { name: 'disabled', type: 'boolean', description: 'Sin rótulo: el hijo se pinta tal cual (cuando el texto ya se ve).' },
+      { name: 'children', type: 'ReactNode', description: 'UN elemento: el control. El envoltorio no añade caja (display: contents).' },
+    ],
+  }],
+  keyboard: [['Tab', 'El foco de teclado lo muestra (un clic no lo deja pegado)'], ['Escape', 'Lo descarta sin mover el foco']],
+  a11y: ['WCAG 1.4.13: descartable con Escape, recorrible con el puntero y persistente mientras haya puntero o foco.', 'Decorativo por defecto: el nombre lo pone el control; describe para información adicional.', 'Sin animación con movimiento reducido.'],
 };

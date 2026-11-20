@@ -45,6 +45,14 @@ export const ICONS = {
   grip: ['M9 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M9 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M9 19a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M15 19a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'],
   /** Más acciones. */
   more: ['M6 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z', 'M18 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'],
+  // Destinos de navegación de una aplicación (riel lateral, cajón móvil).
+  home: ['M4 11l8-6.5 8 6.5', 'M6 9.5V19.5h12V9.5'],
+  academic: ['M12 5L3 9.5l9 4.5 9-4.5z', 'M7 11.5v4c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-4', 'M21 9.5v5'],
+  compass: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M15.5 8.5l-2 5-5 2 2-5z'],
+  chart: ['M4 20h16', 'M7 16.5v-5', 'M12 16.5V6', 'M17 16.5v-8'],
+  bell: ['M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z', 'M10 20.5a2 2 0 0 0 4 0'],
+  shield: ['M12 3.5l7 2.5v5.5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z', 'M9 12l2 2 4-4'],
+  user: ['M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M5 20c.8-3.5 3.6-5.5 7-5.5s6.2 2 7 5.5'],
   /**
    * Generar con IA: una chispa fluida, su burbuja y una partícula, en ese orden.
    * Son trazos separados para animarlos por separado (`data-nx-live` en

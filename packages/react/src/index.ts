@@ -29,6 +29,8 @@ export type { NexTabsProps, NexTabsListProps, NexTabProps, NexTabsPanelProps } f
 export { NexPanel } from './panel.tsx';
 export type { NexPanelProps } from './panel.tsx';
 export { NexNav, NexNavItem, NexNavGroup } from './nav.tsx';
+export { NexTooltip } from './tooltip.tsx';
+export type { NexTooltipProps } from './tooltip.tsx';
 export type { NexNavProps, NexNavItemProps } from './nav.tsx';
 export { NexSegmented } from './segmented.tsx';
 export type { NexSegmentedProps, NexSegmentedOption } from './segmented.tsx';

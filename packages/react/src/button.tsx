@@ -19,6 +19,11 @@ interface ButtonOwnProps {
   iconStart?: ReactNode;
   iconEnd?: ReactNode;
   fullWidth?: boolean;
+  /**
+   * `center` (por defecto) o `start`: el contenido se lee de izquierda a
+   * derecha y `iconEnd` va al extremo (filas de una barra lateral, listas).
+   */
+  contentAlign?: 'center' | 'start';
   children?: ReactNode;
 }
 
@@ -48,14 +53,14 @@ export const NexButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, NexBu
   const defaults = useNex();
   const {
     appearance = 'default', tone = 'neutral', density = defaults.density, motion = defaults.motion,
-    loading = false, loadingLabel = 'Cargando', iconStart, iconEnd, fullWidth, children, className, ...rest
+    loading = false, loadingLabel = 'Cargando', iconStart, iconEnd, fullWidth, contentAlign = 'center', children, className, ...rest
   } = props;
   const content = (
     <>
       <span className="nx-button__label">
         {iconStart}
         {children}
-        {iconEnd}
+        {iconEnd && contentAlign === 'start' ? <span className="nx-button__end">{iconEnd}</span> : iconEnd}
       </span>
       {loading && (
         <>
@@ -76,6 +81,7 @@ export const NexButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, NexBu
     'data-nx-density': density,
     'data-nx-loading': loading ? '' : undefined,
     'data-nx-full-width': fullWidth ? '' : undefined,
+    'data-nx-align': contentAlign === 'start' ? 'start' : undefined,
     'data-nx-icon-only': !children && (iconStart || iconEnd) ? '' : undefined,
     'aria-busy': loading || undefined,
   };

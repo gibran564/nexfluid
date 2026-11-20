@@ -102,6 +102,7 @@ export const buttonDoc: ComponentDoc = {
         { name: 'iconStart / iconEnd', type: 'ReactNode', description: 'Iconos decorativos (NexIcon).' },
         { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Ocupa el ancho del contenedor.' },
         { name: 'href', type: 'string', description: 'Pinta un <a>. Con disabled pierde el href y anuncia aria-disabled.' },
+        { name: 'contentAlign', type: "'center' | 'start'", default: "'center'", description: 'start: contenido de izquierda a derecha e iconEnd al extremo (filas de una barra lateral). Desde 0.9.0.' },
         { name: 'linkAs', type: 'ElementType', description: 'Con href, el enlace del enrutador (Link de Next.js, de React Router) para navegar sin recargar; como `as` en NexNav.Item. Inerte, vuelve a <a>. Desde 0.8.0.' },
         { name: '…props', type: 'ButtonHTMLAttributes | AnchorHTMLAttributes', description: 'Se reenvían (onClick, type, aria-*, ref).' },
       ],
