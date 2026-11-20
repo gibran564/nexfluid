@@ -29,17 +29,19 @@ export interface NexNavProps extends HTMLAttributes<HTMLElement> {
   landmark?: boolean;
   /** Lado del rótulo en el riel compacto. Por defecto, `right`. */
   tooltipSide?: 'right' | 'left';
+  /** Distancia del rótulo al destino (px): para que salga del riel si éste tiene margen. Por defecto 8. */
+  tooltipGap?: number;
   children?: ReactNode;
 }
 
-interface NavContextValue { compact: boolean; tooltipSide: 'right' | 'left' }
-const NavContext = createContext<NavContextValue>({ compact: false, tooltipSide: 'right' });
+interface NavContextValue { compact: boolean; tooltipSide: 'right' | 'left'; tooltipGap: number }
+const NavContext = createContext<NavContextValue>({ compact: false, tooltipSide: 'right', tooltipGap: 8 });
 
 /**
  * Navegación vertical con la gota líquida bajo el elemento actual
  * (`aria-current`). La gota se inclina hacia el elemento bajo el puntero.
  */
-function NavRoot({ motion, compact = false, density, landmark = true, tooltipSide = 'right', className, children, ...rest }: NexNavProps) {
+function NavRoot({ motion, compact = false, density, landmark = true, tooltipSide = 'right', tooltipGap = 8, className, children, ...rest }: NexNavProps) {
   const defaults = useNex();
   const host = useRef<HTMLElement>(null);
   const origin = useRef<LiquidOrigin>('program');
@@ -71,7 +73,7 @@ function NavRoot({ motion, compact = false, density, landmark = true, tooltipSid
       onPointerLeave={() => liquid.lean(null)}
     >
       <LiquidDrop svgRef={liquid.svg} pathRef={liquid.path} />
-      <NavContext.Provider value={{ compact, tooltipSide }}>
+      <NavContext.Provider value={{ compact, tooltipSide, tooltipGap }}>
         <ul className="nx-nav__list">{children}</ul>
       </NavContext.Provider>
     </Tag>
@@ -95,7 +97,7 @@ export interface NexNavItemProps extends Omit<HTMLAttributes<HTMLElement>, 'chil
 
 export function NexNavItem({ href, current, icon, trailing, level = 0, as, expanded, className, children, style, ...rest }: NexNavItemProps) {
   const Tag: ElementType = as ?? (href ? 'a' : 'button');
-  const { compact, tooltipSide } = useContext(NavContext);
+  const { compact, tooltipSide, tooltipGap } = useContext(NavContext);
   // Compacto: el texto sigue ahí (nombre accesible) pero oculto; el rótulo lo repite al ver.
   const item = (
       <Tag
@@ -115,7 +117,7 @@ export function NexNavItem({ href, current, icon, trailing, level = 0, as, expan
   );
   return (
     <li>
-      {compact ? <NexTooltip label={children} side={tooltipSide} align="center">{item}</NexTooltip> : item}
+      {compact ? <NexTooltip label={children} side={tooltipSide} align="center" gap={tooltipGap}>{item}</NexTooltip> : item}
     </li>
   );
 }

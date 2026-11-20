@@ -27,6 +27,8 @@ export interface NexTooltipProps {
   /** Lado preferido; se da la vuelta si no cabe. Por defecto `top`. */
   side?: NexSide;
   align?: NexAlign;
+  /** Distancia al control en px. Por defecto 8; más si el control está dentro de un riel con margen. */
+  gap?: number;
   /** El rótulo describe (aria-describedby) en vez de repetir el nombre. */
   describe?: boolean;
   /** Sin rótulo (p. ej. cuando el texto ya se ve): el hijo se pinta tal cual. */
@@ -35,7 +37,7 @@ export interface NexTooltipProps {
   children: ReactNode;
 }
 
-export function NexTooltip({ label, side = 'top', align = 'center', describe = false, disabled = false, className, children }: NexTooltipProps) {
+export function NexTooltip({ label, side = 'top', align = 'center', gap = 8, describe = false, disabled = false, className, children }: NexTooltipProps) {
   const id = `nx-tip-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const wrap = useRef<HTMLSpanElement>(null);
   const tip = useRef<HTMLSpanElement>(null);
@@ -43,7 +45,7 @@ export function NexTooltip({ label, side = 'top', align = 'center', describe = f
   const anchor = () => (wrap.current?.firstElementChild as HTMLElement | null) ?? null;
   const shown = open && !disabled;
 
-  useAnchoredLayer(shown, tip, anchor, { side, align, gap: 8, flip: true, shift: true });
+  useAnchoredLayer(shown, tip, anchor, { side, align, gap, flip: true, shift: true });
 
   // Descripción real: se une al control mientras exista el rótulo.
   useEffect(() => {
