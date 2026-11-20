@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NexCheckbox, NexIcon, NexInput, NexSelect, type NexSelectOption } from '@nexfluid/react';
+import { NexButton, NexCheckbox, NexIcon, NexInput, NexSelect, NexTextarea, type NexSelectOption } from '@nexfluid/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 
@@ -216,4 +216,57 @@ export const checkboxDoc: ComponentDoc = {
   }],
   keyboard: [['Espacio', 'Marcar / desmarcar'], ['Tab', 'Siguiente control']],
   a11y: ['Es un <input type="checkbox"> nativo con apariencia propia: rol, estado y teclado son los del navegador.', 'indeterminate se aplica como propiedad del DOM: se anuncia como mixto.', 'La marca se dibuja con un trazo; con movimiento reducido aparece sin animación.'],
+};
+
+/* ---- NexTextarea --------------------------------------------------------------- */
+
+function TextareaPreview({ density, footer }: { density: string; footer: boolean }) {
+  const [text, setText] = useState('');
+  const [sent, setSent] = useState<string[]>([]);
+  const max = 500;
+  return (
+    <div className="doc-forms">
+      <NexTextarea
+        label="Comentario" hideLabel placeholder="Escribe una respuesta…" value={text} onChange={(e) => setText(e.target.value)}
+        maxLength={max} minRows={2} maxRows={6} density={density as never}
+        description={`${text.length} / ${max}`}
+        footer={footer ? (
+          <>
+            <span style={{ flex: 1 }} />
+            <NexButton appearance="filled" disabled={!text.trim()} onClick={() => { setSent([text.trim(), ...sent]); setText(''); }}>Responder</NexButton>
+          </>
+        ) : undefined}
+      />
+      {sent.length > 0 && <ul className="doc-hint" style={{ margin: 0 }} aria-live="polite">{sent.map((t, i) => <li key={i}>{t}</li>)}</ul>}
+    </div>
+  );
+}
+
+export const textareaDoc: ComponentDoc = {
+  path: 'componentes/textarea',
+  name: 'NexTextarea',
+  eyebrow: 'Componentes · Formularios',
+  summary: 'Texto de varias líneas con la membrana, la etiqueta, la ayuda y el error de NexInput. Crece con lo escrito entre minRows y maxRows y admite una fila de acciones dentro de la misma membrana: compositores, respuestas, notas.',
+  status: 'piloto',
+  wide: true,
+  imports: [{ names: ['NexTextarea'], from: '@nexfluid/react' }],
+  origin: <>el compositor y los comentarios del muro de Nextudio</>,
+  controls: [
+    { kind: 'select', name: 'density', label: 'Densidad', options: ['compact', 'comfortable', 'spacious'], initial: 'comfortable' },
+    { kind: 'boolean', name: 'footer', label: 'Pie con acciones', initial: true },
+  ],
+  render: (v) => <TextareaPreview density={String(v.density)} footer={Boolean(v.footer)} />,
+  code: (v) => jsx('NexTextarea', { label: 'Comentario', hideLabel: true, value: { code: 'text' }, onChange: { code: '(e) => setText(e.target.value)' }, minRows: 2, maxRows: 6, density: v.density as string, footer: v.footer ? { code: '<NexButton appearance="filled">Responder</NexButton>' } : undefined }, undefined, { density: 'comfortable' }),
+  api: [{
+    component: 'NexTextarea',
+    rows: [
+      { name: 'label · hideLabel', type: 'ReactNode · boolean', description: 'Etiqueta obligatoria; puede ocultarse visualmente.' },
+      { name: 'description · error', type: 'ReactNode', description: 'Unidos con aria-describedby; error activa aria-invalid.' },
+      { name: 'minRows · maxRows', type: 'number', default: '3 · 12', description: 'Crece sin saltos (se mide antes de pintar); pasado el tope, desplaza. Infinity: sin tope.' },
+      { name: 'footer', type: 'ReactNode', description: 'Fila dentro de la membrana, bajo el texto: contadores, adjuntos, enviar.' },
+      { name: '…props', type: 'TextareaHTMLAttributes', description: 'Se reenvían al <textarea> (ref incluida).' },
+    ],
+  }],
+  keyboard: [['Tab', 'Entrar y salir del campo (no inserta tabulador)'], ['(nativo)', 'Edición, corrector y dictado del sistema']],
+  a11y: ['Etiqueta real (<label for>), obligatoria.', 'El foco tiñe toda la membrana, incluido el pie.', 'En pantallas táctiles el texto nunca baja de 16 px (iOS no amplía la página).'],
 };

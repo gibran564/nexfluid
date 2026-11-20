@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NexMenu, type NexMenuItem } from '@nexfluid/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
@@ -9,6 +10,17 @@ const MENU_ITEMS: NexMenuItem[] = [
   { id: 'wide', label: 'Salida amplia', group: 'Vista', checked: true, onSelect: () => {} },
   { id: 'del', label: 'Eliminar', tone: 'danger', onSelect: () => {} },
 ];
+
+const SORT_ITEMS = (sort: string, set: (v: string) => void): NexMenuItem[] => [
+  { id: 'recent', label: 'Más recientes', description: 'Lo último publicado arriba', checked: sort === 'recent', onSelect: () => set('recent') },
+  { id: 'due', label: 'Por entrega', description: 'Las tareas que vencen antes, primero', checked: sort === 'due', onSelect: () => set('due') },
+  { id: 'author', label: 'Por autor', checked: sort === 'author', onSelect: () => set('author') },
+];
+
+function SingleSelectionMenu() {
+  const [sort, setSort] = useState('recent');
+  return <NexMenu label={`Orden: ${SORT_ITEMS(sort, setSort).find((i) => i.checked)!.label}`} selection="single" items={SORT_ITEMS(sort, setSort)} appearance="outlined">Orden</NexMenu>;
+}
 
 export const menuDoc: ComponentDoc = {
   path: 'componentes/menu',
@@ -22,8 +34,9 @@ export const menuDoc: ComponentDoc = {
     { kind: 'select', name: 'align', label: 'Alineación', options: ['start', 'end'], initial: 'start' },
     { kind: 'select', name: 'placement', label: 'Lado', options: ['bottom', 'top'], initial: 'bottom' },
     { kind: 'boolean', name: 'text', label: 'Con texto', initial: false },
+    { kind: 'boolean', name: 'single', label: 'Selección única', initial: false },
   ],
-  render: (v) => (
+  render: (v) => v.single ? <SingleSelectionMenu /> : (
     <NexMenu label="Acciones" items={MENU_ITEMS} align={v.align as never} placement={v.placement as never}>
       {v.text ? 'Acciones' : undefined}
     </NexMenu>
@@ -37,6 +50,7 @@ export const menuDoc: ComponentDoc = {
         { name: 'label', type: 'string', description: 'Nombre accesible del disparador y del menú. Si hay texto visible, debe contenerlo.' },
         { name: 'children · icon', type: 'ReactNode', description: 'Texto visible e icono del disparador (por defecto, `more`).' },
         { name: 'align · placement', type: "'start' | 'end' · 'bottom' | 'top'", description: 'Alineación y lado preferido; se da la vuelta si no cabe.' },
+        { name: 'selection', type: "'multiple' | 'single'", default: "'multiple'", description: '`multiple`: `checked` es un interruptor (menuitemcheckbox). `single`: una opción elegida (menuitemradio), el icono se conserva y la marca va al final. Desde 0.8.0.' },
         { name: 'open · defaultOpen · onOpenChange', type: '…', description: 'Control opcional de la apertura.' },
       ],
     },
@@ -44,7 +58,8 @@ export const menuDoc: ComponentDoc = {
       component: 'NexMenuItem',
       rows: [
         { name: 'id · label · onSelect', type: '…', description: '`onSelect` corre DESPUÉS de cerrar y devolver el foco.' },
-        { name: 'hint · icon · group · checked · tone · disabled', type: '…', description: 'Pista, icono, grupo, interruptor (`menuitemcheckbox`), peligro y deshabilitada.' },
+        { name: 'hint · icon · group · checked · tone · disabled', type: '…', description: 'Pista, icono, grupo, interruptor u opción (según `selection`), peligro y deshabilitada.' },
+        { name: 'description', type: 'ReactNode', description: 'Segunda línea bajo la etiqueta, unida con aria-describedby. Desde 0.8.0.' },
       ],
     },
     {

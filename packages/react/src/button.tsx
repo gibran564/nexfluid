@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
+import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ElementType, type ReactNode, type Ref } from 'react';
 import type { Material } from '@nexfluid/foundation';
 import { cx, type NexAppearance, type NexDensity, type NexMotion } from '@nexfluid/components';
 import { useNex } from './provider.tsx';
@@ -25,7 +25,16 @@ interface ButtonOwnProps {
 export type NexButtonProps = ButtonOwnProps &
   (
     | (Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & { href?: undefined })
-    | (Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'children'> & { href: string; disabled?: boolean })
+    | (Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'children'> & {
+        href: string;
+        disabled?: boolean;
+        /**
+         * Componente de enlace del enrutador (`Link` de Next.js, de React Router…)
+         * para navegar sin recargar. Recibe `href`, `className`, `ref`, los
+         * manejadores y los `aria-*`/`data-*`. Por defecto, `<a>`.
+         */
+        linkAs?: ElementType;
+      })
   );
 
 const MATERIAL: Record<NexAppearance, Material> = { default: 'raised', filled: 'solid', outlined: 'clear', ghost: 'clear', editorial: 'ink' };
@@ -72,13 +81,14 @@ export const NexButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, NexBu
   };
 
   if (rest.href !== undefined) {
-    const { disabled: linkDisabled, ...anchor } = rest as AnchorHTMLAttributes<HTMLAnchorElement> & { disabled?: boolean };
+    const { disabled: linkDisabled, linkAs, ...anchor } = rest as AnchorHTMLAttributes<HTMLAnchorElement> & { disabled?: boolean; linkAs?: ElementType };
     const inert = linkDisabled || loading;
     return (
       <NexSurface
         {...(anchor as object)}
         {...common}
-        as="a"
+        // Un enlace inerte no tiene destino: siempre <a> (sin href), nunca el del enrutador.
+        as={inert || !linkAs ? 'a' : linkAs}
         interactive={!inert}
         activatable={!inert}
         ref={ref as Ref<HTMLElement>}

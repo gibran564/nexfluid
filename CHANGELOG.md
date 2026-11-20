@@ -2,6 +2,17 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
+## 0.8.0 — preparada el 2026-11-19 (sin publicar)
+
+Primitivas para contenido creado por personas: identidad, texto largo y menús de elección. Compatible hacia atrás con 0.7.0: sólo añade exportaciones y props opcionales; ningún componente existente cambia por defecto. Origen: NexFeed 2.0 (muro social de Nextudio), donde se auditó qué faltaba en la biblioteca antes de reimplementarlo en la aplicación (`docs/NEXFEED.md` en Nextudio).
+
+- **`NexAvatar`** (nuevo). Imagen o, si falta o no carga (también antes de hidratar), hasta dos iniciales por grafemas sobre un tono estable que sale del nombre (FNV-1a: mismo nombre, mismo tono en servidor y cliente). El tono es una de cuatro parejas de tokens de foundation (`accent`, `success`, `warning`, `neutral`): ningún color nuevo. `shape="circle"` (personas, cápsula) o `"membrane"` (espacios: cursos, equipos; superelipse de la dirección). Decorativo por defecto (`aria-hidden`); `decorative={false}` lo anuncia como `role="img"` con el nombre. Se exportan `avatarInitials` y `avatarTone`. Sustituye a `UserAvatar` de Nextudio, que no recuperaba una imagen rota.
+- **`NexTextarea`** (nuevo). `<textarea>` nativo con la membrana, la etiqueta, la ayuda y el error de `NexInput` (`aria-describedby`, `aria-invalid`). Crece con lo escrito entre `minRows` (3) y `maxRows` (12; `Infinity` sin tope), medido antes de pintar y también cuando el valor cambia desde fuera. `footer`: una fila de acciones dentro de la misma membrana (contadores, adjuntos, enviar). En pantallas táctiles el texto no baja de 16 px. Nextudio tenía 42 `<textarea>` propios.
+- **`NexMenu` · `selection="single"`.** Con `checked`, cada acción es una opción excluyente (`menuitemradio`) en vez de un interruptor (`menuitemcheckbox`): el icono se conserva (p. ej. el de una reacción) y la marca va al final. `selection` vale `multiple` por defecto: los menús existentes no cambian.
+- **`NexMenuItem.description`.** Segunda línea bajo la etiqueta («Una instrucción para IA, reutilizable»), unida con `aria-describedby`. La rejilla de la acción admite ahora icono, texto, pista y marca sin columnas fijas.
+- **`NexButton` · `linkAs`.** Con `href`, el componente de enlace del enrutador (`Link` de Next.js, de React Router…) para navegar en el cliente sin perder la membrana, la física ni los atributos. Un enlace inerte (`disabled`, `loading`) sigue siendo `<a>` sin destino. Antes, un `NexButton` con `href` siempre recargaba la página: en Nextudio rompía las rutas interceptadas (el permalink de una publicación como diálogo).
+- NexDocs: páginas de `NexAvatar` y `NexTextarea`; `NexMenu` gana el control «Selección única» y las filas de API nuevas.
+
 ## 0.7.0 — preparada el 2026-11-16 (sin publicar)
 
 Primera versión publicable después de 0.5.0: **0.6.0 nunca se publicó** y todo su contenido (sección siguiente) llega con 0.7.0. Compatible hacia atrás con 0.5.0 en API: sólo añade exportaciones y props opcionales; los cambios visibles por defecto de 0.6.0 siguen anotados abajo.
