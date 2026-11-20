@@ -3,7 +3,8 @@ import { createRoot, hydrateRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { NexAvatar, NexMenu, NexTextarea, avatarInitials, avatarTone, type NexMenuItem } from '@nexfluid/react';
+import { forwardRef, type AnchorHTMLAttributes } from 'react';
+import { NexAvatar, NexButton, NexMenu, NexTextarea, avatarInitials, avatarTone, type NexMenuItem } from '@nexfluid/react';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -167,5 +168,31 @@ describe('NexMenu · selection y description', () => {
     expect(document.getElementById(described)!.textContent).toBe('Una instrucción para IA, reutilizable');
     expect(page!.hasAttribute('aria-describedby')).toBe(false);
     expect(await violations()).toEqual([]);
+  });
+});
+
+describe('NexButton · linkAs', () => {
+  // Un enlace de enrutador mínimo: navega sin recargar y deja una marca.
+  const RouterLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(function RouterLink({ onClick, ...props }, ref) {
+    return <a {...props} ref={ref} data-router="" onClick={(e) => { onClick?.(e); e.preventDefault(); (window as { routed?: string }).routed = props.href; }} />;
+  });
+
+  it('usa el componente del enrutador con la membrana y los atributos de NexButton', () => {
+    act(() => root.render(<NexButton href="/muro/1" linkAs={RouterLink} appearance="ghost" aria-label="Abrir">Abrir</NexButton>));
+    const link = $<HTMLAnchorElement>('a');
+    expect(link.dataset.router).toBe('');
+    expect(link.classList.contains('nx-button')).toBe(true);
+    expect(link.getAttribute('href')).toBe('/muro/1');
+    expect(link.dataset.nxAppearance).toBe('ghost');
+    act(() => link.click());
+    expect((window as { routed?: string }).routed).toBe('/muro/1');
+  });
+
+  it('inerte (disabled) vuelve a <a> sin destino', () => {
+    act(() => root.render(<NexButton href="/muro/1" linkAs={RouterLink} disabled>Abrir</NexButton>));
+    const link = $<HTMLAnchorElement>('a');
+    expect(link.dataset.router).toBeUndefined();
+    expect(link.hasAttribute('href')).toBe(false);
+    expect(link.getAttribute('aria-disabled')).toBe('true');
   });
 });
