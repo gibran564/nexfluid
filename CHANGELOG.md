@@ -2,6 +2,17 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
+## 0.9.0 — preparada el 2026-11-20 (sin publicar)
+
+Navegación de aplicación: el riel lateral compacto, sus rótulos y los iconos de destino. Compatible hacia atrás con 0.8.0: sólo añade exportaciones y props opcionales; `NexNav` sin las props nuevas se pinta igual. Origen: la barra lateral de Nextudio (`AppSidebar`), que mantenía su propio sistema de iconos, rótulos y estados y ocultaba los iconos al expandirse.
+
+- **`NexNav` · `compact`.** Riel de iconos: la etiqueta de cada destino sigue siendo su nombre accesible (texto oculto) y aparece como rótulo (`NexTooltip`) con el puntero o el foco de teclado. El icono es el mismo en los dos estados; los títulos de `NexNav.Group` siguen nombrando su sublista aunque no se vean, y los grupos se separan con un filete. `tooltipSide` elige el lado (`right` por defecto). Lo que acompaña a un destino (`trailing`, p. ej. un contador) queda superpuesto al icono.
+- **`NexNav` · `density`.** `compact` 32 px, `comfortable` 36 px (por defecto), `spacious` 44 px; siempre 44 px con puntero grueso.
+- **`NexNav` · `landmark={false}`.** Un grupo con nombre (`role="group"`) en vez de un `<nav>`: una barra lateral compone varias listas dentro de UNA navegación sin anidar landmarks.
+- **`NexTooltip`** (nuevo). Rótulo de un control sin texto visible. No añade caja (`display: contents`), aparece con el puntero o con el foco de TECLADO (`:focus-visible`), sube a la capa superior con el posicionamiento de las capas ancladas (ningún contenedor con `overflow` lo recorta) y cumple WCAG 1.4.13: Escape lo descarta, se puede recorrer con el puntero y dura mientras haya puntero o foco. Decorativo por defecto (`aria-hidden`, repite el nombre del control); con `describe` se une con `aria-describedby`. Sin animación con movimiento reducido.
+- **Iconos** `home`, `academic`, `compass`, `chart`, `bell`, `shield` y `user`, en la retícula de 24 px (trazo 1.5, extremos redondos).
+- NexDocs: página de `NexTooltip`; `NexNav` gana el control «Riel compacto» y las filas de API nuevas.
+
 ## 0.8.0 — preparada el 2026-11-19 (sin publicar)
 
 Primitivas para contenido creado por personas: identidad, texto largo y menús de elección. Compatible hacia atrás con 0.7.0: sólo añade exportaciones y props opcionales; ningún componente existente cambia por defecto. Origen: NexFeed 2.0 (muro social de Nextudio), donde se auditó qué faltaba en la biblioteca antes de reimplementarlo en la aplicación (`docs/NEXFEED.md` en Nextudio).
