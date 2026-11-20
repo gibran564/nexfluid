@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { ComponentPage, type ComponentDoc } from './docs/component-page.tsx';
 import { buttonDoc } from './pages/docs-actions.tsx';
-import { badgeDoc, cardDoc } from './pages/docs-surfaces.tsx';
+import { avatarDoc, badgeDoc, cardDoc } from './pages/docs-surfaces.tsx';
 import { frameDoc, tabsDoc } from './pages/docs-navigation-layout.tsx';
 import { codeBlockDoc, fluidBlobDoc, markdownDoc, markdownWidgetDoc, propertiesWidgetDoc } from './pages/docs-content.tsx';
 import { explorerDoc, inspectorDoc, navDoc, panelDoc, previewDoc, segmentedDoc, surfaceDoc } from './pages/docs-new.tsx';
@@ -16,7 +16,7 @@ import { CompositionLabPage } from './pages/composition-lab.tsx';
 import { QualityPage } from './pages/quality.tsx';
 import { scrollDoc } from './pages/docs-scroll.tsx';
 import { sheetsDoc } from './pages/docs-sheets.tsx';
-import { checkboxDoc, inputDoc, selectDoc } from './pages/docs-forms.tsx';
+import { checkboxDoc, inputDoc, selectDoc, textareaDoc } from './pages/docs-forms.tsx';
 import { flowDoc, menuDoc } from './pages/docs-editorial.tsx';
 import { consoleDoc, dataViewDoc, markdownFieldDoc } from './pages/docs-console.tsx';
 import { inkDoc, anchoredLayerDoc } from './pages/docs-layer-ink.tsx';
@@ -32,7 +32,7 @@ export interface PageDef {
 }
 
 export const COMPONENT_DOCS: readonly ComponentDoc[] = [
-  surfaceDoc, buttonDoc, menuDoc, anchoredLayerDoc, segmentedDoc, inputDoc, selectDoc, checkboxDoc, badgeDoc, cardDoc, panelDoc, tabsDoc, navDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
+  surfaceDoc, buttonDoc, menuDoc, anchoredLayerDoc, segmentedDoc, inputDoc, textareaDoc, selectDoc, checkboxDoc, badgeDoc, avatarDoc, cardDoc, panelDoc, tabsDoc, navDoc, scrollDoc, codeBlockDoc, markdownDoc, frameDoc,
   flowDoc, inkDoc, portalDoc, consoleDoc, markdownFieldDoc, dataViewDoc, markdownWidgetDoc, propertiesWidgetDoc, inspectorDoc, explorerDoc, previewDoc, sheetsDoc, fluidBlobDoc,
 ];
 
@@ -68,9 +68,11 @@ export const PAGES: readonly PageDef[] = [
   component(anchoredLayerDoc, 'Componentes', 'Capas', 'popover capa flotante contextual ancla posicionamiento flip colision dialogo modal'),
   component(segmentedDoc, 'Componentes', 'Acciones', 'selector radio segmentos'),
   component(inputDoc, 'Componentes', 'Formularios', 'campo texto input entrada'),
+  component(textareaDoc, 'Componentes', 'Formularios', 'textarea texto largo comentario compositor varias lineas'),
   component(selectDoc, 'Componentes', 'Formularios', 'select lista desplegable lenguaje combobox'),
   component(checkboxDoc, 'Componentes', 'Formularios', 'casilla checkbox marcar tareas'),
   component(badgeDoc, 'Componentes', 'Superficies', 'insignia etiqueta estado'),
+  component(avatarDoc, 'Componentes', 'Superficies', 'avatar persona usuario iniciales identidad perfil'),
   component(cardDoc, 'Componentes', 'Superficies', 'tarjeta expandir panel'),
   component(panelDoc, 'Componentes', 'Superficies', 'panel plegable'),
   component(tabsDoc, 'Componentes', 'Navegación', 'pestañas tablist gota'),

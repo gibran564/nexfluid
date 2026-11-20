@@ -1,4 +1,4 @@
-import { NexBadge, NexButton, NexCard, NexIcon } from '@nexfluid/react';
+import { NexBadge, NexButton, NexCard, NexIcon, NexAvatar } from '@nexfluid/react';
 import type { ComponentDoc } from '../docs/component-page.tsx';
 import { jsx } from '../docs/kit.tsx';
 import { example } from '../examples/index.ts';
@@ -155,5 +155,58 @@ export const cardDoc: ComponentDoc = {
     'El foco del enlace se dibuja alrededor de la tarjeta entera.',
     'La membrana SVG y la zona cromática son aria-hidden; selected debe acompañarse de aria-current o texto.',
     'Ampliar abre un diálogo modal con nombre; Escape lo cierra y devuelve el foco al botón.',
+  ],
+};
+
+/* ---- NexAvatar ----------------------------------------------------------------- */
+
+const PEOPLE = ['María José de la Cruz', 'Beto Ramírez', 'Ana López', '王秀英', 'Jo'];
+
+export const avatarDoc: ComponentDoc = {
+  path: 'componentes/avatar',
+  name: 'NexAvatar',
+  eyebrow: 'Componentes · Superficies',
+  summary: 'La identidad de una persona o de un espacio: imagen si la hay y, si falta o no carga, iniciales sobre un tono estable que sale del nombre. Sólo usa parejas de tokens con contraste verificado.',
+  status: 'piloto',
+  imports: [{ names: ['NexAvatar'], from: '@nexfluid/react' }],
+  origin: <><code>UserAvatar</code> de Nextudio (muro, comentarios, compositor)</>,
+  controls: [
+    { kind: 'text', name: 'name', label: 'Nombre', initial: 'María José de la Cruz' },
+    { kind: 'select', name: 'size', label: 'Tamaño', options: ['small', 'medium', 'large'], initial: 'large' },
+    { kind: 'select', name: 'shape', label: 'Forma', options: ['circle', 'membrane'], initial: 'circle' },
+    { kind: 'boolean', name: 'broken', label: 'Imagen que no carga', initial: false },
+  ],
+  render: (v) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <NexAvatar name={String(v.name)} size={v.size as never} shape={v.shape as never} src={v.broken ? 'data:image/png;base64,AAAA' : null} />
+      <span>{String(v.name)}</span>
+    </div>
+  ),
+  code: (v) => jsx('NexAvatar', { name: String(v.name), size: v.size as string, shape: v.shape as string, src: { code: 'user.avatarUrl' } }, undefined, { size: 'medium', shape: 'circle' }),
+  variants: () => (
+    <div className="doc-matrix">
+      {(['circle', 'membrane'] as const).map((shape) => (
+        <div key={shape} className="doc-matrix-row">
+          <code>{shape}</code>
+          {PEOPLE.map((name) => <NexAvatar key={name} name={name} shape={shape} decorative={false} />)}
+        </div>
+      ))}
+    </div>
+  ),
+  api: [{
+    component: 'NexAvatar',
+    rows: [
+      { name: 'name', type: 'string', description: 'Iniciales (hasta dos, por grafemas), tono estable y nombre accesible.' },
+      { name: 'src', type: 'string | null', description: 'Imagen. Si falta o falla al cargar (también antes de hidratar), iniciales.' },
+      { name: 'size', type: "'small' | 'medium' | 'large' | number", default: "'medium'", description: '28 · 36 · 48 px, o un tamaño en px.' },
+      { name: 'shape', type: "'circle' | 'membrane'", default: "'circle'", description: 'Personas en cápsula; espacios (cursos, equipos) en la superelipse de la dirección.' },
+      { name: 'decorative', type: 'boolean', default: 'true', description: 'Oculto al lector cuando el nombre está escrito al lado; con false, role="img" y aria-label.' },
+      { name: 'avatarInitials · avatarTone', type: '(name) => string', description: 'Las mismas reglas, exportadas para quien pinte su propia identidad.' },
+    ],
+  }],
+  a11y: [
+    'Decorativo por defecto: el nombre casi siempre está escrito al lado y repetirlo sólo añade ruido.',
+    'El tono nunca transmite información: es una ayuda para reconocer, no un estado.',
+    'Con prefers-contrast: more el borde toma el color de la tinta.',
   ],
 };
