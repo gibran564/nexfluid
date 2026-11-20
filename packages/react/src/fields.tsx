@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Campos de formulario: NexInput y NexCheckbox.
+ * Campos de formulario: NexInput, NexTextarea y NexCheckbox.
  *
  * Son los controles nativos del navegador (`<input>`) con su etiqueta, su
  * descripción y su error cableados (`aria-describedby`, `aria-invalid`): el
@@ -9,7 +9,7 @@
  * de siempre. La identidad está en la membrana: el foco tiñe el campo desde
  * dentro y la casilla dibuja su marca con un trazo.
  */
-import { forwardRef, useEffect, useId, useImperativeHandle, useRef, type InputHTMLAttributes, type ReactNode } from 'react';
+import { forwardRef, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react';
 import { cx, type NexDensity } from '@nexfluid/components';
 import { useNex } from './provider.tsx';
 
@@ -55,6 +55,85 @@ export const NexInput = forwardRef<HTMLInputElement, NexInputProps>(function Nex
           aria-describedby={describedBy}
         />
         {trailing && <span className="nx-input__adorn" data-side="trailing">{trailing}</span>}
+      </div>
+      {description && <p id={`${id}-description`} className="nx-field__description">{description}</p>}
+      {error && <p id={`${id}-error`} className="nx-field__error">{error}</p>}
+    </div>
+  );
+});
+
+export interface NexTextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'rows'> {
+  /** Etiqueta visible (obligatoria: el nombre accesible no es opcional). */
+  label: ReactNode;
+  description?: ReactNode;
+  error?: ReactNode;
+  /** Etiqueta visualmente oculta (sigue siendo el nombre accesible). */
+  hideLabel?: boolean;
+  density?: NexDensity;
+  /** Altura mínima en líneas. Por defecto 3. */
+  minRows?: number;
+  /** Crece con el texto hasta `maxRows` líneas y después desplaza. Por defecto 12; `Infinity` sin tope. */
+  maxRows?: number;
+  /** Fila dentro de la misma membrana, bajo el texto: contadores, adjuntos, enviar. */
+  footer?: ReactNode;
+}
+
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+/**
+ * Texto de varias líneas: un `<textarea>` nativo con la misma membrana,
+ * etiqueta, ayuda y error que NexInput. Crece con lo escrito entre `minRows` y
+ * `maxRows` (sin saltos: se mide antes de pintar) y admite una fila de
+ * acciones dentro de la membrana (`footer`), para compositores y respuestas.
+ */
+export const NexTextarea = forwardRef<HTMLTextAreaElement, NexTextareaProps>(function NexTextarea(
+  { label, description, error, hideLabel, density, minRows = 3, maxRows = 12, footer, className, id: idProp, required, disabled, style, ...rest },
+  ref,
+) {
+  const defaults = useNex();
+  const auto = useId();
+  const id = idProp ?? `nx-textarea-${auto.replace(/:/g, '')}`;
+  const area = useRef<HTMLTextAreaElement>(null);
+  useImperativeHandle(ref, () => area.current!);
+  const describedBy = [description ? `${id}-description` : null, error ? `${id}-error` : null, rest['aria-describedby']].filter(Boolean).join(' ') || undefined;
+  const min = Math.max(1, minRows);
+  const max = Math.max(min, maxRows);
+
+  // Ajuste a su contenido: la altura se recalcula al escribir y cuando cambia
+  // el valor desde fuera (borrar tras enviar). Se lee la altura de línea real.
+  const fit = () => {
+    const el = area.current;
+    if (!el) return;
+    const cs = getComputedStyle(el);
+    const line = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.5 || 24;
+    const pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    el.style.height = 'auto';
+    const wanted = Math.min(Math.max(el.scrollHeight, line * min + pad), Number.isFinite(max) ? line * max + pad : Infinity);
+    el.style.height = `${Math.ceil(wanted)}px`;
+    el.style.overflowY = el.scrollHeight > wanted + 1 ? 'auto' : 'hidden';
+  };
+  useIsoLayoutEffect(fit, [rest.value, min, max]);
+
+  return (
+    <div className={cx('nx-field', className)} data-nx-density={density ?? defaults.density} data-invalid={error ? '' : undefined} data-disabled={disabled ? '' : undefined}>
+      <label htmlFor={id} className={cx('nx-field__label', hideLabel && 'nx-visually-hidden')}>
+        {label}{required && <span className="nx-field__required" aria-hidden="true"> *</span>}
+      </label>
+      <div className="nx-input" data-nx-multiline="">
+        <textarea
+          {...rest}
+          ref={area}
+          id={id}
+          rows={min}
+          className="nx-input__control"
+          style={style}
+          required={required}
+          disabled={disabled}
+          aria-invalid={error ? true : rest['aria-invalid']}
+          aria-describedby={describedBy}
+          onInput={(event) => { fit(); rest.onInput?.(event); }}
+        />
+        {footer && <div className="nx-input__footer">{footer}</div>}
       </div>
       {description && <p id={`${id}-description`} className="nx-field__description">{description}</p>}
       {error && <p id={`${id}-error`} className="nx-field__error">{error}</p>}

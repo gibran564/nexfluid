@@ -35,11 +35,13 @@ export interface NexMenuItem {
   label: string;
   /** Pista secundaria, en gris junto a la etiqueta («Markdown», «Ctrl+D»). */
   hint?: ReactNode;
+  /** Segunda línea bajo la etiqueta: para qué sirve la acción. Forma parte del nombre accesible. */
+  description?: ReactNode;
   icon?: ReactNode;
   /** Las acciones con el mismo grupo se agrupan bajo su título, en orden de aparición. */
   group?: string;
   disabled?: boolean;
-  /** Con valor, la acción es un interruptor (`menuitemcheckbox`). */
+  /** Con valor, la acción es un interruptor (`menuitemcheckbox`) o, con `selection="single"`, una opción (`menuitemradio`). */
   checked?: boolean;
   /** `danger` sólo cambia el color: la etiqueta debe decir la consecuencia. */
   tone?: 'neutral' | 'danger';
@@ -59,6 +61,13 @@ export interface NexMenuProps {
   align?: 'start' | 'end';
   /** Lado preferido; se da la vuelta si no cabe. */
   placement?: 'bottom' | 'top';
+  /**
+   * Qué significa `checked`. `multiple` (por defecto): interruptores
+   * independientes (`menuitemcheckbox`, la marca sustituye al icono).
+   * `single`: una sola opción elegida (`menuitemradio`); el icono se conserva
+   * y la marca va al final. Para elegir una reacción, un orden o una vista.
+   */
+  selection?: 'multiple' | 'single';
   disabled?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
@@ -71,7 +80,7 @@ export interface NexMenuProps {
 
 
 export function NexMenu({
-  items: source, label, children, icon, appearance = 'ghost', align = 'start', placement = 'bottom', disabled,
+  items: source, label, children, icon, appearance = 'ghost', align = 'start', placement = 'bottom', selection = 'multiple', disabled,
   open: controlled, defaultOpen = false, onOpenChange, density, motion, className, triggerClassName,
 }: NexMenuProps) {
   const defaults = useNex();
@@ -212,7 +221,7 @@ export function NexMenu({
               {group.entries.map(({ item, index }) => (
                 <div
                   key={item.id}
-                  role={item.checked === undefined ? 'menuitem' : 'menuitemcheckbox'}
+                  role={item.checked === undefined ? 'menuitem' : selection === 'single' ? 'menuitemradio' : 'menuitemcheckbox'}
                   aria-checked={item.checked}
                   aria-disabled={item.disabled || undefined}
                   tabIndex={index === active ? 0 : -1}
@@ -220,14 +229,20 @@ export function NexMenu({
                   data-nx-index={index}
                   data-nx-tone={item.tone === 'danger' ? 'danger' : undefined}
                   data-active={index === active ? '' : undefined}
+                  data-nx-described={item.description !== undefined ? '' : undefined}
+                  aria-describedby={item.description !== undefined ? `${base}-d${index}` : undefined}
                   onPointerMove={() => { if (!item.disabled && index !== active) setActive(index); }}
                   onClick={() => choose(index)}
                 >
                   <span className="nx-menu__icon" aria-hidden="true">
-                    {item.checked === undefined ? item.icon : item.checked ? <NexIcon name="check" /> : null}
+                    {item.checked === undefined || selection === 'single' ? item.icon : item.checked ? <NexIcon name="check" /> : null}
                   </span>
-                  <span className="nx-menu__label">{item.label}</span>
+                  <span className="nx-menu__text">
+                    <span className="nx-menu__label">{item.label}</span>
+                    {item.description !== undefined && <span id={`${base}-d${index}`} className="nx-menu__description">{item.description}</span>}
+                  </span>
                   {item.hint !== undefined && <span className="nx-menu__hint">{item.hint}</span>}
+                  {selection === 'single' && item.checked && <span className="nx-menu__check" aria-hidden="true"><NexIcon name="check" /></span>}
                 </div>
               ))}
             </div>

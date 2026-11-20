@@ -58,8 +58,10 @@ export {
 } from './scroll.tsx';
 export type { NexScrollAreaProps, NexScrollRootProps, NexScrollViewportProps, NexScrollController, NexScrollVariant, NexScrollSection } from './scroll.tsx';
 export type { ScrollState as NexScrollState } from '@nexfluid/core';
-export { NexInput, NexCheckbox } from './fields.tsx';
-export type { NexInputProps, NexCheckboxProps } from './fields.tsx';
+export { NexInput, NexTextarea, NexCheckbox } from './fields.tsx';
+export type { NexInputProps, NexTextareaProps, NexCheckboxProps } from './fields.tsx';
+export { NexAvatar, avatarInitials, avatarTone } from './avatar.tsx';
+export type { NexAvatarProps, NexAvatarSize } from './avatar.tsx';
 export { NexPortal } from './portal.tsx';
 export type { NexPortalProps, NexPortalMode, NexPortalStatus, NexPortalConsoleEntry, NexPortalHandle } from './portal.tsx';
 export type { SandboxResources } from '@nexfluid/components';
