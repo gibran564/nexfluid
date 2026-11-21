@@ -2,6 +2,16 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
+## Sin publicar
+
+### Corregido
+
+- `NexFrame`: el lienzo ya no aísla el apilamiento de su contenido
+  (`isolation: auto` en `.nx-frame__canvas`). Las capas `position: fixed` que
+  abre la aplicación desde el lienzo (visores, revisiones, modos de foco)
+  quedaban por debajo de la barra superior (`--nx-layer-frame`). Detectado al
+  adoptar `NexFrame` como shell autenticado de Nextudio.
+
 ## 0.9.0 — preparada el 2026-11-20 (sin publicar)
 
 Navegación de aplicación: el riel lateral compacto, sus rótulos y los iconos de destino. Compatible hacia atrás con 0.8.0: sólo añade exportaciones y props opcionales; `NexNav` sin las props nuevas se pinta igual. Origen: la barra lateral de Nextudio (`AppSidebar`), que mantenía su propio sistema de iconos, rótulos y estados y ocultaba los iconos al expandirse.

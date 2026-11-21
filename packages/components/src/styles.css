@@ -575,7 +575,14 @@
 .nx-frame__navigation { grid-area: nav; display: flex; flex-direction: column; --nx-fill: transparent; --nx-edge-color: transparent; --nx-glow: 0; }
 .nx-frame__top { grid-area: top; display: flex; flex-direction: column; overflow: visible; z-index: var(--nx-layer-frame); }
 .nx-frame__explorer { grid-area: explorer; }
-.nx-frame__canvas { grid-area: canvas; }
+/*
+ * El lienzo aloja el contenido de la aplicación, que puede abrir capas
+ * `position: fixed` propias (visores, revisiones, modos de foco). Como
+ * membrana aislaría su apilamiento (`isolation: isolate`), aunque no dibuja
+ * forma; aislado, esas capas quedarían por debajo de la barra superior
+ * (`--nx-layer-frame`). El lienzo no aísla: sus capas compiten en el marco.
+ */
+.nx-frame__canvas { grid-area: canvas; isolation: auto; }
 .nx-frame__canvas:focus { outline: none; }
 .nx-frame__canvas:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: -3px; }
 .nx-frame__inspector { grid-area: inspector; position: relative; overflow: visible; }
