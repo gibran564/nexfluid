@@ -206,6 +206,9 @@ export const LAYERS = { base: 0, raised: 10, frame: 30, overlay: 40, popover: 50
 export const LAYOUT = { measure: '64ch', columns: 12, gutter: '24px', page: '1240px' } as const;
 
 /** Densidad: alto de control y relleno. comfortable cumple el objetivo táctil de 44 px. */
+/** Objetivo táctil mínimo (px) con puntero grueso, en cualquier densidad (WCAG 2.5.5, Apple HIG). */
+export const TOUCH_TARGET = 44;
+
 export const DENSITY = {
   compact: { control: '34px', padX: '14px', gap: '8px', cardPad: '16px', font: '0.8125rem' },
   comfortable: { control: '44px', padX: '20px', gap: '14px', cardPad: '24px', font: '0.9375rem' },

@@ -202,6 +202,24 @@ describe('NexFrame: el estado de un marco no alcanza a los marcos anidados', () 
   });
 });
 
+describe('texto completo y objetivos táctiles', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = (selector: string) => css.match(new RegExp(`(?:^|\\n)${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{([^}]*)\\}`))?.[1] ?? '';
+  it('los rótulos de navegación, menús, selector y tooltip fluyen en vez de cortarse', () => {
+    for (const selector of ['.nx-nav__label', '.nx-menu__label', '.nx-select__label']) {
+      const body = rule(selector);
+      assert.ok(body, `${selector} existe`);
+      assert.doesNotMatch(body, /text-overflow:\s*ellipsis|white-space:\s*nowrap/, selector);
+      assert.match(body, /overflow-wrap:\s*break-word/, selector);
+    }
+    const tooltip = css.match(/\.nx-tooltip \{([^}]*)\}/)?.[1] ?? '';
+    assert.doesNotMatch(tooltip, /text-overflow:\s*ellipsis|white-space:\s*nowrap/);
+  });
+  it('con puntero grueso los segmentos tienen objetivo táctil', () => {
+    assert.match(css, /@media \(pointer: coarse\) \{ \.nx-segmented__option \{ min-height: 40px; \} \}/);
+  });
+});
+
 describe('icono animable ai-generate', () => {
   const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   it('la respiración interpola entre el trazo de ICONS y la pose de ICON_POSES', () => {

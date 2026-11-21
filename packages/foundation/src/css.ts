@@ -4,6 +4,7 @@
  */
 import { NEXTUDIO_BRIDGE, NEXTUDIO_DIRECTION } from './compat.ts';
 import {
+  TOUCH_TARGET,
   BREAKPOINTS, COLOR_ROLES, cssVar, DENSITY, DIRECTIONS, FONTS, LAYERS, LAYOUT, MOTION, SHAPES, SPACE, THEMES, TYPE_SCALE,
   type ColorRole, type ColorTheme, type Direction, type ShapeFamily,
 } from './tokens.ts';
@@ -77,7 +78,10 @@ export function renderTokensCss(): string {
   const density = (d: keyof typeof DENSITY) => Object.entries(DENSITY[d]).map(([k, v]) => `--nx-density-${kebab(k)}: ${v};`);
   out.push(block(":root,\n[data-nx-density='comfortable']", density('comfortable')));
   out.push(block("[data-nx-density='compact']", density('compact')));
-  out.push(block("[data-nx-density='spacious']", density('spacious')), '');
+  out.push(block("[data-nx-density='spacious']", density('spacious')));
+  // Con el dedo, ningún control baja de 44 px (WCAG 2.5.5, HIG): la densidad
+  // compacta conserva sus márgenes y su tipografía, no su objetivo táctil.
+  out.push(`@media (pointer: coarse) {\n${block("[data-nx-density='compact']", [`--nx-density-control: ${TOUCH_TARGET}px;`]).replace(/^/gm, '  ')}\n}`, '');
 
   out.push('/* ---- Temas: [data-nx-theme] ---- */');
   for (const name of Object.keys(THEMES) as Array<keyof typeof THEMES>) {

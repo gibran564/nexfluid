@@ -7,6 +7,7 @@ import { ICON_POSES, ICONS } from '../src/icons.ts';
 import {
   COLOR_ROLES, CONTRAST_REQUIREMENTS, contrastRatio, cssVar, customTheme, DIRECTIONS, SHAPES, SPACE, THEMES, TYPE_SCALE,
   type ThemeName,
+  TOUCH_TARGET,
 } from '../src/tokens.ts';
 
 const near = (a: number, b: number, eps: number) => assert.ok(Math.abs(a - b) <= eps, `${a} ≉ ${b} (±${eps})`);
@@ -104,6 +105,10 @@ describe('hojas generadas', () => {
     assert.match(css, /\[data-nx-theme='editorial-light'\] \{\n  color-scheme: light;/);
   });
 
+  it('con puntero grueso la densidad compacta conserva el objetivo táctil de 44 px', () => {
+    assert.equal(TOUCH_TARGET, 44);
+    assert.match(renderTokensCss(), /@media \(pointer: coarse\) \{\n  \[data-nx-density='compact'\] \{\n    --nx-density-control: 44px;/);
+  });
   it('tokens.css coincide byte a byte con la fuente TS', () => {
     assert.equal(readFileSync(new URL('../src/tokens.css', import.meta.url), 'utf8'), renderTokensCss(), 'Ejecuta `npm run tokens`');
   });

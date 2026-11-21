@@ -109,6 +109,11 @@
   --nx-density-card-pad: 32px;
   --nx-density-font: 1rem;
 }
+@media (pointer: coarse) {
+  [data-nx-density='compact'] {
+    --nx-density-control: 44px;
+  }
+}
 
 /* ---- Temas: [data-nx-theme] ---- */
 :root,
