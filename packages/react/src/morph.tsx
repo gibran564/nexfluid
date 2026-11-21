@@ -312,6 +312,7 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
   const outgoing = useRef<HTMLDivElement>(null);
   const viewport = container === 'viewport';
   const isModal = modal ?? viewport;
+  const defaults = useNex();
   const [hasTitle, setHasTitle] = useState(false);
   const reduced = useRef(false);
   reduced.current = !canAnimate(ctx.motion, preference);
@@ -477,6 +478,10 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
     <div
       ref={root}
       className={cx('nx-morph', viewport && 'nx-root', className)}
+      // En <body> el panel queda fuera del proveedor: repite su tema, dirección y densidad.
+      data-nx-theme={viewport ? defaults.theme : undefined}
+      data-nx-direction={viewport ? defaults.direction : undefined}
+      data-nx-density={viewport ? defaults.density : undefined}
       data-nx-morph-mode={viewport ? 'viewport' : 'inline'}
       data-nx-morph-state="opening"
       style={style}

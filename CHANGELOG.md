@@ -11,6 +11,11 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
   abre la aplicación desde el lienzo (visores, revisiones, modos de foco)
   quedaban por debajo de la barra superior (`--nx-layer-frame`). Detectado al
   adoptar `NexFrame` como shell autenticado de Nextudio.
+- `NexMorph`: el panel en modo `viewport` se monta en `<body>`, fuera del
+  `NexProvider`, y caía en los tokens por defecto (claro) aunque la aplicación
+  estuviera en un tema oscuro o en otra dirección. Ahora la raíz del portal
+  repite `data-nx-theme`, `data-nx-direction` y `data-nx-density` del
+  proveedor más cercano. `useNex()` expone `theme` y `direction` heredados.
 
 ## 0.9.0 — preparada el 2026-11-20 (sin publicar)
 
