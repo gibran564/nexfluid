@@ -10,6 +10,13 @@ export interface NexContextValue {
   preference: MotionPreference | null;
   /** Firma del aspecto (tema, dirección, densidad): las membranas se redibujan cuando cambia. */
   look: string;
+  /**
+   * Tema y dirección vigentes (los del proveedor más cercano que los declara).
+   * Lo que se pinta fuera del subárbol del proveedor —el panel de NexMorph en
+   * `<body>`— los vuelve a declarar para no caer en los valores por defecto.
+   */
+  theme?: string;
+  direction?: string;
 }
 
 const DEFAULTS: NexContextValue = { density: 'comfortable', motion: 'subtle', preference: null, look: '' };
@@ -67,7 +74,7 @@ export function NexProvider({ theme, direction, density = 'comfortable', motion 
   }, [preference, reducedMotion]);
   useEffect(() => () => preference?.dispose(), [preference]);
   const outer = useContext(NexContext);
-  const value = { density, motion, preference, look: `${outer.look}/${theme ?? ''}:${direction ?? ''}:${density}` };
+  const value = { density, motion, preference, look: `${outer.look}/${theme ?? ''}:${direction ?? ''}:${density}`, theme: theme ?? outer.theme, direction: direction ?? outer.direction };
   return (
     <NexContext.Provider value={value}>
       <div

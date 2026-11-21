@@ -202,6 +202,15 @@ describe('NexFrame: el estado de un marco no alcanza a los marcos anidados', () 
   });
 });
 
+describe('NexFrame: el lienzo no aísla el apilamiento del contenido', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  it('las capas fijas del contenido pueden subir sobre la barra superior', () => {
+    // .nx-membrane aísla (isolation: isolate); el lienzo lo anula porque no dibuja forma.
+    assert.match(css, /\.nx-membrane \{[^}]*isolation: isolate/);
+    assert.match(css, /\.nx-frame__canvas \{[^}]*isolation: auto/);
+  });
+});
+
 describe('icono animable ai-generate', () => {
   const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   it('la respiración interpola entre el trazo de ICONS y la pose de ICON_POSES', () => {
