@@ -50,6 +50,25 @@ function Workspace({ controller }: { controller?: React.Ref<NexMorphController> 
 }
 
 describe('NexMorph (React)', () => {
+  it('en el viewport (portal en <body>) el panel conserva el tema, la dirección y la densidad del proveedor', () => {
+    render(
+      <NexProvider theme="editorial-dark" direction="kinetic-minimal" density="compact" reducedMotion="reduce">
+        <NexProvider density="comfortable">
+          <NexMorph defaultOpen>
+            <NexMorph.Source><button type="button">Abrir</button></NexMorph.Source>
+            <NexMorph.Target label="Detalle"><p>Detalle</p></NexMorph.Target>
+          </NexMorph>
+        </NexProvider>
+      </NexProvider>,
+    );
+    const portal = $('.nx-morph[data-nx-morph-mode="viewport"]');
+    expect(container.contains(portal)).toBe(false);
+    // Tema y dirección se heredan del proveedor exterior; la densidad, del más cercano.
+    expect(portal.getAttribute('data-nx-theme')).toBe('editorial-dark');
+    expect(portal.getAttribute('data-nx-direction')).toBe('kinetic-minimal');
+    expect(portal.getAttribute('data-nx-density')).toBe('comfortable');
+  });
+
   it('origen → destino con trigger accesible, región con nombre y vuelta del foco', () => {
     render(<NexProvider reducedMotion="reduce"><Workspace /></NexProvider>);
     const trigger = $('.nx-morph-trigger');
