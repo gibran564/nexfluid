@@ -9,7 +9,7 @@
  * de siempre. La identidad está en la membrana: el foco tiñe el campo desde
  * dentro y la casilla dibuja su marca con un trazo.
  */
-import { forwardRef, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import { forwardRef, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, type InputHTMLAttributes, type MouseEvent as ReactMouseEvent, type ReactNode, type TextareaHTMLAttributes } from 'react';
 import { cx, type NexDensity } from '@nexfluid/components';
 import { useNex } from './provider.tsx';
 
@@ -29,12 +29,40 @@ export interface NexInputProps extends Omit<InputHTMLAttributes<HTMLInputElement
   hideLabel?: boolean;
 }
 
+const INTERACTIVE = 'a[href], button, input, select, textarea, [tabindex], [contenteditable]';
+
+/**
+ * Un clic en la membrana, fuera del `<input>`, enfoca el campo: con el cursor al
+ * final, o al principio si el clic cae antes del texto. El `<input>` sólo mide
+ * su línea; si ocupara toda la cápsula, un clic por encima o por debajo de la
+ * línea dejaría el cursor al principio (Chromium y WebKit), y WebKit no deja
+ * corregirlo con `line-height`. Los controles dentro de los adornos (un botón
+ * de borrar, un enlace) conservan su clic.
+ */
+function focusFromMembrane(event: ReactMouseEvent<HTMLDivElement>, input: HTMLInputElement | null) {
+  if (!input || input.disabled || event.button !== 0) return;
+  const target = event.target as Element;
+  if (target === input) return;
+  const interactive = target.closest(INTERACTIVE);
+  if (interactive && interactive !== event.currentTarget && event.currentTarget.contains(interactive)) return;
+  event.preventDefault();
+  input.focus();
+  const at = event.clientX < input.getBoundingClientRect().left ? 0 : input.value.length;
+  try {
+    input.setSelectionRange(at, at);
+  } catch {
+    // `type="number"`, `email`… no admiten selección: basta con el foco.
+  }
+}
+
 export const NexInput = forwardRef<HTMLInputElement, NexInputProps>(function NexInput(
   { label, description, error, leading, trailing, density, hideLabel, className, id: idProp, required, disabled, ...rest },
   ref,
 ) {
   const defaults = useNex();
   const auto = useId();
+  const input = useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => input.current!, []);
   const id = idProp ?? `nx-input-${auto.replace(/:/g, '')}`;
   const describedBy = [description ? `${id}-description` : null, error ? `${id}-error` : null, rest['aria-describedby']].filter(Boolean).join(' ') || undefined;
   return (
@@ -42,11 +70,11 @@ export const NexInput = forwardRef<HTMLInputElement, NexInputProps>(function Nex
       <label htmlFor={id} className={cx('nx-field__label', hideLabel && 'nx-visually-hidden')}>
         {label}{required && <span className="nx-field__required" aria-hidden="true"> *</span>}
       </label>
-      <div className="nx-input">
+      <div className="nx-input" onMouseDown={(event) => focusFromMembrane(event, input.current)}>
         {leading && <span className="nx-input__adorn" data-side="leading">{leading}</span>}
         <input
           {...rest}
-          ref={ref}
+          ref={input}
           id={id}
           className="nx-input__control"
           required={required}

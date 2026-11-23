@@ -54,6 +54,33 @@ describe('NexInput y NexCheckbox', () => {
     expect(input.getAttribute('aria-describedby')!.split(' ').map((id) => document.getElementById(id)!.textContent)).toEqual(['Ayuda', 'Vacío']);
     expect(await violations()).toEqual([]);
   });
+  it('un clic en la membrana enfoca con el cursor al final; los controles de los adornos conservan su clic', () => {
+    let borrado = 0;
+    const ref = { current: null as HTMLInputElement | null };
+    act(() => root.render(
+      <NexInput ref={ref} label="Producto" defaultValue="blusa basica" leading="$"
+        trailing={<button type="button" onClick={() => { borrado++; }}>Borrar</button>} />,
+    ));
+    const input = $<HTMLInputElement>('input');
+    expect(ref.current).toBe(input);
+    const down = (el: Element) => {
+      const e = new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0, clientX: 999 });
+      act(() => { el.dispatchEvent(e); });
+      return e;
+    };
+    expect(down($('.nx-input')).defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(input);
+    expect([input.selectionStart, input.selectionEnd]).toEqual([12, 12]);
+    act(() => input.blur());
+    down($('.nx-input__adorn[data-side="leading"]'));
+    expect(document.activeElement).toBe(input);
+    act(() => input.blur());
+    const boton = $('button');
+    expect(down(boton).defaultPrevented).toBe(false);
+    expect(document.activeElement).not.toBe(input);
+    act(() => boton.click());
+    expect(borrado).toBe(1);
+  });
   it('casilla nativa con estado mixto real', async () => {
     function Host() {
       const [on, setOn] = useState(false);

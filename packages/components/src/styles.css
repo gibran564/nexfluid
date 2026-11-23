@@ -1119,7 +1119,15 @@
 .nx-input:focus-within { background: var(--nx-surface); box-shadow: inset 0 0 0 2px var(--nx-accent), 0 0 0 4px var(--nx-accent-soft); }
 .nx-field[data-invalid] .nx-input { box-shadow: inset 0 0 0 1.5px var(--nx-danger); }
 .nx-field[data-disabled] .nx-input { opacity: 0.55; }
-.nx-input__control { flex: 1; min-width: 0; height: 100%; min-height: calc(var(--nx-density-control) - 4px); padding: 0; border: 0; background: transparent; color: inherit; font: 450 var(--nx-density-font) / 1.2 var(--nx-font-body); outline: none; }
+/*
+ * El <input> mide sólo su línea y queda centrado en la cápsula; el resto es la
+ * membrana, que enfoca el campo al hacer clic (NexInput, focusFromMembrane).
+ * Si el <input> ocupara toda la cápsula, un clic por encima o por debajo de su
+ * línea dejaría el cursor al principio en Chromium y WebKit, y WebKit ignora
+ * `line-height` dentro del <input>, así que no se puede corregir sólo con CSS.
+ */
+.nx-input { cursor: text; }
+.nx-input__control { flex: 1; min-width: 0; height: auto; min-height: 0; padding: 0; border: 0; background: transparent; color: inherit; font: 450 var(--nx-density-font) / 1.2 var(--nx-font-body); outline: none; }
 .nx-input__control::placeholder { color: var(--nx-fg-subtle); }
 /*
  * Un solo indicador de foco: el de la membrana (.nx-input:focus-within). El

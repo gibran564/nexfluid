@@ -6,6 +6,18 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- `NexSelect` (y cualquier dueño de `useLiquid` cuyo contenedor se desmonte):
+  la gota sólo se animaba la primera vez que se abría la lista. `useLiquid`
+  marcaba «lista» con un booleano del componente, así que la lista nueva de
+  cada apertura nunca recibía `data-nx-ready` y quedaba el resaltado de
+  respaldo; el `ResizeObserver` seguía además a la lista vieja. Ahora «lista»
+  y el observador van por elemento. Detectado en la caja V3.
+- `NexInput`: un clic por encima o por debajo del texto dejaba el cursor al
+  principio del campo en Chromium y WebKit. El `<input>` mide ahora sólo su
+  línea y un clic en el resto de la membrana enfoca el campo con el cursor al
+  final (o al principio, si cae antes del texto); los botones y enlaces de los
+  adornos conservan su clic. Alargar la línea con `line-height` no basta:
+  WebKit lo ignora dentro del `<input>`. Detectado en la caja V3.
 - `NexFrame`: el lienzo ya no aísla el apilamiento de su contenido
   (`isolation: auto` en `.nx-frame__canvas`). Las capas `position: fixed` que
   abre la aplicación desde el lienzo (visores, revisiones, modos de foco)
