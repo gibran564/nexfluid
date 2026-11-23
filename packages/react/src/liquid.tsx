@@ -50,7 +50,12 @@ export function useLiquid(options: LiquidOptions) {
   const target = useRef({ start: 0, end: 0, cross: 0, thick: 0 });
   const activeEl = useRef<HTMLElement | null>(null);
   const presets = useRef<SpringPreset[]>(['flow', 'flow']);
-  const ready = useRef(false);
+  // «Lista» va por ELEMENTO, no por componente: el anfitrión puede desmontarse y
+  // volver a crearse (la lista de NexSelect existe sólo mientras está abierta).
+  // Con un booleano, la lista nueva nunca recibía `data-nx-ready` y la gota
+  // quedaba oculta desde la segunda apertura.
+  const readyHost = useRef<HTMLElement | null>(null);
+  const isReady = () => host.current !== null && readyHost.current === host.current;
 
   const paint = useCallback((s: number, e: number) => {
     const t = target.current;
@@ -81,7 +86,7 @@ export function useLiquid(options: LiquidOptions) {
     return item;
   }, [host, vertical]);
 
-  const animates = () => ready.current && canAnimate(opts.current.motion, pref.current);
+  const animates = () => isReady() && canAnimate(opts.current.motion, pref.current);
 
   /**
    * Lleva la gota al elemento activo desde donde está ahora (también a mitad
@@ -105,15 +110,15 @@ export function useLiquid(options: LiquidOptions) {
     } else {
       springs.jump([start, end]);
     }
-    if (!ready.current && host.current) {
-      ready.current = true;
+    if (!isReady() && host.current) {
+      readyHost.current = host.current;
       host.current.dataset.nxReady = '';
     }
   }, [measure, springs, host]);
 
   /** El activo es el mismo pero cambió su caja (resize, etiqueta, fuente): se reajusta sin reiniciar el viaje. */
   const settle = useCallback(() => {
-    if (!ready.current) return update('program');
+    if (!isReady()) return update('program');
     const item = measure();
     if (!item) return;
     if (item !== activeEl.current) return; // un cambio de valor lo resuelve update()
@@ -140,19 +145,28 @@ export function useLiquid(options: LiquidOptions) {
 
   // Tras cada render del dueño: si la caja del activo cambió (etiquetas, densidad), se reajusta.
   useIsoLayoutEffect(() => {
-    if (ready.current) settle();
+    if (isReady()) settle();
   });
 
+  // El ResizeObserver sigue al elemento anfitrión actual: se comprueba tras cada
+  // render (las dependencias de un efecto no ven cambiar `host.current`) y sólo
+  // se vuelve a suscribir cuando el elemento es otro, así que no reaparece el
+  // salto que causaba suscribirse en cada render.
+  const observed = useRef<{ el: HTMLElement; dispose: () => void } | null>(null);
   useIsoLayoutEffect(() => {
     const h = host.current;
+    if (observed.current?.el === h) return;
+    observed.current?.dispose();
+    observed.current = null;
     if (!h || typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(() => settle());
     observer.observe(h);
     for (const el of h.querySelectorAll<HTMLElement>(opts.current.items)) observer.observe(el);
     let live = true;
     void document.fonts?.ready.then(() => { if (live) settle(); });
-    return () => { live = false; observer.disconnect(); };
-  }, [settle, host]);
+    observed.current = { el: h, dispose: () => { live = false; observer.disconnect(); } };
+  });
+  useIsoLayoutEffect(() => () => { observed.current?.dispose(); observed.current = null; }, []);
 
   return { svg, path, update, lean, settle };
 }

@@ -119,6 +119,18 @@ describe('NexSelect', () => {
     expect($('output').textContent).toBe('r');
   });
 
+  it('la gota vuelve a estar lista al reabrir (la lista es un elemento nuevo cada vez)', () => {
+    act(() => root.render(<Host />));
+    const trigger = $<HTMLButtonElement>('[role="combobox"]');
+    for (let vez = 0; vez < 3; vez++) {
+      act(() => trigger.click());
+      const list = $('[role="listbox"]');
+      expect(list.hasAttribute('data-nx-ready')).toBe(true);
+      key(trigger, 'Escape');
+      expect(container.querySelector('[role="listbox"]')).toBeNull();
+    }
+  });
+
   it('opciones con imagen y detalle; sin violaciones de axe abierto', async () => {
     act(() => root.render(<Host />));
     act(() => $<HTMLButtonElement>('[role="combobox"]').click());
