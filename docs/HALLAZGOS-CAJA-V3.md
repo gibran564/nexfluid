@@ -24,6 +24,8 @@ Las correcciones están en `jesjack/fix/nexinput-nexselect-webkit` y las propues
 | 3 | Decisión de diseño | `useLiquid` | La gota se estira mucho a lo alto y se adelgaza a lo ancho al viajar | Los tres |
 | 4 | Decisión de diseño | `useLiquid` (attract) | La gota se comprime hacia la opción bajo el puntero pero no viaja a ella | Los tres |
 | 5 | Error de NexDocs | `apps/docs` | Los `<select>` nativos se ven distintos en cada navegador | Diferente en WebKit y Chromium |
+| 6 | Error | `liquidCapsule` (core) | En listas verticales anchas, a mitad del viaje la gota muestra una hendidura | Los tres (es geometría) |
+| 7 | Error (corregido) | NexSelect (CSS) | La lista se estira con un hueco vacío hasta el borde de la ventana | WebKit |
 
 ## 1. NexInput: el cursor queda al principio al hacer clic cerca del borde superior
 
@@ -95,8 +97,18 @@ Es intencional: `liquid.tsx:62` conserva el volumen adelgazando la gota **hasta 
 (`Math.max(0.72, …)`) y le forma un cuello (`--nx-pinch`). Al probarlo, la sensación fue
 **antinatural** en listas, donde el ojo espera que el resaltado siga a la fila.
 
-**Para hablar:** suavizar el efecto en orientación vertical, o hacerlo configurable (por
-ejemplo un tope de adelgazamiento/estiramiento por componente o por token).
+**Medición:** con un rastro del borde derecho de la gota a la altura de su centro (un punto
+por cuadro), la deformación es **asimétrica**: crece despacio al salir y se recoge de golpe al
+llegar; el rastro dibuja un trapecio en vez de una curva redondeada. La causa: la deformación
+sale de la distancia entre los dos bordes, y cada borde tiene su resorte (`magnetic` delante,
+`viscous` detrás). Al llegar, el de delante ya frenó y el de detrás lo alcanza de golpe.
+
+**Propuesta (en `jesjack/feat/sugerencias-caja-v3`, opcional):** `NexProvider liquid="symmetric"`.
+La deformación sigue un seno según el avance del centro entre origen y destino: igual al salir
+que al llegar. Sin el atributo la gota no cambia. Respeta el nivel de movimiento: completa en
+`fluid`, a un tercio en `subtle`, y `elastic` conserva la forma original (su carácter es el
+rebote). Ajustes por CSS: `--nx-liquid-thin` (cuánto adelgaza; hoy fijo en 0.72, y en listas
+anchas convendría más) y `--nx-liquid-stretch`.
 
 ## 4. Decisión de diseño: attract se lee como error
 
@@ -120,6 +132,48 @@ panel de propiedades (`apps/docs/src/docs/kit.tsx:43`, estilos en `docs.css:28�
 No afecta a la librería, pero es lo primero que se ve de NexFluid. **Propuesta:** usar
 `NexSelect` en NexDocs (la propia librería ya lo tiene), o como mínimo `appearance: none` con
 una flecha propia y un foco coherente con el resto.
+
+## 6. liquidCapsule: hendidura a mitad del viaje en listas verticales anchas
+
+**Cómo reproducirlo:** un `NexSelect` de unos 260 px de ancho (p. ej. el selector de tema),
+`motion="fluid"`, forma original de la gota. Al pasar de la primera opción a una de abajo, a
+mitad del viaje la gota se ve como un círculo con una **hendidura** en cada lado, a la altura de
+su centro.
+
+**Causa:** `packages/core/src/membrane.ts`, `liquidCapsule`. El cuello mide
+`neck = pinch · (h/2) · min(1, len / (2.5·h))`, pero sólo hay espacio para él en el **tramo
+recto** de cada lado, `len/2 − r`, con `r = min(h/2, len/2)`. En una lista vertical ancha la gota
+es tan ancha como larga: calculado con los valores por defecto (`thin` 0.72, `--nx-pinch` 0.6,
+opciones de 38 px), el peor punto es **182 px de largo por 184 de ancho**: `r = 91`, tramo recto
+**0**, cuello de **21.8 px**. Sin tramo recto, las dos curvas del cuello bajan casi en vertical y
+se ve una hendidura en lugar de una cintura. En pestañas horizontales no pasa: la gota es baja y
+larga y siempre tiene tramo recto.
+
+**Corrección propuesta:** limitar el cuello a una fracción del tramo recto, por ejemplo
+`neck = min(neck, 0.5 · (len/2 − r))`, de modo que desaparezca cuando la cápsula no tiene lados
+rectos. No cambia la forma cuando sí los tiene (pestañas, navegación, viajes cortos).
+
+## 7. NexSelect: la lista se estira hasta el borde de la ventana en WebKit
+
+**Cómo reproducirlo:** abrir cualquier `NexSelect` en WebKitGTK (Tauri en Linux). La lista
+tiene sus opciones arriba y un hueco vacío hasta el borde inferior de la ventana.
+
+**Causa:** en la capa superior (Popover API, `position: fixed` y el `max-height` que pone
+`useAnchoredLayer`), WebKit estira un contenedor `display: grid` hasta su alto máximo.
+Medido: 600 px con un contenido de 126. Con `display: block` o `flex` mide 126.
+
+**Corrección (en `jesjack/fix/nexinput-nexselect-webkit`):** `.nx-select__popup` pasa a
+columna flex; la lista (`flex: 0 1 auto; min-height: 0`) sigue respetando el máximo y se
+desplaza. De paso, la lista sube de 300 a 320 px: con 300, ocho opciones de una línea
+(8 × 38 = 304 px) mostraban una barra de desplazamiento por 4 px.
+
+## Añadido para la caja: NexCombobox
+
+El campo de producto necesita texto libre con sugerencias, y `NexSelect` no sirve porque mueve
+el foco a su buscador. `NexCombobox` (en `jesjack/feat/sugerencias-caja-v3`) es el patrón WAI-ARIA
+combobox con `aria-autocomplete="list"`: el foco se queda en el `<input>`, la sugerencia activa la
+marca la misma gota de NexSelect, elegir no reabre la lista, y las teclas que no usa (Intro con la
+lista cerrada) llegan a la aplicación. Reutiliza la membrana de `NexInput` y la lista de NexSelect.
 
 ## Lo que funcionó bien
 
