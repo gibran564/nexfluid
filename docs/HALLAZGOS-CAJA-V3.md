@@ -298,6 +298,26 @@ Con `headers`, el encabezado muestra "A Producto". En una tabla de una aplicaci�
 dice nada. **Propuesta (rama de sugerencias):** `columnLabels="both" | "name" | "letter"` en
 NexSheets y NexSheetGrid; por defecto `both`, como hoy. Con `name`, la letra queda en `aria-label`.
 
+## 18. La esquina de la última celda de NexSheets (corregido en la rama de fixes)
+
+La selección y la celda activa tenían siempre esquinas de 3 px. En la última fila y columna, donde la
+hoja es redondeada (22 px), su recuadro se veía cortado en cuanto la hoja medía justo su contenido.
+Ahora toman la curva de la hoja (nueva variable `--nx-sheets-radius`, mismo valor por defecto).
+
+## 19. El modal de NexMorph pierde `radius` y `corner` del NexProvider
+
+Con `container="viewport"` el panel se monta en `<body>`. Lleva el tema (`data-nx-theme`), pero no las
+variables que pone `NexProvider radius`/`corner` en su elemento: dentro del modal, los campos y
+botones vuelven a ser cápsula. Arreglo en la caja: un `NexProvider` con la misma forma dentro del
+panel. Propuesta: que el panel copie también `--nx-control-radius` y `--nx-control-corner` (el
+contexto ya sabe ambos valores) o que `NexProvider` los exponga en su contexto.
+
+## Añadido para la caja: NexDatePicker
+
+Elegir un día en un calendario, con el disparador y la capa de NexSelect. Fechas `AAAA-MM-DD` locales,
+`min`/`max`, `isDateDisabled`, `isDateMarked` (punto bajo los días con datos), idioma por `Intl`,
+primer día de la semana configurable, botón Hoy y el teclado del patrón WAI-ARIA *date picker dialog*.
+
 ## Añadido para la caja: NexCombobox
 
 El campo de producto necesita texto libre con sugerencias, y `NexSelect` no sirve porque mueve
