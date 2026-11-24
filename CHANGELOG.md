@@ -6,6 +6,12 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- Anillos de foco interiores (barra de fórmulas de NexSheets, buscadores de
+  NexSelect y de la paleta de comandos, editores de Markdown, consola, NexInk,
+  NexPortal): se veían más gruesos de un lado. Medían 1.5 px y el motor
+  redondea un lado a 2 filas de píxeles y el otro a 1 (medido en WebKitGTK).
+  Pasan a 2 px, como el foco de NexInput. Una prueba del contrato CSS impide
+  que vuelva un anillo de foco de medio píxel. Detectado en la caja V3.
 - `NexCheckbox`: al marcar, la casilla pasaba a gota de golpe, y al desmarcar
   se quedaba redonda casi toda la transición y luego saltaba a cuadrada. La gota
   animaba `border-radius` hacia `9999px`: el límite visible (10 px, la mitad de

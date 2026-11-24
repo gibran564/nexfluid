@@ -155,6 +155,15 @@ describe('integridad espacial', () => {
   });
 });
 
+describe('anillos de foco con grosor entero', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  it('ninguna regla de foco usa un anillo interior de medio píxel (se dibuja más grueso de un lado)', () => {
+    const reglas = css.match(/[^{}]*:focus[^{}]*\{[^}]*\}/g) ?? [];
+    const malas = reglas.filter((r) => /inset 0 0 0 \d+\.\d+px/.test(r)).map((r) => r.trim().split('{')[0]!.trim());
+    assert.deepEqual(malas, []);
+  });
+});
+
 describe('transiciones de radio simétricas', () => {
   const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
   it('la casilla marcada no anima hacia 9999px (el cambio visible caería en un extremo de la transición)', () => {
