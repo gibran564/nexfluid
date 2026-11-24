@@ -81,6 +81,8 @@ export { NexFlow, NexEditorialBlock, useNexFlow } from './flow.tsx';
 export type { NexFlowProps, NexEditorialBlockProps, NexEditorialBlockState, NexFlowMode, NexFlowController } from './flow.tsx';
 export { NexSelect } from './select.tsx';
 export type { NexSelectProps, NexSelectOption } from './select.tsx';
+export { NexDatePicker, toIsoDate, fromIsoDate } from './date-picker.tsx';
+export type { NexDatePickerProps } from './date-picker.tsx';
 export { NexCombobox } from './combobox.tsx';
 export type { NexComboboxProps, NexComboboxOption } from './combobox.tsx';
 export { NexConsole, NexLiveConsole, NexTerminalSurface, useNexSession } from './console.tsx';

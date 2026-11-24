@@ -1277,6 +1277,35 @@
 .nx-select__popup[data-layer='top'] { position: fixed; inset: auto; margin: 0; border: 0; color: var(--nx-fg); overflow: visible; }
 .nx-select__popup[data-layer='top']::backdrop { display: none; }
 
+/*
+ * NexDatePicker: el disparador y la capa son los de NexSelect; dentro, un calendario de seis
+ * semanas (no cambia de alto entre meses). Los días son controles: siguen --nx-control-radius.
+ */
+.nx-date__popup { right: auto; width: max-content; min-width: 0; padding: 10px; gap: 8px; }
+.nx-date__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.nx-date__month { font: 600 var(--nx-text-body) / 1.2 var(--nx-font-heading, var(--nx-font-body)); text-transform: capitalize; }
+.nx-date__nav, .nx-date__day, .nx-date__today {
+  border: 0; background: transparent; color: var(--nx-fg); cursor: pointer; font: inherit;
+  border-radius: var(--nx-control-radius); corner-shape: var(--nx-control-corner);
+  transition: background var(--nx-motion-state-duration) var(--nx-motion-state-easing), box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-date__nav { display: inline-grid; place-items: center; width: 34px; height: 34px; color: var(--nx-fg-muted); }
+.nx-date__nav:hover, .nx-date__day:not([aria-disabled]):hover, .nx-date__today:hover { background: var(--nx-surface-sunken); }
+.nx-date__grid { display: grid; gap: 2px; }
+.nx-date__row { display: grid; grid-template-columns: repeat(7, 38px); gap: 2px; }
+.nx-date__weekday { display: grid; place-items: center; height: 26px; color: var(--nx-fg-subtle); font: 550 var(--nx-text-micro) / 1 var(--nx-font-body); text-transform: uppercase; }
+.nx-date__day { position: relative; width: 38px; height: 36px; font: 500 var(--nx-text-small) / 1 var(--nx-font-body); font-variant-numeric: tabular-nums; }
+.nx-date__day[data-outside] { color: var(--nx-fg-subtle); }
+.nx-date__day[aria-disabled] { color: var(--nx-fg-subtle); opacity: 0.45; cursor: default; }
+.nx-date__day[data-today] { box-shadow: inset 0 0 0 1px var(--nx-border-strong, var(--nx-fg-subtle)); }
+.nx-date__day[data-selected] { background: var(--nx-accent); color: var(--nx-accent-fg); box-shadow: none; }
+.nx-date__day[data-selected]:hover { background: var(--nx-accent-hover, var(--nx-accent)); }
+.nx-date__day[data-marked]::after { content: ''; position: absolute; left: 50%; bottom: 5px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--nx-accent); }
+.nx-date__day[data-selected][data-marked]::after { background: currentColor; }
+.nx-date__nav:focus-visible, .nx-date__day:focus-visible, .nx-date__today:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--nx-accent); }
+.nx-date__day[data-selected]:focus-visible { box-shadow: inset 0 0 0 2px var(--nx-accent-fg); }
+.nx-date__today { align-self: flex-start; padding: 6px 12px; color: var(--nx-accent); font: 550 var(--nx-text-small) / 1 var(--nx-font-body); }
+
 /* Campos que dibujan su propio anillo (búsqueda de NexSelect, barra de fórmulas,
    editor de celda, editor Markdown): ningún outline global se superpone. */
 .nx-select__popup > .nx-select__search:is(:focus, :focus-visible),
