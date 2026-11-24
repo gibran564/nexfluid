@@ -6,6 +6,11 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- `NexSelect`: en WebKit la lista quedaba con un hueco vacío
+  hasta el borde de la ventana. En la capa superior, WebKit estira una rejilla
+  (`display: grid`) hasta su `max-height`; el popup es ahora una columna flex,
+  que mide su contenido en los tres motores. La lista sube de 300 a 320 px de
+  alto máximo: caben 8 opciones de una línea sin barra de desplazamiento.
 - `NexSelect` (y cualquier dueño de `useLiquid` cuyo contenedor se desmonte):
   la gota sólo se animaba la primera vez que se abría la lista. `useLiquid`
   marcaba «lista» con un booleano del componente, así que la lista nueva de
