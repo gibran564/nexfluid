@@ -233,8 +233,12 @@ export function NexSheetGrid({ label, className, style }: NexSheetGridProps) {
     return () => { for (const t of trackers.current) t.dispose(); trackers.current = []; };
   }, []);
   useLayoutEffect(() => { for (const t of trackers.current) t.refresh(); }, [rows.total, cols.total, sheet.id]);
+  // Qué carril se está arrastrando. En un ref, no en una variable de railHandlers: railHandlers se
+  // llama en cada render y el desplazamiento vuelve a renderizar la rejilla (filas virtuales), así
+  // que una variable local volvía a valer `false` tras el primer movimiento y el arrastre se
+  // detenía a la primera casilla.
+  const draggingRail = useRef<number | null>(null);
   const railHandlers = (index: number, orientation: 'vertical' | 'horizontal') => {
-    let dragging = false;
     const axis = (e: { clientX: number; clientY: number }) => (orientation === 'vertical' ? e.clientY : e.clientX);
     return {
       onPointerDown: (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -246,12 +250,12 @@ export function NexSheetGrid({ label, className, style }: NexSheetGridProps) {
         const g = t.geometry();
         if (local < g.start || local > g.start + g.length) t.jumpToTrack(axis(e));
         e.currentTarget.setPointerCapture?.(e.pointerId);
-        dragging = true;
+        draggingRail.current = index;
         t.beginDrag(axis(e));
       },
-      onPointerMove: (e: ReactPointerEvent<HTMLDivElement>) => { if (dragging) trackers.current[index]?.dragTo(axis(e)); },
-      onPointerUp: () => { dragging = false; trackers.current[index]?.endDrag(); },
-      onPointerCancel: () => { dragging = false; trackers.current[index]?.endDrag(); },
+      onPointerMove: (e: ReactPointerEvent<HTMLDivElement>) => { if (draggingRail.current === index) trackers.current[index]?.dragTo(axis(e)); },
+      onPointerUp: () => { if (draggingRail.current === index) draggingRail.current = null; trackers.current[index]?.endDrag(); },
+      onPointerCancel: () => { if (draggingRail.current === index) draggingRail.current = null; trackers.current[index]?.endDrag(); },
       onPointerEnter: () => trackers.current[index]?.setInteracting(true),
       onPointerLeave: () => trackers.current[index]?.setInteracting(false),
     };

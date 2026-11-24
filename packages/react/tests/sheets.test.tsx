@@ -2,7 +2,8 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import axe from 'axe-core';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ScrollTracker } from '@nexfluid/core';
 import { NexProvider, NexScroll } from '@nexfluid/react';
 import { NexSheets, cellKey, createWorkbook, sheetFromRows, sheetValueRows, type Workbook } from '@nexfluid/react/sheets';
 
@@ -205,5 +206,30 @@ describe('NexSheets · rejilla de hoja de cálculo desde el inicio', () => {
     expect(Number(grid.getAttribute('aria-rowcount'))).toBeGreaterThan(101);
     for (let i = 0; i < 25; i++) key(grid, 'ArrowRight');
     expect(Number(grid.getAttribute('aria-colcount'))).toBeGreaterThan(27);
+  });
+});
+
+describe('NexSheets · arrastre de los carriles', () => {
+  it('el arrastre sigue después de que la rejilla vuelve a renderizar (no se traba en la primera casilla)', () => {
+    const dragTo = vi.spyOn(ScrollTracker.prototype, 'dragTo');
+    const libro = createWorkbook([sheetFromRows('Grande', Array.from({ length: 60 }, (_, r) => [r, r * 2]))]);
+    const hoja = (etiqueta: string) => <NexSheets defaultWorkbook={libro} height={320} label={etiqueta} />;
+    act(() => root.render(hoja('Prueba')));
+    const carril = $('.nx-sheet__lane--v .nx-scroll__rail');
+    const puntero = (tipo: string, y: number) => act(() => {
+      carril.dispatchEvent(new MouseEvent(tipo, { bubbles: true, cancelable: true, button: 0, clientY: y }));
+    });
+    puntero('pointerdown', 10);
+    puntero('pointermove', 20);
+    // Desplazarse vuelve a renderizar la rejilla: antes, el "arrastrando" vivía en una variable
+    // que se reiniciaba en cada render y los movimientos siguientes se ignoraban.
+    act(() => root.render(hoja('Prueba (otra vez)')));
+    puntero('pointermove', 30);
+    puntero('pointermove', 40);
+    expect(dragTo).toHaveBeenCalledTimes(3);
+    puntero('pointerup', 40);
+    puntero('pointermove', 50);
+    expect(dragTo).toHaveBeenCalledTimes(3);
+    dragTo.mockRestore();
   });
 });

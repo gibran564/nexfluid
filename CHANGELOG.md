@@ -6,6 +6,14 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- NexSheets: arrastrar la barra de desplazamiento de la rejilla avanzaba una
+  casilla y se detenía. El estado "arrastrando" de los carriles era una
+  variable local de `railHandlers`, que se vuelve a crear en cada render, y el
+  desplazamiento vuelve a renderizar la rejilla (filas virtuales): tras el
+  primer movimiento valía `false` y los demás se ignoraban. Ahora vive en un
+  `useRef`, como en `NexScrollRail`. Medido en WebKitGTK: antes el
+  desplazamiento se quedaba en 259 px; ahora avanza en cada paso. Detectado en
+  la caja V3.
 - NexSheets: el anillo de foco de la rejilla sólo se veía abajo y a la derecha.
   Era una sombra interior de la zona con scroll: la tapaban los encabezados
   fijos y la recortaban las esquinas redondeadas. Ahora lo pinta el contenedor
