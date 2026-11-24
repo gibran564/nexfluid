@@ -6,6 +6,12 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Añadido
 
+- **NexSheets · `columnLabels`** (propuesta; por defecto no cambia). Qué muestra
+  el encabezado de una columna con nombre (`headers`): `both` (letra y nombre,
+  como hasta ahora), `name` (sólo el nombre; la letra queda en `aria-label`) o
+  `letter`. Para tablas de una aplicación, donde "A Producto" no aporta. Nuevo
+  tipo `NexColumnLabels`. Origen: el carrito de la caja V3
+  (`docs/HALLAZGOS-CAJA-V3.md`, punto 17).
 - **`NexProvider` · `radius` y `corner`** (propuesta; sin ellos no cambia
   nada). Redondez de los controles al estilo de `rounded-*` de Bootstrap:
   `radius` = `none` (0) · `sm` (6 px) · `md` (10 px) · `lg` (16 px) · `pill`, y

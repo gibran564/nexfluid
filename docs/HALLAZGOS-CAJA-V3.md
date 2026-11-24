@@ -30,6 +30,12 @@ Las correcciones están en `jesjack/fix/nexinput-nexselect-webkit` y las propues
 | 9 | Decisión de diseño | `NexSurface` | El área del puntero no sigue a la membrana abombada | Los tres |
 | 10 | Error (corregido) + propuesta | Familia `capsule`, campos | NexButton no tiene la misma redondez que NexInput y NexSelect; la redondez no se puede elegir | Los tres |
 | 11 | Error (corregido) | `NexCheckbox` | Al marcar, la casilla cambia de golpe; al desmarcar, tarda y luego salta | Los tres |
+| 12 | Error (corregido) | Anillos de foco (8) | Se ven más gruesos de un lado (1.5 px) | WebKit (medido) |
+| 13 | Error (corregido) | NexSheets | El anillo de foco de la rejilla sólo se ve abajo y a la derecha | Los tres |
+| 14 | Error (corregido) | NexSheets | Arrastrar la barra de desplazamiento avanza una casilla y se detiene | Los tres |
+| 15 | Sin reproducir | NexSheets | Doble barra de desplazamiento (nativa y de NexFluid) | WebKit, en la caja |
+| 16 | Decisión de diseño | `NexDataView` (gráfica) | Sólo 3 colores de serie; en editorial-light dos son naranjas casi iguales | Los tres |
+| 17 | Propuesta | NexSheets | El encabezado de una columna con nombre siempre lleva la letra ("A Producto") | Los tres |
 
 ## 1. NexInput: el cursor queda al principio al hacer clic cerca del borde superior
 
@@ -244,6 +250,53 @@ navegador dibujaba con `9999px 7px` tras reducir los radios en proporción (su s
 lado). La hoja se ve idéntica (comparado en WebKitGTK) y la transición es pareja en los dos
 sentidos. Ojo: un valor "a la mitad" (`10px 7px`) no sirve, porque pierde la hoja. El mismo patrón (`9999px` en una
 transición de `border-radius`) puede estar en otros sitios; no se revisaron.
+
+## 12. Anillos de foco de 1.5 px
+
+La barra de fórmulas de NexSheets (y otros siete anillos de foco interiores: buscadores de
+NexSelect y de la paleta de comandos, editores de Markdown, consola, NexInk, NexPortal) usaban
+`box-shadow: inset 0 0 0 1.5px`. Medido en WebKitGTK a tamaño real: el anillo ocupa **2 filas de
+píxeles arriba y 1 abajo** con el campo en un píxel entero, y al revés a medio píxel; nunca
+parejo. **Corrección (rama de errores):** 2 px, como el foco de NexInput (salen 2 y 2), y una
+prueba del contrato CSS que impide anillos de foco de medio píxel. **Para hablar:** quedan otros
+nueve 1.5 px que no son de foco (estado inválido, borde de NexCheckbox, enlaces de Markdown, alto
+contraste) con el mismo efecto; no se tocaron.
+
+## 13. NexSheets: el anillo de foco de la rejilla
+
+Era una sombra interior de `.nx-sheet__viewport`, la zona con scroll: los encabezados fijos lo
+tapaban arriba y a la izquierda y las esquinas redondeadas del contenedor lo recortaban. **Corrección
+(rama de errores):** lo pinta el contenedor (`.nx-sheets::after`), encima de todo y con sus esquinas,
+como NexInput con `:focus-within`. En WebKitGTK aparece también al hacer clic, no sólo con teclado.
+
+## 14. NexSheets: el arrastre de la barra se detiene en la primera casilla
+
+`grid.tsx`: el estado "arrastrando" de los carriles era una variable local de `railHandlers`, que se
+llama en cada render; desplazarse vuelve a renderizar la rejilla (filas virtuales), así que tras el
+primer movimiento valía `false`. Medido en WebKitGTK con arrastre sintético: 259 px y ahí se
+quedaba. **Corrección (rama de errores):** un `useRef`, como `NexScrollRail`; avanza en cada paso.
+No depende del navegador.
+
+## 15. Doble barra de desplazamiento (sin reproducir)
+
+En la caja se vio una barra nativa además de los carriles de NexFluid en la hoja. En una página
+aislada en WebKitGTK no se reproduce: la hoja activa sus carriles (`data-nx-rails`), la barra
+nativa mide 0 px y `scrollbar-width: none` se aplica. Probablemente fue la combinación con la
+página de la caja. Queda abierto.
+
+## 16. Gráficas de NexDataView: paleta de 3 colores
+
+Las series usan `--nx-accent`, `--nx-fluid` y `--nx-border-strong`; de la cuarta en adelante se
+repite el acento. En editorial-light el acento y el fluido son dos naranjas casi iguales, y una
+tabla de ventas (hora, venta, precio, cantidad, subtotal) se dibujaba como barras naranjas
+mezcladas en escalas distintas. **Para hablar:** una paleta categórica con más colores y
+distinguibles, y quizá no graficar por defecto columnas de escalas muy distintas juntas.
+
+## 17. Propuesta: encabezados sólo con el nombre
+
+Con `headers`, el encabezado muestra "A Producto". En una tabla de una aplicación la letra no
+dice nada. **Propuesta (rama de sugerencias):** `columnLabels="both" | "name" | "letter"` en
+NexSheets y NexSheetGrid; por defecto `both`, como hoy. Con `name`, la letra queda en `aria-label`.
 
 ## Añadido para la caja: NexCombobox
 

@@ -7,7 +7,7 @@ import { NexButton, NexIconButton } from '../button.tsx';
 import { NexIcon } from '../icon.tsx';
 import { NexSegmented } from '../segmented.tsx';
 import { NexSheetsProvider, useNexSheets, useSheetsInteraction, type NexSheetsProviderProps } from './controller.tsx';
-import { NexSheetGrid } from './grid.tsx';
+import { NexSheetGrid, type NexColumnLabels } from './grid.tsx';
 
 const useSelection = () => useSheetsInteraction(useCallback((st, c) => st.selections[c.sheet.id] ?? null, []));
 const useEditing = () => useSheetsInteraction(useCallback((st) => st.editing, []));
@@ -215,6 +215,8 @@ export interface NexSheetsProps extends NexSheetsProviderProps {
   inspector?: boolean;
   /** Nombre accesible de la rejilla (por defecto, el de la hoja). */
   label?: string;
+  /** Encabezados de columna con nombre: `both` (letra y nombre, por defecto), `name` o `letter`. */
+  columnLabels?: NexColumnLabels;
   className?: string;
   style?: CSSProperties;
 }
@@ -224,14 +226,14 @@ export interface NexSheetsProps extends NexSheetsProviderProps {
  * pestañas, estado e inspector opcional). Para otra composición, usa
  * `NexSheets.Provider` con las piezas sueltas.
  */
-export function NexSheetsEditor({ height = 560, toolbar = true, formulaBar = true, tabs = true, statusBar = true, inspector = false, label, className, style, ...provider }: NexSheetsProps) {
+export function NexSheetsEditor({ height = 560, toolbar = true, formulaBar = true, tabs = true, statusBar = true, inspector = false, label, columnLabels, className, style, ...provider }: NexSheetsProps) {
   return (
     <NexSheetsProvider {...provider}>
       <div className={cx('nx-sheets', className)} style={{ ...style, '--nx-sheets-height': typeof height === 'number' ? `${height}px` : height } as CSSProperties} data-inspector={inspector ? '' : undefined}>
         {toolbar && <NexSheetToolbar />}
         {formulaBar && <NexFormulaBar />}
         <div className="nx-sheets__body">
-          <NexSheetGrid label={label} />
+          <NexSheetGrid label={label} columnLabels={columnLabels} />
           {inspector && <NexCellInspector />}
         </div>
         {(tabs || statusBar) && (

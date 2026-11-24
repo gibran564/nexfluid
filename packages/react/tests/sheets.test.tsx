@@ -233,3 +233,17 @@ describe('NexSheets · arrastre de los carriles', () => {
     dragTo.mockRestore();
   });
 });
+
+describe('NexSheets · columnLabels', () => {
+  const libro = createWorkbook([{ ...sheetFromRows('Carrito', [['blusa', 150, 1]]), headers: ['Producto', 'Precio'] }]);
+  const textos = () => Array.from(container.querySelectorAll('.nx-sheet__head')).map((h) => h.textContent);
+  it('por defecto, letra y nombre; con "name", sólo el nombre; con "letter", sólo la letra', () => {
+    act(() => root.render(<NexSheets defaultWorkbook={libro} height={200} />));
+    expect(textos().slice(0, 3)).toEqual(['AProducto', 'BPrecio', 'C']);
+    act(() => root.render(<NexSheets defaultWorkbook={libro} height={200} columnLabels="name" />));
+    expect(textos().slice(0, 3)).toEqual(['Producto', 'Precio', 'C']);
+    expect(container.querySelector('.nx-sheet__head .nx-sheet__head-name')?.getAttribute('aria-label')).toBe('A: Producto');
+    act(() => root.render(<NexSheets defaultWorkbook={libro} height={200} columnLabels="letter" />));
+    expect(textos().slice(0, 3)).toEqual(['A', 'B', 'C']);
+  });
+});

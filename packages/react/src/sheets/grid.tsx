@@ -30,9 +30,18 @@ const OVERSCAN = 3;
 /** Sin selección guardada, la activa es A1 (como al abrir cualquier hoja). */
 const ORIGIN = { row: 0, column: 0 };
 
+/**
+ * Qué muestra el encabezado de una columna con nombre (`headers` de la hoja): `both` (por defecto)
+ * la letra y el nombre; `name` sólo el nombre (tablas de una aplicación, donde la letra no dice
+ * nada); `letter` sólo la letra. Las columnas sin nombre muestran siempre la letra.
+ */
+export type NexColumnLabels = 'both' | 'name' | 'letter';
+
 export interface NexSheetGridProps {
   /** Nombre accesible (por defecto, el de la hoja). */
   label?: string;
+  /** Encabezados de columna con nombre: letra y nombre, sólo el nombre o sólo la letra. */
+  columnLabels?: NexColumnLabels;
   className?: string;
   style?: CSSProperties;
 }
@@ -41,7 +50,7 @@ interface Window { r0: number; r1: number; c0: number; c1: number }
 
 const rowHeaderWidth = (rows: number) => Math.max(44, String(rows).length * 9 + 24);
 
-export function NexSheetGrid({ label, className, style }: NexSheetGridProps) {
+export function NexSheetGrid({ label, columnLabels = 'both', className, style }: NexSheetGridProps) {
   const sheets = useNexSheets();
   const sheet = sheets.sheet;
   const preference = useMotionPreference();
@@ -311,7 +320,11 @@ export function NexSheetGrid({ label, className, style }: NexSheetGridProps) {
             <div className="nx-sheet__corner" role="columnheader" aria-colindex={1}><span className="nx-visually-hidden">Filas</span></div>
             {colList.map((c) => (
               <div key={c} className="nx-sheet__head" role="columnheader" aria-colindex={c + 2} style={{ left: W + cols.offsetOf(c), width: cols.sizeOf(c) }}>
-                {sheet.headers?.[c] ? <><span>{columnName(c)}</span><span className="nx-sheet__head-name">{sheet.headers[c]}</span></> : columnName(c)}
+                {sheet.headers?.[c] && columnLabels !== 'letter'
+                  ? columnLabels === 'name'
+                    ? <span className="nx-sheet__head-name" aria-label={`${columnName(c)}: ${sheet.headers[c]}`}>{sheet.headers[c]}</span>
+                    : <><span>{columnName(c)}</span><span className="nx-sheet__head-name">{sheet.headers[c]}</span></>
+                  : columnName(c)}
                 <span className="nx-sheet__resize" aria-hidden="true" onPointerDown={startResize(c)} />
               </div>
             ))}

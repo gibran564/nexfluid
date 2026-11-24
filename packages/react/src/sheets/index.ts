@@ -10,7 +10,7 @@ export type { NexSheetsProps } from './parts.tsx';
 export { NexDataView } from './data-view.tsx';
 export type { NexDataViewProps, NexDataViewMode, NexSheetsOpenRequest } from './data-view.tsx';
 export { NexSheetGrid } from './grid.tsx';
-export type { NexSheetGridProps } from './grid.tsx';
+export type { NexSheetGridProps, NexColumnLabels } from './grid.tsx';
 export { NexSheetsProvider, useNexSheets, useSheetsInteraction } from './controller.tsx';
 export type { NexSheetsController, NexSheetsProviderProps, SheetsEditing } from './controller.tsx';
 export * from '@nexfluid/sheets';
