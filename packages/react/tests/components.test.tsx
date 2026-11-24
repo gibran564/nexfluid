@@ -3,7 +3,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  NexBadge, NexButton, NexCard, NexCodeBlock, NexFrame, NexFrameRegion, NexIconButton, NexIcon, NexProvider, NexTab,
+  NexBadge, NexButton, NexCard, NexCodeBlock, NexFrame, NexFrameRegion, NexIconButton, NexIcon, NexProvider, NexSurface, NexTab,
   NexTabs, NexTabsList, NexTabsPanel,
 } from '@nexfluid/react';
 import { NexMarkdown } from '@nexfluid/react/markdown';
@@ -409,5 +409,20 @@ describe('NexButton · zona cromática con la membrana dibujada', () => {
     expect(recorte.getAttribute('d')).toBe(relleno.getAttribute('d'));
     // Centro de 200 × 40: la esquina más lejana está a hypot(100, 20).
     expect(boton.style.getPropertyValue('--nx-zone-ray')).toBe(`${Math.hypot(100, 20)}px`);
+  });
+
+  it('hitArea: por defecto sólo la caja; con "membrane" también la parte abombada; se puede anular', () => {
+    render(
+      <>
+        <NexButton id="original">Original</NexButton>
+        <NexProvider hitArea="membrane">
+          <NexButton id="membrana">Membrana</NexButton>
+          <NexSurface interactive hitArea="box" id="anulada">Caja</NexSurface>
+          <NexSurface id="quieta">Sin interacción</NexSurface>
+        </NexProvider>
+      </>,
+    );
+    const hit = (id: string) => container.querySelector(`#${id}`)!.closest('.nx-surface')!.getAttribute('data-nx-hit');
+    expect([hit('original'), hit('membrana'), hit('anulada'), hit('quieta')]).toEqual([null, 'membrane', null, null]);
   });
 });

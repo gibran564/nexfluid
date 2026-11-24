@@ -15,6 +15,15 @@ import type { NexDensity, NexMotion } from '@nexfluid/components';
  */
 export type NexLiquidShape = 'spring' | 'symmetric';
 
+/**
+ * Área que responde al puntero en las superficies interactivas con membrana (NexButton, NexCard…).
+ * - `box` (por defecto): la caja del elemento, fija aunque la membrana se abombe hacia el puntero.
+ * - `membrane`: además, la parte abombada. El abombamiento tiene un tamaño fijo (`--nx-pull`), así
+ *   que el área no persigue al puntero: añade un margen de unos píxeles al salir. Sin coste por
+ *   cuadro: la forma ya se dibuja para pintar la membrana.
+ */
+export type NexHitArea = 'box' | 'membrane';
+
 export interface NexContextValue {
   density: NexDensity;
   motion: NexMotion;
@@ -30,6 +39,8 @@ export interface NexContextValue {
   direction?: string;
   /** Forma de la gota (la del proveedor más cercano que la declara). */
   liquid?: NexLiquidShape;
+  /** Área del puntero de las membranas (la del proveedor más cercano que la declara). */
+  hitArea?: NexHitArea;
 }
 
 const DEFAULTS: NexContextValue = { density: 'comfortable', motion: 'subtle', preference: null, look: '' };
@@ -68,6 +79,8 @@ export interface NexProviderProps {
   reducedMotion?: MotionMode;
   /** Forma de la gota líquida al viajar. Por defecto `spring` (la original). Ver `NexLiquidShape`. */
   liquid?: NexLiquidShape;
+  /** Área que responde al puntero en las membranas. Por defecto `box` (la original). Ver `NexHitArea`. */
+  hitArea?: NexHitArea;
   /** Pinta el fondo del tema (para islas y páginas completas). */
   canvas?: boolean;
   className?: string;
@@ -80,7 +93,7 @@ export interface NexProviderProps {
  * subárbol. Es un `<div class="nx-root">`; puede anidarse (islas con otro tema).
  * Sin proveedor, los componentes usan `comfortable` y `subtle`.
  */
-export function NexProvider({ theme, direction, density = 'comfortable', motion = 'subtle', reducedMotion = 'system', liquid, canvas, className, style, children }: NexProviderProps) {
+export function NexProvider({ theme, direction, density = 'comfortable', motion = 'subtle', reducedMotion = 'system', liquid, hitArea, canvas, className, style, children }: NexProviderProps) {
   const [preference] = useState<MotionPreference | null>(() =>
     typeof window === 'undefined' ? null : createMotionPreference(reducedMotion),
   );
@@ -89,7 +102,7 @@ export function NexProvider({ theme, direction, density = 'comfortable', motion 
   }, [preference, reducedMotion]);
   useEffect(() => () => preference?.dispose(), [preference]);
   const outer = useContext(NexContext);
-  const value = { density, motion, preference, look: `${outer.look}/${theme ?? ''}:${direction ?? ''}:${density}`, theme: theme ?? outer.theme, direction: direction ?? outer.direction, liquid: liquid ?? outer.liquid };
+  const value = { density, motion, preference, look: `${outer.look}/${theme ?? ''}:${direction ?? ''}:${density}`, theme: theme ?? outer.theme, direction: direction ?? outer.direction, liquid: liquid ?? outer.liquid, hitArea: hitArea ?? outer.hitArea };
   return (
     <NexContext.Provider value={value}>
       <div

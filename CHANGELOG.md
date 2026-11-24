@@ -6,6 +6,15 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Añadido
 
+- **`NexProvider` · `hitArea="membrane"`** (propuesta; por defecto no cambia).
+  Hoy el área que responde al puntero en una superficie interactiva (NexButton,
+  NexCard…) es la caja del elemento, aunque la membrana se abombe hacia el
+  puntero. Con `membrane`, la parte abombada también responde: el relleno del
+  SVG recibe el puntero. Sin coste por cuadro (la forma ya se dibuja) y sin
+  persecución: el abombamiento tiene tamaño fijo (`--nx-pull`), así que sólo
+  añade un margen de unos píxeles al salir. `NexSurface` acepta `hitArea` para
+  anularlo. Nuevo tipo `NexHitArea`. Origen: la caja V3
+  (`docs/HALLAZGOS-CAJA-V3.md`, punto 9).
 - **`NexProvider` · `liquid="symmetric"`** (propuesta; por defecto la gota no
   cambia). Forma de la gota al viajar: hoy la deformación sale de la
   distancia entre sus dos bordes, con resortes distintos delante (magnético) y

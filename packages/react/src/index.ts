@@ -10,7 +10,7 @@
  * para usarlos desde Server Components, donde `NexCard.Title` no está disponible.
  */
 export { NexProvider, useNex, useMotionPreference } from './provider.tsx';
-export type { NexProviderProps, NexContextValue, NexLiquidShape } from './provider.tsx';
+export type { NexProviderProps, NexContextValue, NexLiquidShape, NexHitArea } from './provider.tsx';
 export { NexSurface } from './surface.tsx';
 export type { NexSurfaceProps, SurfaceKind } from './surface.tsx';
 export { NexIcon } from './icon.tsx';

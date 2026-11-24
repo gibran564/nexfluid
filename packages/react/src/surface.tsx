@@ -18,7 +18,7 @@ import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type 
 import { membranePath } from '@nexfluid/core';
 import type { Material, ShapeFamily } from '@nexfluid/foundation';
 import { cx, type NexMotion } from '@nexfluid/components';
-import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
+import { canAnimate, useMotionPreference, useNex, type NexHitArea } from './provider.tsx';
 import { useSprings } from './springs.ts';
 
 export type SurfaceKind = 'surface' | 'control' | 'content';
@@ -53,6 +53,8 @@ export interface NexSurfaceProps extends Omit<HTMLAttributes<HTMLElement>, 'role
   /** Sin borde en reposo. */
   quiet?: boolean;
   motion?: NexMotion;
+  /** Área del puntero: sólo la caja (`box`) o también la parte abombada (`membrane`). Por defecto, la del proveedor. */
+  hitArea?: NexHitArea;
   /** Rol ARIA del elemento (la prop `role` está reservada a la gramática). */
   ariaRole?: string;
   ref?: Ref<HTMLElement>;
@@ -88,7 +90,7 @@ function readGeometry(el: HTMLElement): Geometry {
 
 export function NexSurface({
   as: Tag = 'div', kind = 'surface', shape, material = 'base', interactive = false, activatable = false, live, calm = false, focusWithin = false, selected, quiet,
-  motion, ariaRole, ref, className, children, onPointerEnter, onPointerMove, onPointerLeave, onPointerDown, onPointerUp, onFocus, onBlur, onKeyDown, ...rest
+  motion, hitArea, ariaRole, ref, className, children, onPointerEnter, onPointerMove, onPointerLeave, onPointerDown, onPointerUp, onFocus, onBlur, onKeyDown, ...rest
 }: NexSurfaceProps) {
   const defaults = useNex();
   const level = motion ?? defaults.motion;
@@ -265,6 +267,7 @@ export function NexSurface({
       data-nx-quiet={quiet ? '' : undefined}
       data-nx-calm={calm ? '' : undefined}
       data-nx-motion={level}
+      data-nx-hit={interactive && drawLive && (hitArea ?? defaults.hitArea) === 'membrane' ? 'membrane' : undefined}
     >
       {drawLive && (
         <svg ref={svg} className="nx-surface__shape" aria-hidden="true" focusable="false" preserveAspectRatio="none">

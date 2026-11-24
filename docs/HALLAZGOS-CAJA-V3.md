@@ -26,6 +26,8 @@ Las correcciones están en `jesjack/fix/nexinput-nexselect-webkit` y las propues
 | 5 | Error de NexDocs | `apps/docs` | Los `<select>` nativos se ven distintos en cada navegador | Diferente en WebKit y Chromium |
 | 6 | Error (corregido) | `liquidCapsule` (core) | En listas verticales anchas, a mitad del viaje la gota muestra una hendidura | Los tres (es geometría) |
 | 7 | Error (corregido) | NexSelect (CSS) | La lista se estira con un hueco vacío hasta el borde de la ventana | WebKit |
+| 8 | Error (corregido) | `NexSurface` | El brillo bajo el puntero conserva las esquinas de la caja mientras la membrana se abomba | Los tres |
+| 9 | Decisión de diseño | `NexSurface` | El área del puntero no sigue a la membrana abombada | Los tres |
 
 ## 1. NexInput: el cursor queda al principio al hacer clic cerca del borde superior
 
@@ -167,6 +169,35 @@ Medido: 600 px con un contenido de 126. Con `display: block` o `flex` mide 126.
 columna flex; la lista (`flex: 0 1 auto; min-height: 0`) sigue respetando el máximo y se
 desplaza. De paso, la lista sube de 300 a 320 px: con 300, ocho opciones de una línea
 (8 × 38 = 304 px) mostraban una barra de desplazamiento por 4 px.
+
+## 8. NexSurface: el brillo no sigue a la membrana
+
+**Cómo reproducirlo:** pasar el puntero cerca del borde de un `NexButton` con `motion="fluid"`.
+La membrana (SVG) se abomba hacia el puntero, pero el brillo rosado bajo él
+(`.nx-surface__zone`) es un `<span>` con las esquinas fijas de la caja: se ven dos formas, el
+borde abombado y el brillo rectangular dentro.
+
+**Corrección (en `jesjack/fix/nexinput-nexselect-webkit`):** con la membrana dibujada, la zona se
+recorta con un `<clipPath>` que lleva la misma forma y se actualiza en el mismo cuadro que el
+borde, y se extiende 24 px (`--nx-zone-bleed`) fuera del elemento para cubrir el abombamiento.
+El degradado usa un radio explícito (`--nx-zone-ray`, la esquina más lejana de la caja
+original), así que el brillo mide lo mismo que antes. Se conservan las transiciones de CSS
+(opacidad, inundación al activar).
+
+## 9. Decisión de diseño: el área del puntero no sigue a la membrana
+
+El borde se abomba hacia el puntero, pero el área que responde a él sigue siendo la caja: al
+salir por la parte abombada, el puntero deja de estar "sobre" el botón aunque visualmente siga
+dentro. Mantener el área fija es una decisión razonable (un blanco estable), así que va como
+propuesta opcional.
+
+**Propuesta (en `jesjack/feat/sugerencias-caja-v3`):** `NexProvider hitArea="membrane"` (y
+`hitArea` en `NexSurface` para anularlo). El relleno del SVG recibe el puntero, así que la parte
+abombada también cuenta. Comprobado en WebKitGTK que un punto del abombamiento fuera de la caja
+llega al botón. Sin coste por cuadro y sin persecución: el abombamiento tiene tamaño fijo
+(`--nx-pull`), sólo añade un margen de unos píxeles al salir. Las esquinas de la caja que quedan
+fuera de la forma redondeada siguen respondiendo: recortarlas exige `clip-path` sobre el
+elemento, que repinta cada cuadro, y no compensa por unos píxeles.
 
 ## Añadido para la caja: NexCombobox
 
