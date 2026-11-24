@@ -2,7 +2,7 @@ import { act, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NexCheckbox, NexCombobox, NexInput, NexSelect, type NexComboboxOption, type NexComboboxProps, type NexSelectOption } from '@nexfluid/react';
+import { NexCheckbox, NexCombobox, NexInput, NexProvider, NexSelect, useNex, type NexComboboxOption, type NexComboboxProps, type NexSelectOption } from '@nexfluid/react';
 import { NexMarkdown } from '@nexfluid/react/markdown';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -285,5 +285,24 @@ describe('NexCombobox', () => {
     }
     escribir(input, 'blusa');
     expect(await violations()).toEqual([]);
+  });
+});
+
+describe('NexProvider · liquid', () => {
+  it('por defecto no declara forma (la gota es la original); se hereda y se puede volver a cambiar', () => {
+    function Forma({ id }: { id: string }) {
+      return <output id={id}>{useNex().liquid ?? 'original'}</output>;
+    }
+    act(() => root.render(
+      <>
+        <NexProvider><Forma id="sin" /></NexProvider>
+        <NexProvider liquid="symmetric">
+          <Forma id="sim" />
+          <NexProvider theme="editorial-dark"><Forma id="heredada" /></NexProvider>
+          <NexProvider liquid="spring"><Forma id="anulada" /></NexProvider>
+        </NexProvider>
+      </>,
+    ));
+    expect(['sin', 'sim', 'heredada', 'anulada'].map((id) => $(`#${id}`).textContent)).toEqual(['original', 'symmetric', 'symmetric', 'spring']);
   });
 });

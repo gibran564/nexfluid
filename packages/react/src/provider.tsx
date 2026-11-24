@@ -4,6 +4,17 @@ import { createContext, useContext, useEffect, useState, type CSSProperties, typ
 import { createMotionPreference, sharedMotionPreference, type MotionMode, type MotionPreference } from '@nexfluid/core';
 import type { NexDensity, NexMotion } from '@nexfluid/components';
 
+/**
+ * Forma de la gota líquida al viajar (NexSelect, NexCombobox, NexTabs, NexNav, NexSegmented).
+ * - `spring` (por defecto): la deformación sale de la distancia entre sus dos bordes, cada uno
+ *   con su resorte (magnético delante, viscoso detrás): crece despacio al salir y se recoge de
+ *   golpe al llegar.
+ * - `symmetric`: la deformación sigue una curva simétrica (seno) según el avance entre origen y
+ *   destino: igual al salir que al llegar. Con `subtle` se escala a un tercio; `elastic` conserva
+ *   la forma `spring`, porque su carácter es el rebote.
+ */
+export type NexLiquidShape = 'spring' | 'symmetric';
+
 export interface NexContextValue {
   density: NexDensity;
   motion: NexMotion;
@@ -17,6 +28,8 @@ export interface NexContextValue {
    */
   theme?: string;
   direction?: string;
+  /** Forma de la gota (la del proveedor más cercano que la declara). */
+  liquid?: NexLiquidShape;
 }
 
 const DEFAULTS: NexContextValue = { density: 'comfortable', motion: 'subtle', preference: null, look: '' };
@@ -53,6 +66,8 @@ export interface NexProviderProps {
   motion?: NexMotion;
   /** `system` sigue `prefers-reduced-motion`; `reduce` y `full` lo fuerzan. Sólo la aplicación decide `full`. */
   reducedMotion?: MotionMode;
+  /** Forma de la gota líquida al viajar. Por defecto `spring` (la original). Ver `NexLiquidShape`. */
+  liquid?: NexLiquidShape;
   /** Pinta el fondo del tema (para islas y páginas completas). */
   canvas?: boolean;
   className?: string;
@@ -65,7 +80,7 @@ export interface NexProviderProps {
  * subárbol. Es un `<div class="nx-root">`; puede anidarse (islas con otro tema).
  * Sin proveedor, los componentes usan `comfortable` y `subtle`.
  */
-export function NexProvider({ theme, direction, density = 'comfortable', motion = 'subtle', reducedMotion = 'system', canvas, className, style, children }: NexProviderProps) {
+export function NexProvider({ theme, direction, density = 'comfortable', motion = 'subtle', reducedMotion = 'system', liquid, canvas, className, style, children }: NexProviderProps) {
   const [preference] = useState<MotionPreference | null>(() =>
     typeof window === 'undefined' ? null : createMotionPreference(reducedMotion),
   );
@@ -74,7 +89,7 @@ export function NexProvider({ theme, direction, density = 'comfortable', motion 
   }, [preference, reducedMotion]);
   useEffect(() => () => preference?.dispose(), [preference]);
   const outer = useContext(NexContext);
-  const value = { density, motion, preference, look: `${outer.look}/${theme ?? ''}:${direction ?? ''}:${density}`, theme: theme ?? outer.theme, direction: direction ?? outer.direction };
+  const value = { density, motion, preference, look: `${outer.look}/${theme ?? ''}:${direction ?? ''}:${density}`, theme: theme ?? outer.theme, direction: direction ?? outer.direction, liquid: liquid ?? outer.liquid };
   return (
     <NexContext.Provider value={value}>
       <div

@@ -10,11 +10,20 @@
  * Es una única superficie persistente: cualquier cambio de valor (ratón,
  * teclado o programático) la hace viajar desde su estado visual actual.
  * Movimiento reducido y `motion="none"`: salto inmediato.
+ *
+ * Forma: `NexProvider liquid="symmetric"` cambia la deformación por una curva
+ * simétrica (ver `NexLiquidShape`); sin él, la forma es la original.
+ *
+ * Ajustes por CSS (heredables), además de `--nx-pinch` (cuello):
+ * - `--nx-liquid-thin`: cuánto puede adelgazar (0.72 por defecto: hasta un 28 %).
+ *   Con `symmetric` es el ancho exacto a mitad del viaje.
+ * - `--nx-liquid-stretch`: con `symmetric`, estiramiento por cada largo de
+ *   elemento recorrido (0.35 por defecto).
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import { liquidCapsule } from '@nexfluid/core';
 import type { NexMotion } from '@nexfluid/components';
-import { canAnimate, useMotionPreference } from './provider.tsx';
+import { canAnimate, useMotionPreference, useNex } from './provider.tsx';
 import { presetFor, useSprings, type SpringPreset } from './springs.ts';
 
 export type LiquidOrigin = 'pointer' | 'keyboard' | 'program';
@@ -43,6 +52,9 @@ export function useLiquid(options: LiquidOptions) {
   const preference = useMotionPreference();
   const pref = useRef(preference);
   pref.current = preference;
+  const liquidShape = useNex().liquid ?? 'spring';
+  const shape = useRef(liquidShape);
+  shape.current = liquidShape;
   const { host } = options;
   const vertical = options.orientation === 'vertical';
   const svg = useRef<SVGSVGElement>(null);
@@ -57,15 +69,46 @@ export function useLiquid(options: LiquidOptions) {
   const readyHost = useRef<HTMLElement | null>(null);
   const isReady = () => host.current !== null && readyHost.current === host.current;
 
+  /** Viaje en curso (centros de origen y destino) para la envolvente simétrica; `null` en reposo o al inclinarse. */
+  const travel = useRef<{ from: number; to: number } | null>(null);
+
   const paint = useCallback((s: number, e: number) => {
     const t = target.current;
     const len = Math.max(1, t.end - t.start);
-    const stretch = Math.max(0, (Math.abs(e - s) - len) / len);
-    const pinchVar = host.current ? parseFloat(getComputedStyle(host.current).getPropertyValue('--nx-pinch')) || 0.6 : 0.6;
+    const style = host.current ? getComputedStyle(host.current) : null;
+    const read = (name: string, fallback: number) => {
+      const v = style ? parseFloat(style.getPropertyValue(name)) : NaN;
+      return Number.isFinite(v) ? v : fallback;
+    };
+    const pinchVar = read('--nx-pinch', 0.6);
+    // Cuánto puede adelgazar la gota al estirarse (0.72: hasta un 28 %).
+    const thinFloor = Math.min(1, Math.max(0.1, read('--nx-liquid-thin', 0.72)));
+    let stretch = Math.max(0, (Math.abs(e - s) - len) / len);
+    // Volumen aproximadamente constante: al estirarse, la gota adelgaza (hasta `thinFloor`) y se recupera al llegar.
+    let thin = Math.max(thinFloor, Math.sqrt(1 / (1 + stretch)));
+    const trip = travel.current;
+    const level = opts.current.motion;
+    // `elastic` conserva la forma original: su carácter es el rebote, que la envolvente aplanaría.
+    const symmetric = shape.current === 'symmetric' && (level === 'fluid' || level === 'subtle');
+    if (trip && symmetric && Math.abs(trip.to - trip.from) > 1) {
+      // Envolvente simétrica: la deformación depende del avance del CENTRO entre origen y destino
+      // (seno: nula al salir y al llegar, máxima a la mitad), no de la distancia entre los bordes,
+      // cuyos resortes distintos (magnético delante, viscoso detrás) la hacen crecer despacio y
+      // caer de golpe. La gota se redibuja centrada con el largo de esa envolvente.
+      const center = (s + e) / 2;
+      const progress = Math.min(1, Math.max(0, (center - trip.from) / (trip.to - trip.from)));
+      const peak = read('--nx-liquid-stretch', 0.35) * Math.min(4, Math.abs(trip.to - trip.from) / len);
+      // `subtle` sigue la misma curva, a un tercio: discreta, como el resto de ese nivel.
+      const envelope = Math.sin(Math.PI * progress) * (level === 'subtle' ? 1 / 3 : 1);
+      stretch = envelope * peak;
+      // Aquí `--nx-liquid-thin` es el ancho exacto a mitad del viaje (p. ej. 0.5: la mitad).
+      thin = 1 - (1 - thinFloor) * envelope;
+      const half = (len * (1 + stretch)) / 2;
+      s = center - half;
+      e = center + half;
+    }
     const pinch = Math.min(1, stretch * 1.4) * pinchVar;
-    // Volumen aproximadamente constante: al estirarse, la gota adelgaza (hasta un 28 %) y se recupera al llegar.
-    const thin = t.thick > 6 ? Math.max(0.72, Math.sqrt(1 / (1 + stretch))) : 1;
-    const thick = t.thick * thin;
+    const thick = t.thick > 6 ? t.thick * thin : t.thick;
     path.current?.setAttribute('d', liquidCapsule(s, e, thick, pinch, { vertical, offset: t.cross + (t.thick - thick) / 2 }));
   }, [host, vertical]);
 
@@ -106,8 +149,11 @@ export function useLiquid(options: LiquidOptions) {
       const lead = presetFor(level, 'lead');
       const trail = motion === 'subtle' ? 'calm' : presetFor(level, 'trail');
       presets.current = forward ? [trail, lead] : [lead, trail];
+      // Desde donde está ahora (también a mitad de otro viaje) hasta el centro del nuevo activo.
+      travel.current = { from: (s0! + e0!) / 2, to: (start + end) / 2 };
       springs.to([start, end], presets.current);
     } else {
+      travel.current = null;
       springs.jump([start, end]);
     }
     if (!isReady() && host.current) {
@@ -123,8 +169,13 @@ export function useLiquid(options: LiquidOptions) {
     if (!item) return;
     if (item !== activeEl.current) return; // un cambio de valor lo resuelve update()
     const { start, end } = target.current;
-    if (springs.moving) springs.to([start, end], presets.current);
-    else springs.jump([start, end]);
+    if (springs.moving) {
+      if (travel.current) travel.current.to = (start + end) / 2;
+      springs.to([start, end], presets.current);
+    } else {
+      travel.current = null;
+      springs.jump([start, end]);
+    }
   }, [measure, springs, update]);
 
   /** Attract: la gota se inclina hacia la opción bajo el puntero, sin moverse a ella. */
@@ -133,6 +184,7 @@ export function useLiquid(options: LiquidOptions) {
     const item = measure();
     if (!item || item !== activeEl.current) return;
     const { start, end } = target.current;
+    travel.current = null; // la inclinación conserva su forma propia, sin envolvente
     presets.current = ['magnetic', 'magnetic'];
     if (!toward || toward === item) {
       springs.to([start, end], ['flow', 'flow']);

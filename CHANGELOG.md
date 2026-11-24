@@ -6,18 +6,18 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Añadido
 
-- **`NexCombobox`** (nuevo). Campo de texto libre con sugerencias (patrón
-  WAI-ARIA combobox con `aria-autocomplete="list"`): el foco se queda en el
-  `<input>` mientras la lista está abierta, la sugerencia activa la marca la
-  gota de NexSelect y sigue al puntero, y elegir NO vuelve a abrir la lista
-  aunque cambien las sugerencias. Las sugerencias las da la aplicación; con
-  `filter` (por defecto) se filtran aquí sin acentos, con `filter={false}` se
-  muestran tal cual (búsqueda propia). `onOptionSelect` avisa de la elección;
-  las teclas que el combobox no usa (Intro con la lista cerrada, Escape con la
-  lista ya cerrada) llegan a `onKeyDown`. Tab cierra sin elegir. Reutiliza la
-  membrana de `NexInput` y la lista de `NexSelect`. Origen: el campo de
-  producto de la caja V3, que no podía usar NexSelect porque éste mueve el
-  foco a su buscador.
+- **`NexProvider` · `liquid="symmetric"`** (propuesta; por defecto la gota no
+  cambia). Forma de la gota al viajar: hoy la deformación sale de la
+  distancia entre sus dos bordes, con resortes distintos delante (magnético) y
+  detrás (viscoso), y crece despacio al salir pero se recoge de golpe al
+  llegar. Con `symmetric` sigue una curva simétrica (seno) según el avance
+  entre origen y destino. Respeta el nivel de movimiento: completa en `fluid`,
+  a un tercio en `subtle`, y `elastic` conserva la forma original (su carácter
+  es el rebote). Se hereda entre proveedores anidados. Ajustes opcionales por
+  CSS: `--nx-liquid-thin` (cuánto adelgaza; antes fijo en 0.72) y, con
+  `symmetric`, `--nx-liquid-stretch` (estiramiento por largo recorrido, 0.35).
+  Nuevo tipo `NexLiquidShape`. Origen: el rastro del borde de la gota medido en
+  la caja V3 (`docs/HALLAZGOS-CAJA-V3.md`, punto 3).
 
 ### Corregido
 
