@@ -166,6 +166,19 @@
   pointer-events: none;
   transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing), --nx-zone-r var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
 }
+/*
+ * Con la membrana dibujada (SVG), la zona se recorta con su misma forma (clip-path en línea a un
+ * <clipPath> que NexSurface actualiza en cada cuadro) y se extiende --nx-zone-bleed fuera del
+ * elemento para cubrir el abombamiento. La posición llega en píxeles del elemento: se desplaza
+ * lo mismo que la caja.
+ */
+.nx-surface[data-nx-drawn] > .nx-surface__zone {
+  --nx-zone-bleed: 24px;
+  inset: calc(-1 * var(--nx-zone-bleed));
+  border-radius: 0;
+  corner-shape: initial;
+  background: radial-gradient(circle var(--nx-zone-ray, 100px) at calc(var(--nx-zone-x, 50%) + var(--nx-zone-bleed)) calc(var(--nx-zone-y, 50%) + var(--nx-zone-bleed)), var(--nx-zone) 0, transparent var(--nx-zone-r));
+}
 .nx-surface:is([data-nx-state='attract'], [data-nx-state='deform'], [data-nx-state='activate']) > .nx-surface__zone,
 .nx-surface[data-nx-selected] > .nx-surface__zone { opacity: var(--nx-zone-strength); }
 .nx-surface[data-nx-state='activate'] > .nx-surface__zone { --nx-zone-r: 170%; }

@@ -61,6 +61,20 @@ export interface NexSurfaceProps extends Omit<HTMLAttributes<HTMLElement>, 'role
   [key: string]: unknown;
 }
 
+/** Margen (px) que la zona cromática se extiende fuera del elemento para cubrir el abombamiento. Igual que `--nx-zone-bleed` en CSS. */
+const ZONE_BLEED = 24;
+
+/**
+ * Coloca la zona cromática en `(x, y)` px del elemento. `--nx-zone-ray` es la distancia a la
+ * esquina más lejana del elemento: con la zona extendida (--nx-zone-bleed), el degradado usa ese
+ * radio explícito para medir igual que sin extender (`farthest-corner` de la caja original).
+ */
+function placeZone(node: HTMLElement, x: number, y: number, w: number, h: number) {
+  node.style.setProperty('--nx-zone-x', `${x}px`);
+  node.style.setProperty('--nx-zone-y', `${y}px`);
+  node.style.setProperty('--nx-zone-ray', `${Math.hypot(Math.max(x, w - x), Math.max(y, h - y))}px`);
+}
+
 type Geometry = { radius: number; smoothing: number; pull: number; push: number };
 
 function readGeometry(el: HTMLElement): Geometry {
@@ -83,11 +97,14 @@ export function NexSurface({
   const fill = useRef<SVGPathElement>(null);
   const edge = useRef<SVGPathElement>(null);
   const meniscus = useRef<SVGPathElement>(null);
+  const zoneClip = useRef<SVGPathElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const size = useRef({ w: 0, h: 0 });
   const focus = useRef({ x: 0, y: 0 });
   const geometry = useRef<Geometry>({ radius: 16, smoothing: 0.8, pull: 0, push: 0 });
-  const gradient = `nx-m-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const gradient = `nx-m-${uid}`;
+  const clipId = `nx-z-${uid}`;
   const [engaged, setEngaged] = useState(false);
   const drawLive = live === 'engaged' ? engaged || Boolean(selected) : (live ?? interactive);
   const selectedRef = useRef(selected);
@@ -111,6 +128,9 @@ export function NexSurface({
     fill.current.setAttribute('d', d);
     edge.current?.setAttribute('d', d);
     meniscus.current?.setAttribute('d', d);
+    // La zona cromática (el brillo bajo el puntero) se recorta con la misma forma: sin esto se
+    // quedaba con las esquinas de la caja mientras la membrana se abombaba.
+    zoneClip.current?.setAttribute('d', d);
   }, []);
 
   const springs = useSprings([0, 0], ([amount, press]) => {
@@ -129,6 +149,8 @@ export function NexSurface({
     if (!node || !drawLive || typeof ResizeObserver === 'undefined') return;
     const measure = () => {
       size.current = { w: node.offsetWidth, h: node.offsetHeight };
+      // Con la membrana dibujada, la zona se coloca en píxeles (su caja se extiende fuera del elemento).
+      if (!node.style.getPropertyValue('--nx-zone-ray')) placeZone(node, size.current.w / 2, size.current.h / 2, size.current.w, size.current.h);
       geometry.current = readGeometry(node);
       svg.current?.setAttribute('viewBox', `0 0 ${size.current.w} ${size.current.h}`);
       const [a, p] = springs.values();
@@ -149,8 +171,7 @@ export function NexSurface({
     const r = node.getBoundingClientRect();
     const x = e.clientX - r.left;
     const y = e.clientY - r.top;
-    node.style.setProperty('--nx-zone-x', `${x}px`);
-    node.style.setProperty('--nx-zone-y', `${y}px`);
+    placeZone(node, x, y, r.width, r.height);
     // El foco del campo se proyecta al borde más cercano: tira de la membrana hacia fuera.
     const { w, h } = size.current;
     const dl = x, dr = w - x, dt = y, db = h - y;
@@ -207,8 +228,7 @@ export function NexSurface({
         },
         onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
           if (activatable && (e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) {
-            el.current?.style.setProperty('--nx-zone-x', '50%');
-            el.current?.style.setProperty('--nx-zone-y', '50%');
+            if (el.current) placeZone(el.current, size.current.w / 2, size.current.h / 2, size.current.w, size.current.h);
             setState('activate');
             setTimeout(() => { if (el.current?.dataset.nxState === 'activate') setState('attract'); }, 420);
           }
@@ -253,13 +273,19 @@ export function NexSurface({
               <stop offset="0" className="nx-surface__meniscus-top" />
               <stop offset="0.45" className="nx-surface__meniscus-bottom" />
             </linearGradient>
+            {interactive && (
+              <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+                {/* La caja de la zona empieza `ZONE_BLEED` px antes que la del elemento. */}
+                <path ref={zoneClip} transform={`translate(${ZONE_BLEED} ${ZONE_BLEED})`} />
+              </clipPath>
+            )}
           </defs>
           <path ref={fill} className="nx-surface__fill" />
           <path ref={meniscus} className="nx-surface__meniscus" stroke={`url(#${gradient})`} />
           <path ref={edge} className="nx-surface__edge" />
         </svg>
       )}
-      {interactive && <span className="nx-surface__zone" aria-hidden="true" />}
+      {interactive && <span className="nx-surface__zone" aria-hidden="true" style={drawLive ? { clipPath: `url(#${clipId})` } : undefined} />}
       {children}
     </Tag>
   );

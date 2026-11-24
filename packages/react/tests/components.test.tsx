@@ -381,3 +381,33 @@ describe('NexWidgets', () => {
     expect(await violations()).toEqual([]);
   });
 });
+
+describe('NexButton · zona cromática con la membrana dibujada', () => {
+  const RO = globalThis.ResizeObserver;
+  const medidas = { w: Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth'), h: Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight') };
+  beforeEach(() => {
+    (globalThis as { ResizeObserver?: unknown }).ResizeObserver = class { observe() {} disconnect() {} };
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', { configurable: true, get: () => 200 });
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', { configurable: true, get: () => 40 });
+  });
+  afterEach(() => {
+    (globalThis as { ResizeObserver?: unknown }).ResizeObserver = RO;
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', medidas.w!);
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', medidas.h!);
+  });
+
+  it('la zona se recorta con la misma forma que la membrana y mide como la caja original', () => {
+    render(<NexButton>Reiniciar</NexButton>);
+    const boton = container.querySelector<HTMLElement>('.nx-surface')!;
+    expect(boton.hasAttribute('data-nx-drawn')).toBe(true);
+    const zona = container.querySelector<HTMLElement>('.nx-surface__zone')!;
+    const id = /^url\(#(.+)\)$/.exec(zona.style.clipPath)?.[1];
+    expect(id).toBeTruthy();
+    const recorte = document.getElementById(id!)!.querySelector('path')!;
+    const relleno = container.querySelector('.nx-surface__fill')!;
+    expect(recorte.getAttribute('d')).toBeTruthy();
+    expect(recorte.getAttribute('d')).toBe(relleno.getAttribute('d'));
+    // Centro de 200 × 40: la esquina más lejana está a hypot(100, 20).
+    expect(boton.style.getPropertyValue('--nx-zone-ray')).toBe(`${Math.hypot(100, 20)}px`);
+  });
+});

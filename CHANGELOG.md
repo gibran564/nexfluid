@@ -6,6 +6,15 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- `NexSurface` (NexButton, NexCard… interactivas): el brillo bajo el puntero
+  (`.nx-surface__zone`) se quedaba con las esquinas de la caja mientras la
+  membrana se abombaba hacia el puntero, y se veían dos formas. Con la
+  membrana dibujada, la zona se recorta ahora con su misma forma (un
+  `<clipPath>` que se actualiza en el mismo cuadro que el borde) y se extiende
+  `--nx-zone-bleed` (24 px) fuera del elemento para cubrir el abombamiento. El
+  degradado usa un radio explícito (`--nx-zone-ray`, la esquina más lejana de
+  la caja original), así que el brillo mide lo mismo que antes. Detectado en la
+  caja V3.
 - `liquidCapsule` (la gota de NexSelect, NexNav, NexTabs…): en listas
   verticales anchas, a mitad del viaje la gota mostraba una hendidura en cada
   lado. El cuello se aplicaba aunque la cápsula no tuviera tramo recto (una
