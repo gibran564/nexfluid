@@ -1876,3 +1876,23 @@ code.nx-ink__glyph { font: 500 11px var(--nx-font-mono); }
 @media (pointer: coarse) { .nx-grid__handle { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .nx-grid__handle:not([data-nx-motion-pref='full'] *) { transition: none; } }
 [data-nx-motion-pref='reduce'] .nx-grid__handle { transition: none; }
+
+/* Image editing is loaded from @nexfluid/react/image. */
+.nx-image-editor { container: nx-image-editor / inline-size; display: grid; gap: var(--nx-gap, 12px); min-width: 0; padding: var(--nx-gap, 12px); }
+.nx-image-editor__tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.nx-image-editor__work { display: grid; gap: var(--nx-gap, 12px); min-width: 0; }
+.nx-image-editor__work > * { min-width: 0; }
+.nx-image-editor__viewport { overflow: auto; max-height: min(62dvh, 660px); min-height: 160px; background: var(--nx-surface-sunken); }
+.nx-image-editor__viewport canvas { display: block; margin-inline: auto; max-inline-size: none; block-size: auto; }
+.nx-image-editor__viewport canvas[data-drawing] { touch-action: none; cursor: crosshair; }
+.nx-image-editor__properties, .nx-image-editor__export { display: grid; align-content: start; gap: 8px; }
+.nx-image-editor__values { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 8px; }
+.nx-image-editor :is(input, select) { max-inline-size: 100%; accent-color: var(--nx-accent); color: inherit; }
+.nx-image-editor :is(input[type='number'], input:not([type]), select) { inline-size: 100%; min-block-size: 2.75rem; border: 1px solid var(--nx-border); padding-inline: 8px; }
+.nx-image-editor :is(button, summary):focus-visible, .nx-image-editor__viewport:focus-visible { outline-offset: 2px; }
+.nx-image-editor__properties label { display: block; }
+.nx-image-editor__properties input[type='range'] { display: block; width: 100%; }
+.nx-image-editor__export summary { cursor: pointer; min-block-size: 2.75rem; padding-block: .55rem; }
+@container nx-image-editor (min-width: 760px) {
+  .nx-image-editor__work { grid-template-columns: minmax(0, 1fr) 17rem; }
+}
