@@ -413,12 +413,16 @@ function SelectionSurface({ rows, cols, W, animate, fillPreview }: { rows: Axis;
     cellSprings.to(activeTarget, [lead, lead, lead, lead]);
   }, [target.join(','), activeTarget.join(','), animate]); // eslint-disable-line react-hooks/exhaustive-deps
   const multiple = range.from.row !== range.to.row || range.from.column !== range.to.column;
+  // Toca la esquina inferior derecha del contenido: ahí la hoja es redondeada y un recuadro de
+  // esquina recta se vería cortado. Toma la curva de la hoja (--nx-sheets-radius).
+  const contentEnd = [W + cols.total - 0.5, HEAD_H + rows.total - 0.5];
+  const atEnd = (r: number[]) => (r[2]! >= contentEnd[0]! && r[3]! >= contentEnd[1]! ? '' : undefined);
   return (
     <>
-      <div ref={box} className="nx-sheet__selection" data-multiple={multiple ? '' : undefined} aria-hidden="true">
+      <div ref={box} className="nx-sheet__selection" data-multiple={multiple ? '' : undefined} data-nx-end={atEnd(target)} aria-hidden="true">
         {!sheets.readOnly && !editing && <span className="nx-sheet__fill" title="Rellenar" />}
       </div>
-      <div ref={cell} className="nx-sheet__active" data-editing={editing ? '' : undefined} aria-hidden="true" />
+      <div ref={cell} className="nx-sheet__active" data-editing={editing ? '' : undefined} data-nx-end={atEnd(activeTarget)} aria-hidden="true" />
       {fillPreview && (() => {
         const [l, t, r, b] = rect(fillPreview);
         return <div className="nx-sheet__fill-preview" aria-hidden="true" style={{ transform: `translate(${l}px, ${t}px)`, width: r! - l!, height: b! - t! }} />;

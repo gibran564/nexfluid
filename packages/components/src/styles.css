@@ -984,7 +984,8 @@
   grid-template-rows: auto auto minmax(0, 1fr) auto;
   height: var(--nx-sheets-height, 560px);
   min-width: 0;
-  border-radius: 22px;
+  --nx-sheets-radius: 22px;
+  border-radius: var(--nx-sheets-radius);
   background: var(--nx-surface);
   box-shadow: inset 0 0 0 1px var(--nx-border);
   overflow: clip;
@@ -1075,6 +1076,8 @@
 .nx-sheet__selection { z-index: 1; pointer-events: none; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--nx-accent); will-change: transform; }
 .nx-sheet__selection[data-multiple] { background: color-mix(in srgb, var(--nx-accent) 9%, transparent); }
 .nx-sheet__active { z-index: 2; pointer-events: none; border-radius: 3px; box-shadow: inset 0 0 0 2px var(--nx-accent); will-change: transform; }
+/* La celda de la esquina inferior derecha sigue la curva de la hoja (si no, su recuadro se corta). */
+.nx-sheet__selection[data-nx-end], .nx-sheet__active[data-nx-end] { border-bottom-right-radius: var(--nx-sheets-radius); }
 .nx-sheet__active[data-editing] { box-shadow: inset 0 0 0 2px var(--nx-accent), 0 4px 14px color-mix(in srgb, var(--nx-accent) 22%, transparent); }
 .nx-sheet__fill {
   position: absolute; right: -5px; bottom: -5px; width: 9px; height: 9px; border-radius: 9999px; pointer-events: auto; cursor: crosshair; touch-action: none;
