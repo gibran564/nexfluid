@@ -20,7 +20,7 @@ La biblioteca recibe un Blob raster autorizado por la aplicación. La aplicació
 
 El recorte se expresa en coordenadas normalizadas del original. Las marcas se expresan en coordenadas normalizadas del resultado encuadrado y rotado. Exportar genera PNG, JPEG o WebP si el navegador dispone del codificador. La vista previa utiliza como máximo 960 px de lado y la exportación 4096 px. El editor acepta hasta 25 MB y comprueba el máximo de 24 megapíxeles tras la decodificación del navegador. Valida los datos persistidos en la capa anfitriona y conserva la procedencia antes de publicar una figura.
 
-El motor usa Canvas 2D y no recibe URLs ni SVG. Su interfaz organiza el encuadre, los ajustes de color y las anotaciones en grupos separados. La primera versión incluye flechas, etiquetas y regiones rectangulares. El teclado puede añadir una marca centrada. Las posiciones precisas se eligen con puntero o pantalla táctil. Los formatos con pérdidas tienen calidad configurable. El zoom sólo afecta el visor.
+El motor usa Canvas 2D y no recibe URLs ni SVG. Su interfaz organiza el encuadre, los ajustes de color y las anotaciones en grupos separados. La primera versión incluye flechas, etiquetas y regiones rectangulares. El recorte se puede trazar sobre el original o escribir en porcentajes. Las marcas se colocan con puntero, pantalla táctil o coordenadas mediante teclado. Los formatos con pérdidas tienen calidad configurable. El zoom sólo afecta el visor.
 
 ## Elección del motor
 

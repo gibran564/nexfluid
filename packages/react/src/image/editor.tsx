@@ -49,6 +49,8 @@ export function NexImageEditor({ source, initialEdits, initialFormat = 'image/pn
   const [annotationType, setAnnotationType] = useState<NexImageAnnotation['type']>('arrow');
   const [annotationLabel, setAnnotationLabel] = useState('');
   const [drawing, setDrawing] = useState(false);
+  const [points, setPoints] = useState({ from: { x: .25, y: .25 }, to: { x: .75, y: .75 } });
+  const showOriginal = compare || drawing && tool === 'crop';
   const canvas = useRef<HTMLCanvasElement>(null);
   const start = useRef<NexImagePoint | null>(null);
   const edits = history.current;
@@ -73,13 +75,13 @@ export function NexImageEditor({ source, initialEdits, initialFormat = 'image/pn
     if (!bitmap || !target) return;
     const frame = requestAnimationFrame(() => {
       try {
-        drawNexImage(target, bitmap, compare ? originalImageEdits() : edits, 960);
+        drawNexImage(target, bitmap, showOriginal ? originalImageEdits() : edits, 960);
       } catch (reason) {
         setError(reason instanceof Error ? reason.message : 'No se pudo dibujar la imagen.');
       }
     });
     return () => cancelAnimationFrame(frame);
-  }, [bitmap, compare, edits]);
+  }, [bitmap, showOriginal, edits]);
 
   function update(patch: Partial<NexImageEdits>) {
     setHistory((h) => ({ past: [...h.past.slice(-39), h.current], current: normalizeImageEdits({ ...h.current, ...patch }), future: [] }));
@@ -119,6 +121,8 @@ export function NexImageEditor({ source, initialEdits, initialFormat = 'image/pn
     }
   }
   const size = bitmap ? imageGeometry(bitmap.width, bitmap.height, edits) : null;
+  const preview = bitmap ? imageGeometry(bitmap.width, bitmap.height, showOriginal ? originalImageEdits() : edits, 960) : null;
+  const previewWidth = preview ? `min(${zoom}%, calc(min(62dvh, 660px) * ${preview.width / preview.height * zoom / 100}))` : undefined;
 
   return (
     <NexSurface as="section" kind="content" material="clear" aria-label={label} className="nx-image-editor">
@@ -134,8 +138,8 @@ export function NexImageEditor({ source, initialEdits, initialFormat = 'image/pn
       <div className="nx-image-editor__work">
         <div>
           <div className="nx-image-editor__viewport" role="region" tabIndex={0} aria-label="Área de previsualización y desplazamiento">
-            {bitmap ? <canvas ref={canvas} role="img" aria-label={compare ? 'Imagen original' : 'Imagen editada'}
-              data-drawing={drawing && !compare ? '' : undefined} style={{ inlineSize: `${zoom}%` }}
+            {bitmap ? <canvas ref={canvas} role="img" aria-label={showOriginal ? 'Imagen original' : 'Imagen editada'}
+              data-drawing={drawing && !compare ? '' : undefined} style={{ inlineSize: previewWidth }}
               onPointerDown={(event) => {
                 if (!drawing || compare || event.button !== 0) return;
                 start.current = position(event);
@@ -144,19 +148,33 @@ export function NexImageEditor({ source, initialEdits, initialFormat = 'image/pn
               onPointerUp={(event) => {
                 const from = start.current;
                 start.current = null;
-                if (drawing && !compare && from) addAnnotation(from, position(event));
+                if (!drawing || compare || !from) return;
+                const to = position(event);
+                if (tool === 'crop') {
+                  const x = Math.min(from.x, to.x);
+                  const y = Math.min(from.y, to.y);
+                  const width = Math.abs(from.x - to.x);
+                  const height = Math.abs(from.y - to.y);
+                  if (width >= .01 && height >= .01) update({ crop: { x, y, width, height } });
+                  setDrawing(false);
+                } else {
+                  addAnnotation(from, to);
+                }
               }}
               onPointerCancel={() => { start.current = null; }}
             /> : !error && <p role="status">Abriendo imagen…</p>}
           </div>
           <div className="nx-image-editor__tools">
-            <NexButton appearance="ghost" density="compact" aria-pressed={compare} onClick={() => setCompare(!compare)}>Ver original</NexButton>
+            <NexButton appearance="ghost" density="compact" aria-pressed={compare} onClick={() => { setCompare(!compare); setDrawing(false); }}>Ver original</NexButton>
             <label>Zoom <input type="range" min={50} max={200} step={25} value={zoom} onChange={(e) => setZoom(e.currentTarget.valueAsNumber)} /> {zoom} %</label>
             {size && <span>{size.width} × {size.height} px</span>}
           </div>
         </div>
         <div className="nx-image-editor__properties">
           {tool === 'crop' && <>
+            <NexButton density="compact" aria-pressed={drawing} disabled={compare || !bitmap}
+              onClick={() => setDrawing(!drawing)}>Marcar recorte</NexButton>
+            {drawing && <p role="status">Arrastra sobre el original para delimitar el recorte.</p>}
             <label>Proporción
               <select defaultValue="free" onChange={(e) => {
                 if (bitmap && e.currentTarget.value !== 'free') update({ crop: centeredImageCrop(bitmap.width, bitmap.height, Number(e.currentTarget.value)) });
@@ -189,6 +207,21 @@ export function NexImageEditor({ source, initialEdits, initialFormat = 'image/pn
             {annotationType === 'label' && <label>Texto <input value={annotationLabel} maxLength={120} onChange={(e) => setAnnotationLabel(e.currentTarget.value)} /></label>}
             <NexButton density="compact" aria-pressed={drawing} disabled={compare} onClick={() => setDrawing(!drawing)}>Marcar sobre la imagen</NexButton>
             {drawing && <p role="status">Arrastra sobre la imagen para colocar la marca.</p>}
+            <details>
+              <summary>Posición precisa</summary>
+              <div className="nx-image-editor__values">
+                {(['from', 'to'] as const).map((point) => (['x', 'y'] as const).map((axis) => (
+                  <label key={`${point}-${axis}`}>{point === 'from' ? 'Inicio' : 'Fin'} {axis === 'x' ? 'horizontal' : 'vertical'} (%)
+                    <input type="number" min={0} max={100} value={fieldValue(points[point][axis])}
+                      onChange={(e) => {
+                        const value = e.currentTarget.valueAsNumber;
+                        if (Number.isFinite(value)) setPoints({ ...points, [point]: { ...points[point], [axis]: Math.min(100, Math.max(0, value)) / 100 } });
+                      }} />
+                  </label>
+                )))}
+                <NexButton density="compact" disabled={compare} onClick={() => addAnnotation(points.from, points.to)}>Añadir marca por coordenadas</NexButton>
+              </div>
+            </details>
             <NexButton density="compact" disabled={compare} onClick={() => addAnnotation({ x: .25, y: .25 }, { x: .75, y: .75 })}>Añadir marca centrada</NexButton>
             {edits.annotations.map((item, index) => <NexButton key={index} density="compact" appearance="ghost"
               onClick={() => update({ annotations: edits.annotations.filter((_, i) => i !== index) })}>
