@@ -29,6 +29,7 @@ Las correcciones están en `jesjack/fix/nexinput-nexselect-webkit` y las propues
 | 8 | Error (corregido) | `NexSurface` | El brillo bajo el puntero conserva las esquinas de la caja mientras la membrana se abomba | Los tres |
 | 9 | Decisión de diseño | `NexSurface` | El área del puntero no sigue a la membrana abombada | Los tres |
 | 10 | Error (corregido) + propuesta | Familia `capsule`, campos | NexButton no tiene la misma redondez que NexInput y NexSelect; la redondez no se puede elegir | Los tres |
+| 11 | Error (corregido) | `NexCheckbox` | Al marcar, la casilla cambia de golpe; al desmarcar, tarda y luego salta | Los tres |
 
 ## 1. NexInput: el cursor queda al principio al hacer clic cerca del borde superior
 
@@ -228,6 +229,21 @@ controles en el subárbol, así que todos cambian juntos, en CSS y en la membran
 proveedor y no en cada componente porque el diseño dice que "la geometría es del motor, no de
 cada componente". `NexSegmented` y las pestañas no se pasaron al token: dentro llevan la gota,
 que siempre es una cápsula, y con otra redondez el contenedor no coincidiría con ella.
+
+## 11. NexCheckbox: la animación es rápida al marcar y lenta al desmarcar
+
+**Causa:** la casilla marcada (gota) anima `border-radius` de `7px` a `9999px 7px 9999px 7px`. En
+una casilla de 20 px la suma de radios excede el lado y el navegador los reduce en proporción
+(dibuja 20 px y casi 0): al marcar, la transición cruza ese
+límite en el primer instante (se ve instantánea); al desmarcar, de 9999 a 10 px no cambia nada
+visible y sólo al final, en la cola lenta de la curva (`cubic-bezier(0.16, 1, 0.3, 1)`), salta a
+cuadrada. La misma duración (260 ms) se sentía rápida en un sentido y lenta en el otro.
+
+**Corrección (en `jesjack/fix/nexinput-nexselect-webkit`):** `20px 0 20px 0`, que es lo que el
+navegador dibujaba con `9999px 7px` tras reducir los radios en proporción (su suma excede el
+lado). La hoja se ve idéntica (comparado en WebKitGTK) y la transición es pareja en los dos
+sentidos. Ojo: un valor "a la mitad" (`10px 7px`) no sirve, porque pierde la hoja. El mismo patrón (`9999px` en una
+transición de `border-radius`) puede estar en otros sitios; no se revisaron.
 
 ## Añadido para la caja: NexCombobox
 
