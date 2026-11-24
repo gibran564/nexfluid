@@ -6,6 +6,13 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- `NexCheckbox`: al marcar, la casilla pasaba a gota de golpe, y al desmarcar
+  se quedaba redonda casi toda la transición y luego saltaba a cuadrada. La gota
+  animaba `border-radius` hacia `9999px`: el límite visible (10 px, la mitad de
+  la casilla) se cruzaba en el primer instante al marcar y en el último al
+  desmarcar. Ahora usa los radios que el navegador dibujaba tras reducirlos en
+  proporción (`20px 0 20px 0`): la hoja se ve igual y la transición es pareja en
+  los dos sentidos. Detectado en la caja V3.
 - Redondez de los controles: un `NexButton` no tenía la misma redondez que un
   `NexInput` o un `NexSelect` a su lado. La familia `capsule` (la de los
   controles) declaraba `cornerShape: 'round'` pero `smoothing: 1`, y la membrana

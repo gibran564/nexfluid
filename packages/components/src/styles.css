@@ -1178,7 +1178,14 @@
   background: var(--nx-surface-sunken); box-shadow: inset 0 0 0 1.5px var(--nx-border-strong);
   transition: background var(--nx-motion-state-duration) var(--nx-motion-state-easing), box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing), border-radius var(--nx-motion-surface-duration) var(--nx-motion-surface-easing);
 }
-.nx-checkbox__control:checked, .nx-checkbox__control:indeterminate { background: var(--nx-accent); box-shadow: inset 0 0 0 1.5px var(--nx-accent); border-radius: 9999px 7px 9999px 7px; }
+/*
+ * Hoja al marcar: dos esquinas opuestas con el radio de todo el lado (20 px) y las otras en 0, que
+ * es lo que dibujaba `9999px 7px 9999px 7px` tras reducir los radios en proporción (su suma
+ * excedía el lado). Con 9999px la transición cruzaba el límite visible en el primer instante al
+ * marcar (instantánea) y en el último al desmarcar (se quedaba igual casi toda la transición y
+ * luego saltaba). Con los valores ya reducidos se ve igual y la transición es pareja.
+ */
+.nx-checkbox__control:checked, .nx-checkbox__control:indeterminate { background: var(--nx-accent); box-shadow: inset 0 0 0 1.5px var(--nx-accent); border-radius: 20px 0 20px 0; }
 .nx-checkbox__control:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: 2px; }
 .nx-checkbox__control:disabled { cursor: not-allowed; opacity: 0.55; }
 .nx-checkbox[data-invalid] .nx-checkbox__control { box-shadow: inset 0 0 0 1.5px var(--nx-danger); }

@@ -155,6 +155,15 @@ describe('integridad espacial', () => {
   });
 });
 
+describe('transiciones de radio simétricas', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
+  it('la casilla marcada no anima hacia 9999px (el cambio visible caería en un extremo de la transición)', () => {
+    const rule = /\.nx-checkbox__control:checked, \.nx-checkbox__control:indeterminate \{[^}]*\}/.exec(css)?.[0] ?? '';
+    assert.match(rule, /border-radius: 20px 0 20px 0/);
+    assert.match(css, /\.nx-checkbox__box \{[^}]*width: 20px; height: 20px/, 'la casilla mide 20 px: la hoja usa el radio de todo el lado');
+  });
+});
+
 describe('redondez: los campos leen el token de los controles', () => {
   const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
   for (const sel of ['.nx-input', '.nx-select__trigger', '.nx-select__search']) {
