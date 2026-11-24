@@ -136,7 +136,11 @@ export function liquidCapsule(start: number, end: number, h: number, pinch = 0, 
   const b = Math.max(start, end);
   const r = Math.min(h / 2, (b - a) / 2);
   const len = b - a;
-  const neck = Math.min(0.85, Math.max(0, pinch)) * (h / 2) * Math.min(1, len / (h * 2.5));
+  // El cuello sólo cabe en el tramo recto de cada lado (`len/2 − r`): sin él (una gota tan ancha
+  // como larga, p. ej. en una lista vertical ancha) las curvas del cuello bajaban casi en vertical
+  // y se veía una hendidura en vez de una cintura. Se limita a la mitad de ese tramo.
+  const straight = Math.max(0, len / 2 - r);
+  const neck = Math.min(Math.min(0.85, Math.max(0, pinch)) * (h / 2) * Math.min(1, len / (h * 2.5)), straight * 0.5);
   const top = offset;
   const bottom = offset + h;
   const mid = (a + b) / 2;

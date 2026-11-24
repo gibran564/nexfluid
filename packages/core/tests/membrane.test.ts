@@ -66,6 +66,14 @@ describe('gota líquida (indicador)', () => {
     assert.ok(Math.max(...ys) <= 32 && Math.min(...ys) >= 0);
     assert.ok(d.includes(' 100 '), 'pasa por el centro');
   });
+  it('sin tramo recto no hay cuello: una gota tan ancha como larga no muestra hendidura', () => {
+    // 184 × 184 con pellizco: es un círculo, el cuello se queda en el borde (y = 0).
+    assert.ok(liquidCapsule(0, 184, 184, 0.6).includes(' 92 0C'));
+    // Con tramo recto corto (30 px por lado), el cuello se limita a la mitad: 15 px, no 20.4.
+    assert.ok(liquidCapsule(0, 120, 60, 1).includes(' 60 15C'));
+    // Con tramo recto de sobra el cuello no cambia (0.85 · 16 = 13.6).
+    assert.ok(liquidCapsule(0, 200, 32, 1).includes(' 100 13.6C'));
+  });
   it('vertical intercambia ejes y acepta start > end', () => {
     assert.equal(liquidCapsule(50, 10, 20, 0, { vertical: true }).startsWith('M0 20'), true);
   });

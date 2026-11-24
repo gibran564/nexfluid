@@ -6,6 +6,13 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- `liquidCapsule` (la gota de NexSelect, NexNav, NexTabs…): en listas
+  verticales anchas, a mitad del viaje la gota mostraba una hendidura en cada
+  lado. El cuello se aplicaba aunque la cápsula no tuviera tramo recto (una
+  gota tan ancha como larga: 182 × 184 px con los valores por defecto en una
+  lista de 255 px) y sus curvas bajaban casi en vertical. Ahora el cuello se
+  limita a la mitad del tramo recto de cada lado; con tramo recto de sobra
+  (pestañas, navegación) no cambia. Detectado en la caja V3.
 - `NexSelect`: en WebKit la lista quedaba con un hueco vacío
   hasta el borde de la ventana. En la capa superior, WebKit estira una rejilla
   (`display: grid`) hasta su `max-height`; el popup es ahora una columna flex,
