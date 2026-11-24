@@ -24,6 +24,23 @@ export type NexLiquidShape = 'spring' | 'symmetric';
  */
 export type NexHitArea = 'box' | 'membrane';
 
+/**
+ * Redondez de los controles (NexButton, NexInput, NexSelect, NexCombobox…), al estilo de
+ * `rounded-*` de Bootstrap. Fija `--nx-control-radius` para el subárbol: todos los controles
+ * cambian por igual, en CSS y en la membrana.
+ */
+export type NexRadius = 'none' | 'sm' | 'md' | 'lg' | 'pill';
+/** Curva de la esquina de los controles: `round` (arco de círculo) o `squircle` (superelipse). */
+export type NexCorner = 'round' | 'squircle';
+
+const RADIUS: Record<NexRadius, string> = { none: '0px', sm: '6px', md: '10px', lg: '16px', pill: '9999px' };
+// `smoothing` de la membrana equivalente a cada `corner-shape` de CSS: round = exponente 2,
+// squircle = superellipse(2) = exponente 4 (n = 2 + 3 · smoothing).
+const CORNER: Record<NexCorner, { shape: string; smoothing: string }> = {
+  round: { shape: 'round', smoothing: '0' },
+  squircle: { shape: 'squircle', smoothing: String(2 / 3) },
+};
+
 export interface NexContextValue {
   density: NexDensity;
   motion: NexMotion;
@@ -81,6 +98,10 @@ export interface NexProviderProps {
   liquid?: NexLiquidShape;
   /** Área que responde al puntero en las membranas. Por defecto `box` (la original). Ver `NexHitArea`. */
   hitArea?: NexHitArea;
+  /** Redondez de los controles del subárbol. Sin ella, la de la dirección (cápsula). Ver `NexRadius`. */
+  radius?: NexRadius;
+  /** Curva de la esquina de los controles. Sin ella, la de la dirección (`round`). Ver `NexCorner`. */
+  corner?: NexCorner;
   /** Pinta el fondo del tema (para islas y páginas completas). */
   canvas?: boolean;
   className?: string;
@@ -88,12 +109,23 @@ export interface NexProviderProps {
   children?: ReactNode;
 }
 
+/** Variables CSS de `radius` y `corner` (se heredan; las membranas las leen al medirse). */
+function shapeVars(radius?: NexRadius, corner?: NexCorner): CSSProperties {
+  const vars: Record<string, string> = {};
+  if (radius) vars['--nx-control-radius'] = RADIUS[radius];
+  if (corner) {
+    vars['--nx-control-corner'] = CORNER[corner].shape;
+    vars['--nx-control-smoothing'] = CORNER[corner].smoothing;
+  }
+  return vars as CSSProperties;
+}
+
 /**
  * Raíz opcional de NexFluidUI: declara tema, densidad y movimiento para su
  * subárbol. Es un `<div class="nx-root">`; puede anidarse (islas con otro tema).
  * Sin proveedor, los componentes usan `comfortable` y `subtle`.
  */
-export function NexProvider({ theme, direction, density = 'comfortable', motion = 'subtle', reducedMotion = 'system', liquid, hitArea, canvas, className, style, children }: NexProviderProps) {
+export function NexProvider({ theme, direction, density = 'comfortable', motion = 'subtle', reducedMotion = 'system', liquid, hitArea, radius, corner, canvas, className, style, children }: NexProviderProps) {
   const [preference] = useState<MotionPreference | null>(() =>
     typeof window === 'undefined' ? null : createMotionPreference(reducedMotion),
   );
@@ -102,12 +134,12 @@ export function NexProvider({ theme, direction, density = 'comfortable', motion 
   }, [preference, reducedMotion]);
   useEffect(() => () => preference?.dispose(), [preference]);
   const outer = useContext(NexContext);
-  const value = { density, motion, preference, look: `${outer.look}/${theme ?? ''}:${direction ?? ''}:${density}`, theme: theme ?? outer.theme, direction: direction ?? outer.direction, liquid: liquid ?? outer.liquid, hitArea: hitArea ?? outer.hitArea };
+  const value = { density, motion, preference, look: `${outer.look}/${theme ?? ''}:${direction ?? ''}:${density}:${radius ?? ''}:${corner ?? ''}`, theme: theme ?? outer.theme, direction: direction ?? outer.direction, liquid: liquid ?? outer.liquid, hitArea: hitArea ?? outer.hitArea };
   return (
     <NexContext.Provider value={value}>
       <div
         className={className ? `nx-root ${className}` : 'nx-root'}
-        style={style}
+        style={radius || corner ? { ...shapeVars(radius, corner), ...style } : style}
         data-nx-theme={theme}
         data-nx-direction={direction}
         data-nx-density={density}

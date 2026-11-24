@@ -306,3 +306,20 @@ describe('NexProvider · liquid', () => {
     expect(['sin', 'sim', 'heredada', 'anulada'].map((id) => $(`#${id}`).textContent)).toEqual(['original', 'symmetric', 'symmetric', 'spring']);
   });
 });
+
+describe('NexProvider · radius y corner', () => {
+  it('fijan los tokens de los controles en el subárbol; sin ellos no se toca nada', () => {
+    act(() => root.render(
+      <>
+        <NexProvider><NexInput label="Original" /></NexProvider>
+        <NexProvider radius="md" corner="squircle"><NexInput label="Ajustado" /></NexProvider>
+        <NexProvider radius="none"><NexInput label="Recto" /></NexProvider>
+      </>,
+    ));
+    const [original, ajustado, recto] = Array.from(container.querySelectorAll<HTMLElement>('.nx-root'));
+    expect(original!.style.getPropertyValue('--nx-control-radius')).toBe('');
+    expect([ajustado!.style.getPropertyValue('--nx-control-radius'), ajustado!.style.getPropertyValue('--nx-control-corner')]).toEqual(['10px', 'squircle']);
+    expect(Number(ajustado!.style.getPropertyValue('--nx-control-smoothing'))).toBeCloseTo(2 / 3);
+    expect([recto!.style.getPropertyValue('--nx-control-radius'), recto!.style.getPropertyValue('--nx-control-corner')]).toEqual(['0px', '']);
+  });
+});

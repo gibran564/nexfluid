@@ -6,6 +6,16 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Añadido
 
+- **`NexProvider` · `radius` y `corner`** (propuesta; sin ellos no cambia
+  nada). Redondez de los controles al estilo de `rounded-*` de Bootstrap:
+  `radius` = `none` (0) · `sm` (6 px) · `md` (10 px) · `lg` (16 px) · `pill`, y
+  `corner` = `round` · `squircle`. Fijan `--nx-control-radius`,
+  `--nx-control-corner` y `--nx-control-smoothing` en el subárbol, así que
+  NexButton, NexInput, NexSelect y NexCombobox cambian juntos, en CSS y en la
+  membrana. Se pueden anidar. `squircle` en CSS (`corner-shape`) sólo lo pinta
+  Chromium; en WebKit los campos quedan con arco de círculo. Nuevos tipos
+  `NexRadius` y `NexCorner`. Origen: la caja V3
+  (`docs/HALLAZGOS-CAJA-V3.md`, punto 10).
 - **`NexProvider` · `hitArea="membrane"`** (propuesta; por defecto no cambia).
   Hoy el área que responde al puntero en una superficie interactiva (NexButton,
   NexCard…) es la caja del elemento, aunque la membrana se abombe hacia el

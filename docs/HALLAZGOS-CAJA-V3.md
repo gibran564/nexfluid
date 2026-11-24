@@ -28,6 +28,7 @@ Las correcciones están en `jesjack/fix/nexinput-nexselect-webkit` y las propues
 | 7 | Error (corregido) | NexSelect (CSS) | La lista se estira con un hueco vacío hasta el borde de la ventana | WebKit |
 | 8 | Error (corregido) | `NexSurface` | El brillo bajo el puntero conserva las esquinas de la caja mientras la membrana se abomba | Los tres |
 | 9 | Decisión de diseño | `NexSurface` | El área del puntero no sigue a la membrana abombada | Los tres |
+| 10 | Error (corregido) + propuesta | Familia `capsule`, campos | NexButton no tiene la misma redondez que NexInput y NexSelect; la redondez no se puede elegir | Los tres |
 
 ## 1. NexInput: el cursor queda al principio al hacer clic cerca del borde superior
 
@@ -198,6 +199,35 @@ llega al botón. Sin coste por cuadro y sin persecución: el abombamiento tiene 
 (`--nx-pull`), sólo añade un margen de unos píxeles al salir. Las esquinas de la caja que quedan
 fuera de la forma redondeada siguen respondiendo: recortarlas exige `clip-path` sobre el
 elemento, que repinta cada cuadro, y no compensa por unos píxeles.
+
+## 10. Redondez: NexButton contra NexInput y NexSelect
+
+**Cómo reproducirlo:** un `NexButton` junto a un `NexInput` o un `NexSelect`. Los dos piden el
+mismo radio (la mitad del alto: una cápsula), pero el botón tiene los extremos casi cuadrados y
+los campos en semicírculo.
+
+**Causa:** la familia `capsule` (la de los controles, `packages/foundation/src/tokens.ts`)
+declara `cornerShape: 'round'` pero `smoothing: 1`. El CSS del botón (antes de dibujarse la
+membrana) es redondo; la membrana en SVG usa una superelipse de exponente `2 + 3 · smoothing` =
+**5**. Los campos son CSS (`border-radius`), con arco de círculo. Además, los campos tenían el
+radio fijo (`calc(alto / 2)`) en vez de leer `--nx-control-radius`: cambiar el token sólo
+cambiaba los botones.
+
+**Corrección (en `jesjack/fix/nexinput-nexselect-webkit`):** `capsule` pasa a `smoothing: 0`
+(semicírculo, como su `cornerShape`), y `NexInput`, el disparador de `NexSelect` y su buscador
+leen `--nx-control-radius` y `--nx-control-corner`. Por defecto se ven igual que antes.
+
+**Para hablar (más amplio):** la misma discrepancia entre `cornerShape` y `smoothing` está en las
+otras familias. `membrane` declara `superellipse(1.8)` (exponente 2^1.8 ≈ 3.5) con
+`smoothing: 0.85` (exponente 4.55); `fluid` declara `squircle` (exponente 4) con `smoothing: 1`
+(exponente 5). La superficie cambia de forma al pasar de CSS a SVG. No se tocó.
+
+**Propuesta (en `jesjack/feat/sugerencias-caja-v3`):** `NexProvider radius="none|sm|md|lg|pill"`
+y `corner="round|squircle"`, al estilo de `rounded-*` de Bootstrap. Fijan los tokens de los
+controles en el subárbol, así que todos cambian juntos, en CSS y en la membrana. Va en el
+proveedor y no en cada componente porque el diseño dice que "la geometría es del motor, no de
+cada componente". `NexSegmented` y las pestañas no se pasaron al token: dentro llevan la gota,
+que siempre es una cápsula, y con otra redondez el contenedor no coincidiría con ella.
 
 ## Añadido para la caja: NexCombobox
 
