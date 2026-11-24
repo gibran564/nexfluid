@@ -432,9 +432,9 @@ function SelectionSurface({ rows, cols, W, animate, fillPreview }: { rows: Axis;
     if (!vp) return;
     const again = () => { if (box.current) markCorner(box.current); if (cell.current) markCorner(cell.current); };
     vp.addEventListener('scroll', again, { passive: true });
-    const ro = new ResizeObserver(again);
-    ro.observe(vp);
-    return () => { vp.removeEventListener('scroll', again); ro.disconnect(); };
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(again);
+    ro?.observe(vp);
+    return () => { vp.removeEventListener('scroll', again); ro?.disconnect(); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const target = rect(range);
   const activeTarget = rect({ from: sel.active, to: sel.active });
