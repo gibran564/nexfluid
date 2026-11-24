@@ -155,6 +155,15 @@ describe('integridad espacial', () => {
   });
 });
 
+describe('foco de la rejilla de NexSheets', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
+  it('lo pinta el contenedor (encima de los encabezados y con sus esquinas), no la zona con scroll', () => {
+    assert.doesNotMatch(css, /\.nx-sheet__viewport:focus-visible \{[^}]*box-shadow/);
+    assert.match(css, /\.nx-sheets:has\(\.nx-sheet__viewport:focus-visible\)::after \{[^}]*opacity: 1/);
+    assert.match(css, /\.nx-sheets::after \{[^}]*border-radius: inherit/);
+  });
+});
+
 describe('anillos de foco con grosor entero', () => {
   const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   it('ninguna regla de foco usa un anillo interior de medio píxel (se dibuja más grueso de un lado)', () => {

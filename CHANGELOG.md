@@ -6,6 +6,11 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- NexSheets: el anillo de foco de la rejilla sólo se veía abajo y a la derecha.
+  Era una sombra interior de la zona con scroll: la tapaban los encabezados
+  fijos y la recortaban las esquinas redondeadas. Ahora lo pinta el contenedor
+  (`.nx-sheets::after`), encima de todo y con sus esquinas, como el foco de
+  NexInput. Detectado en la caja V3.
 - Anillos de foco interiores (barra de fórmulas de NexSheets, buscadores de
   NexSelect y de la paleta de comandos, editores de Markdown, consola, NexInk,
   NexPortal): se veían más gruesos de un lado. Medían 1.5 px y el motor

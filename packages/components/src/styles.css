@@ -1021,7 +1021,19 @@
 .nx-sheet__viewport { grid-area: 1 / 1; position: relative; overflow: auto; min-width: 0; min-height: 0; overscroll-behavior: auto; outline: none; font-variant-numeric: tabular-nums; }
 .nx-sheet[data-nx-rails] > .nx-sheet__viewport { scrollbar-width: none; }
 .nx-sheet[data-nx-rails] > .nx-sheet__viewport::-webkit-scrollbar { display: none; }
-.nx-sheet__viewport:focus-visible { box-shadow: inset 0 0 0 2px var(--nx-accent-line); }
+/*
+ * Foco de la rejilla: lo pinta el CONTENEDOR (como NexInput con :focus-within), por encima de todo
+ * y con sus esquinas. Antes era una sombra interior de .nx-sheet__viewport, la zona con scroll: la
+ * tapaban los encabezados fijos (arriba y a la izquierda) y la recortaban las esquinas redondeadas,
+ * así que sólo se veía abajo y a la derecha.
+ */
+.nx-sheets { position: relative; }
+.nx-sheets::after {
+  content: ''; position: absolute; inset: 0; z-index: 6; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 2px var(--nx-accent-line); opacity: 0;
+  transition: opacity var(--nx-motion-state-duration) var(--nx-motion-state-easing);
+}
+.nx-sheets:has(.nx-sheet__viewport:focus-visible)::after { opacity: 1; }
 .nx-sheet__lane { position: relative; display: none; }
 .nx-sheet__lane[data-nx-overflow] { display: block; }
 .nx-sheet__lane--v { grid-area: 1 / 2; }
