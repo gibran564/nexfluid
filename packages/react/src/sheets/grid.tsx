@@ -386,12 +386,43 @@ function SelectionSurface({ rows, cols, W, animate, fillPreview }: { rows: Axis;
   const sel = selection ?? { anchor: { row: 0, column: 0 }, extent: { row: 0, column: 0 }, active: { row: 0, column: 0 } };
   const range = selectionRange(sel);
   const rect = (r: CellRange) => [W + cols.offsetOf(r.from.column), HEAD_H + rows.offsetOf(r.from.row), W + cols.offsetOf(r.to.column + 1), HEAD_H + rows.offsetOf(r.to.row + 1)];
+  const painted = useRef(new Map<HTMLElement, number[]>());
   const paint = (el: HTMLDivElement | null, [l, t, r, b]: number[]) => {
     if (!el) return;
     el.style.transform = `translate(${l!.toFixed(1)}px, ${t!.toFixed(1)}px)`;
     el.style.width = `${Math.max(0, r! - l!).toFixed(1)}px`;
     el.style.height = `${Math.max(0, b! - t!).toFixed(1)}px`;
+    painted.current.set(el, [l!, t!, r!, b!]);
+    markCorner(el);
   };
+  /*
+   * La esquina inferior derecha de la hoja es redondeada: un recuadro que llega justo ahí se vería
+   * cortado. Toma la curva de la hoja sólo si su esquina coincide con la esquina VISIBLE de la zona
+   * con scroll y esa esquina es la de la hoja (sin carril, barra de estado ni hueco a la derecha).
+   */
+  const markCorner = (el: HTMLElement) => {
+    const rect = painted.current.get(el);
+    const vp = el.closest<HTMLElement>('.nx-sheet__viewport');
+    const sheets = vp?.closest<HTMLElement>('.nx-sheets');
+    let corner = false;
+    if (rect && vp && sheets) {
+      const [, , r, b] = rect;
+      if (Math.abs(r! - (vp.scrollLeft + vp.clientWidth)) < 1.5 && Math.abs(b! - (vp.scrollTop + vp.clientHeight)) < 1.5) {
+        const v = vp.getBoundingClientRect(), h = sheets.getBoundingClientRect();
+        corner = Math.abs(v.right - h.right) < 1.5 && Math.abs(v.bottom - h.bottom) < 1.5;
+      }
+    }
+    if (corner !== el.hasAttribute('data-nx-end')) el.toggleAttribute('data-nx-end', corner);
+  };
+  useEffect(() => {
+    const vp = box.current?.closest<HTMLElement>('.nx-sheet__viewport');
+    if (!vp) return;
+    const again = () => { if (box.current) markCorner(box.current); if (cell.current) markCorner(cell.current); };
+    vp.addEventListener('scroll', again, { passive: true });
+    const ro = new ResizeObserver(again);
+    ro.observe(vp);
+    return () => { vp.removeEventListener('scroll', again); ro.disconnect(); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const target = rect(range);
   const activeTarget = rect({ from: sel.active, to: sel.active });
   const boxSprings = useSprings(target, (v) => paint(box.current, v), 0.3);
@@ -413,16 +444,12 @@ function SelectionSurface({ rows, cols, W, animate, fillPreview }: { rows: Axis;
     cellSprings.to(activeTarget, [lead, lead, lead, lead]);
   }, [target.join(','), activeTarget.join(','), animate]); // eslint-disable-line react-hooks/exhaustive-deps
   const multiple = range.from.row !== range.to.row || range.from.column !== range.to.column;
-  // Toca la esquina inferior derecha del contenido: ahí la hoja es redondeada y un recuadro de
-  // esquina recta se vería cortado. Toma la curva de la hoja (--nx-sheets-radius).
-  const contentEnd = [W + cols.total - 0.5, HEAD_H + rows.total - 0.5];
-  const atEnd = (r: number[]) => (r[2]! >= contentEnd[0]! && r[3]! >= contentEnd[1]! ? '' : undefined);
   return (
     <>
-      <div ref={box} className="nx-sheet__selection" data-multiple={multiple ? '' : undefined} data-nx-end={atEnd(target)} aria-hidden="true">
+      <div ref={box} className="nx-sheet__selection" data-multiple={multiple ? '' : undefined} aria-hidden="true">
         {!sheets.readOnly && !editing && <span className="nx-sheet__fill" title="Rellenar" />}
       </div>
-      <div ref={cell} className="nx-sheet__active" data-editing={editing ? '' : undefined} data-nx-end={atEnd(activeTarget)} aria-hidden="true" />
+      <div ref={cell} className="nx-sheet__active" data-editing={editing ? '' : undefined} aria-hidden="true" />
       {fillPreview && (() => {
         const [l, t, r, b] = rect(fillPreview);
         return <div className="nx-sheet__fill-preview" aria-hidden="true" style={{ transform: `translate(${l}px, ${t}px)`, width: r! - l!, height: b! - t! }} />;
