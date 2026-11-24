@@ -24,7 +24,7 @@ Las correcciones están en `jesjack/fix/nexinput-nexselect-webkit` y las propues
 | 3 | Decisión de diseño | `useLiquid` | La gota se estira mucho a lo alto y se adelgaza a lo ancho al viajar | Los tres |
 | 4 | Decisión de diseño | `useLiquid` (attract) | La gota se comprime hacia la opción bajo el puntero pero no viaja a ella | Los tres |
 | 5 | Error de NexDocs | `apps/docs` | Los `<select>` nativos se ven distintos en cada navegador | Diferente en WebKit y Chromium |
-| 6 | Error | `liquidCapsule` (core) | En listas verticales anchas, a mitad del viaje la gota muestra una hendidura | Los tres (es geometría) |
+| 6 | Error (corregido) | `liquidCapsule` (core) | En listas verticales anchas, a mitad del viaje la gota muestra una hendidura | Los tres (es geometría) |
 | 7 | Error (corregido) | NexSelect (CSS) | La lista se estira con un hueco vacío hasta el borde de la ventana | WebKit |
 
 ## 1. NexInput: el cursor queda al principio al hacer clic cerca del borde superior
@@ -149,9 +149,10 @@ opciones de 38 px), el peor punto es **182 px de largo por 184 de ancho**: `r = 
 se ve una hendidura en lugar de una cintura. En pestañas horizontales no pasa: la gota es baja y
 larga y siempre tiene tramo recto.
 
-**Corrección propuesta:** limitar el cuello a una fracción del tramo recto, por ejemplo
-`neck = min(neck, 0.5 · (len/2 − r))`, de modo que desaparezca cuando la cápsula no tiene lados
-rectos. No cambia la forma cuando sí los tiene (pestañas, navegación, viajes cortos).
+**Corrección (en `jesjack/fix/nexinput-nexselect-webkit`):** el cuello se limita a la mitad del
+tramo recto, `neck = min(neck, 0.5 · (len/2 − r))`: desaparece cuando la cápsula no tiene lados
+rectos y no cambia cuando sí los tiene (pestañas, navegación, viajes cortos). Prueba en
+`packages/core/tests/membrane.test.ts`.
 
 ## 7. NexSelect: la lista se estira hasta el borde de la ventana en WebKit
 
