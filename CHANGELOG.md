@@ -6,6 +6,15 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ### Corregido
 
+- Redondez de los controles: un `NexButton` no tenía la misma redondez que un
+  `NexInput` o un `NexSelect` a su lado. La familia `capsule` (la de los
+  controles) declaraba `cornerShape: 'round'` pero `smoothing: 1`, y la membrana
+  dibujaba sus extremos como superelipse de exponente 5, casi cuadrados; los
+  campos, en CSS, eran semicírculos. Ahora `capsule` tiene `smoothing: 0`
+  (semicírculo, como su `cornerShape`). Además `NexInput`, el disparador de
+  `NexSelect` y su buscador leen `--nx-control-radius` y `--nx-control-corner`
+  en vez de un radio fijo: cambiar el token cambia todos los controles por
+  igual. Por defecto se ven igual que antes. Detectado en la caja V3.
 - `NexSurface` (NexButton, NexCard… interactivas): el brillo bajo el puntero
   (`.nx-surface__zone`) se quedaba con las esquinas de la caja mientras la
   membrana se abombaba hacia el puntero, y se veían dos formas. Con la

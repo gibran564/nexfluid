@@ -76,7 +76,7 @@
   --nx-shape-membrane-smoothing: 0.85;
   --nx-shape-membrane-corner: superellipse(1.8);
   --nx-shape-capsule-radius: 9999px;
-  --nx-shape-capsule-smoothing: 1;
+  --nx-shape-capsule-smoothing: 0;
   --nx-shape-capsule-corner: round;
   --nx-shape-morph-radius: 22px;
   --nx-shape-morph-smoothing: 0.9;
@@ -397,7 +397,7 @@
   --nx-surface-press: 0.015;
   --nx-control-family: capsule;
   --nx-control-radius: 9999px;
-  --nx-control-smoothing: 1;
+  --nx-control-smoothing: 0;
   --nx-control-corner: round;
   --nx-control-attract: 3;
   --nx-control-press: 0.045;
@@ -431,7 +431,7 @@
   --nx-surface-press: 0;
   --nx-control-family: capsule;
   --nx-control-radius: 9999px;
-  --nx-control-smoothing: 1;
+  --nx-control-smoothing: 0;
   --nx-control-corner: round;
   --nx-control-attract: 1.2;
   --nx-control-press: 0.03;
@@ -465,7 +465,7 @@
   --nx-surface-press: 0.03;
   --nx-control-family: capsule;
   --nx-control-radius: 9999px;
-  --nx-control-smoothing: 1;
+  --nx-control-smoothing: 0;
   --nx-control-corner: round;
   --nx-control-attract: 3;
   --nx-control-press: 0.06;
@@ -499,7 +499,7 @@
   --nx-surface-press: 0.02;
   --nx-control-family: capsule;
   --nx-control-radius: 9999px;
-  --nx-control-smoothing: 1;
+  --nx-control-smoothing: 0;
   --nx-control-corner: round;
   --nx-control-attract: 3;
   --nx-control-press: 0.06;

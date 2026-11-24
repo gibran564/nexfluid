@@ -155,6 +155,17 @@ describe('integridad espacial', () => {
   });
 });
 
+describe('redondez: los campos leen el token de los controles', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
+  for (const sel of ['.nx-input', '.nx-select__trigger', '.nx-select__search']) {
+    it(`${sel} usa --nx-control-radius y --nx-control-corner (la misma redondez que NexButton)`, () => {
+      const rule = new RegExp(`(?:^|\\n)\\${sel} \\{[^}]*\\}`).exec(css)?.[0] ?? '';
+      assert.match(rule, /border-radius: var\(--nx-control-radius\)/);
+      assert.match(rule, /corner-shape: var\(--nx-control-corner\)/);
+    });
+  }
+});
+
 describe('foco: un solo indicador en campos compuestos', () => {
   const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   /** Especificidad (a, b, c) de un selector simple de esta hoja (clases, atributos, pseudo-clases; :is cuenta su argumento más fuerte). */

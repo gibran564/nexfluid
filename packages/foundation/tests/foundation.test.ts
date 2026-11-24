@@ -45,6 +45,11 @@ describe('identidad propia: tipografía y geometría nuevas', () => {
     assert.deepEqual(Object.keys(SHAPES), ['fluid', 'membrane', 'capsule', 'morph', 'editorial']);
     assert.equal(SHAPES.fluid.smoothing, 1);
   });
+  it('la cápsula de los controles tiene extremos en semicírculo, como su cornerShape round', () => {
+    // La membrana (SVG) y el CSS deben dibujar la misma redondez: NexButton junto a NexInput.
+    assert.equal(SHAPES.capsule.cornerShape, 'round');
+    assert.equal(SHAPES.capsule.smoothing, 0);
+  });
 });
 
 describe('contrato de tokens', () => {

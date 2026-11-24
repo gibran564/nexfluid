@@ -186,8 +186,13 @@ export const SHAPES = {
   fluid: { radius: 28, smoothing: 1, attract: 7, press: 0.018, cornerShape: 'squircle' },
   /** Superficie con tensión controlada: tarjetas, paneles, regiones. */
   membrane: { radius: 20, smoothing: 0.85, attract: 4, press: 0.012, cornerShape: 'superellipse(1.8)' },
-  /** Forma alargada deformable: controles, indicadores, insignias. */
-  capsule: { radius: 'pill', smoothing: 1, attract: 3, press: 0.045, cornerShape: 'round' },
+  /**
+   * Forma alargada deformable: controles, indicadores, insignias. Extremos en semicírculo
+   * (`smoothing: 0`, superelipse de exponente 2), como su `cornerShape: 'round'` y como los
+   * campos en CSS: con `smoothing: 1` la membrana dibujaba los extremos casi cuadrados y un
+   * NexButton no tenía la misma redondez que un NexInput o un NexSelect a su lado.
+   */
+  capsule: { radius: 'pill', smoothing: 0, attract: 3, press: 0.045, cornerShape: 'round' },
   /** Membrana preparada para transformarse (tarjeta → panel). */
   morph: { radius: 22, smoothing: 0.9, attract: 4, press: 0.012, cornerShape: 'superellipse(1.8)' },
   /** Estructural: contenido largo, tablas, código. Casi recta, sin deformación. */

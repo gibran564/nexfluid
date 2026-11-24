@@ -1124,7 +1124,7 @@
 
 .nx-input {
   display: flex; align-items: center; gap: 8px; min-width: 0; min-height: var(--nx-density-control); padding: 0 14px;
-  border-radius: calc(var(--nx-density-control) / 2); background: var(--nx-surface-sunken); color: var(--nx-fg);
+  border-radius: var(--nx-control-radius); corner-shape: var(--nx-control-corner); background: var(--nx-surface-sunken); color: var(--nx-fg);
   box-shadow: inset 0 0 0 1px var(--nx-border);
   transition: box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing), background var(--nx-motion-state-duration) var(--nx-motion-state-easing);
 }
@@ -1193,7 +1193,7 @@
 .nx-select { position: relative; }
 .nx-select__trigger {
   display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; min-height: var(--nx-density-control); padding: 4px 12px 4px 14px;
-  border: 0; border-radius: calc(var(--nx-density-control) / 2); background: var(--nx-surface-sunken); color: var(--nx-fg); text-align: left; cursor: pointer;
+  border: 0; border-radius: var(--nx-control-radius); corner-shape: var(--nx-control-corner); background: var(--nx-surface-sunken); color: var(--nx-fg); text-align: left; cursor: pointer;
   font: 500 var(--nx-density-font) / 1.2 var(--nx-font-body); box-shadow: inset 0 0 0 1px var(--nx-border);
   transition: box-shadow var(--nx-motion-state-duration) var(--nx-motion-state-easing), background var(--nx-motion-state-duration) var(--nx-motion-state-easing);
 }
@@ -1226,7 +1226,7 @@
 /* El campo de ayuda y el error quedan bajo la lista: la lista se ancla al disparador. */
 .nx-select:has(.nx-field__description, .nx-field__error) .nx-select__popup[data-placement='bottom'] { top: calc(var(--nx-density-control) + 30px); }
 @keyframes nx-select-in { from { opacity: 0; transform: translateY(-4px) scale(0.98); } }
-.nx-select__search { flex: none; min-height: 34px; padding: 0 12px; border: 0; border-radius: 9999px; background: var(--nx-surface-sunken); color: var(--nx-fg); font: 450 var(--nx-text-small) var(--nx-font-body); outline: none; box-shadow: inset 0 0 0 1px var(--nx-border); }
+.nx-select__search { flex: none; min-height: 34px; padding: 0 12px; border: 0; border-radius: var(--nx-control-radius); corner-shape: var(--nx-control-corner); background: var(--nx-surface-sunken); color: var(--nx-fg); font: 450 var(--nx-text-small) var(--nx-font-body); outline: none; box-shadow: inset 0 0 0 1px var(--nx-border); }
 .nx-select__search:focus { box-shadow: inset 0 0 0 1.5px var(--nx-accent); }
 /* 320 px: caben 8 opciones de una línea (38 px) sin barra de desplazamiento. */
 .nx-select__list { position: relative; flex: 0 1 auto; min-height: 0; max-height: 320px; overflow: auto; overscroll-behavior: contain; outline: none; scrollbar-width: thin; }
