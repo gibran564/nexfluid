@@ -2,7 +2,7 @@ import { act, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import axe from 'axe-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NexCheckbox, NexInput, NexSelect, type NexSelectOption } from '@nexfluid/react';
+import { NexCheckbox, NexCombobox, NexInput, NexSelect, type NexComboboxOption, type NexComboboxProps, type NexSelectOption } from '@nexfluid/react';
 import { NexMarkdown } from '@nexfluid/react/markdown';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -163,6 +163,127 @@ describe('NexSelect', () => {
     act(() => $<HTMLButtonElement>('[role="combobox"]').click());
     expect(container.querySelector('[role="option"] img[alt="Motor"]')).not.toBeNull();
     expect(container.querySelector('[role="option"][aria-disabled="true"]')?.textContent).toContain('C++');
+    expect(await violations()).toEqual([]);
+  });
+});
+
+describe('NexCombobox', () => {
+  const PRODUCTOS: NexComboboxOption[] = [
+    { value: '1', label: 'blusa básica' },
+    { value: '2', label: 'blusa de licra' },
+    { value: '3', label: 'mayón faja', description: '$200' },
+    { value: '4', label: 'blusa agotada', disabled: true },
+  ];
+  const escribir = (el: HTMLInputElement, texto: string) => act(() => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(el, texto);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  const visibles = () => Array.from(container.querySelectorAll('[role="option"]')).map((o) => o.textContent);
+  const activa = (input: HTMLInputElement) => document.getElementById(input.getAttribute('aria-activedescendant') ?? '')?.textContent ?? null;
+
+  function Host(props: Partial<NexComboboxProps>) {
+    const [v, setV] = useState('');
+    const [elegida, setElegida] = useState('');
+    const [teclas, setTeclas] = useState<string[]>([]);
+    return (
+      <>
+        <NexCombobox label="Producto" options={PRODUCTOS} value={v} onValueChange={setV}
+          onOptionSelect={(o) => setElegida(o.value)} onKeyDown={(e) => setTeclas((t) => [...t, e.key])} {...props} />
+        <output id="valor">{v}</output><output id="elegida">{elegida}</output><output id="teclas">{teclas.join(',')}</output>
+      </>
+    );
+  }
+
+  it('escribir abre y filtra sin acentos; Intro elige la primera, cierra y no reabre', () => {
+    act(() => root.render(<Host />));
+    const input = $<HTMLInputElement>('input[role="combobox"]');
+    act(() => input.focus());
+    expect(input.getAttribute('aria-expanded')).toBe('false');
+    escribir(input, 'basica');
+    expect(input.getAttribute('aria-expanded')).toBe('true');
+    expect(visibles()).toEqual(['blusa básica']);
+    escribir(input, 'blusa');
+    expect(visibles()).toEqual(['blusa básica', 'blusa de licra', 'blusa agotada']);
+    expect(activa(input)).toBe('blusa básica');
+    expect(input.getAttribute('aria-controls')).toBe($('[role="listbox"]').id);
+    key(input, 'ArrowDown');
+    expect(activa(input)).toBe('blusa de licra');
+    key(input, 'ArrowDown'); // salta la deshabilitada y da la vuelta
+    expect(activa(input)).toBe('blusa básica');
+    key(input, 'ArrowUp');
+    expect(activa(input)).toBe('blusa de licra');
+    key(input, 'Enter');
+    expect($('#valor').textContent).toBe('blusa de licra');
+    expect($('#elegida').textContent).toBe('2');
+    expect(container.querySelector('[role="listbox"]')).toBeNull();
+    expect(document.activeElement).toBe(input);
+    expect($('#teclas').textContent).toBe(''); // las teclas usadas no llegan a la aplicación
+  });
+
+  it('con la lista cerrada, Intro y Escape llegan a onKeyDown; Escape primero cierra', () => {
+    act(() => root.render(<Host />));
+    const input = $<HTMLInputElement>('input[role="combobox"]');
+    act(() => input.focus());
+    key(input, 'Enter');
+    expect($('#teclas').textContent).toBe('Enter');
+    escribir(input, 'faja');
+    key(input, 'Escape');
+    expect(container.querySelector('[role="listbox"]')).toBeNull();
+    expect($('#valor').textContent).toBe('faja'); // Escape no borra lo escrito
+    expect($('#teclas').textContent).toBe('Enter');
+    key(input, 'Escape');
+    expect($('#teclas').textContent).toBe('Enter,Escape');
+    key(input, 'ArrowDown'); // ↓ reabre
+    expect(visibles()).toEqual(['mayón faja$200']);
+    key(input, 'Tab'); // Tab cierra sin elegir
+    expect(container.querySelector('[role="listbox"]')).toBeNull();
+    expect($('#elegida').textContent).toBe('');
+  });
+
+  it('texto libre: sin sugerencias se cierra, vaciar cierra, y emptyMessage avisa', () => {
+    act(() => root.render(<Host />));
+    const input = $<HTMLInputElement>('input[role="combobox"]');
+    act(() => input.focus());
+    escribir(input, 'pantalón');
+    expect(container.querySelector('[role="listbox"]')).toBeNull();
+    key(input, 'Enter');
+    expect($('#valor').textContent).toBe('pantalón');
+    expect($('#teclas').textContent).toBe('Enter');
+    escribir(input, 'blusa');
+    escribir(input, '');
+    expect(container.querySelector('[role="listbox"]')).toBeNull();
+    act(() => root.render(<Host emptyMessage="Producto nuevo" />));
+    escribir(input, 'pantalón');
+    expect($('[role="status"]').textContent).toBe('Producto nuevo');
+  });
+
+  it('filter={false} muestra las sugerencias tal cual; el puntero activa y el clic elige', () => {
+    act(() => root.render(<Host filter={false} options={PRODUCTOS.slice(0, 2)} />));
+    const input = $<HTMLInputElement>('input[role="combobox"]');
+    act(() => input.focus());
+    escribir(input, 'zzz');
+    expect(visibles()).toEqual(['blusa básica', 'blusa de licra']);
+    const [, segunda] = Array.from(container.querySelectorAll<HTMLElement>('[role="option"]'));
+    act(() => { segunda!.dispatchEvent(new PointerEvent('pointermove', { bubbles: true })); });
+    expect(activa(input)).toBe('blusa de licra');
+    const down = new PointerEvent('pointerdown', { bubbles: true, cancelable: true });
+    act(() => { segunda!.dispatchEvent(down); });
+    expect(down.defaultPrevented).toBe(true); // el foco no sale del campo
+    act(() => segunda!.click());
+    expect($('#valor').textContent).toBe('blusa de licra');
+    expect(document.activeElement).toBe(input);
+  });
+
+  it('la gota está lista en cada apertura; sin violaciones de axe abierto', async () => {
+    act(() => root.render(<Host />));
+    const input = $<HTMLInputElement>('input[role="combobox"]');
+    act(() => input.focus());
+    for (let vez = 0; vez < 3; vez++) {
+      escribir(input, vez % 2 ? 'blusa' : 'faja');
+      expect($('[role="listbox"]').hasAttribute('data-nx-ready')).toBe(true);
+      key(input, 'Escape');
+    }
+    escribir(input, 'blusa');
     expect(await violations()).toEqual([]);
   });
 });

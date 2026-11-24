@@ -1215,6 +1215,8 @@
 .nx-checkbox[data-disabled] .nx-checkbox__label { color: var(--nx-fg-muted); cursor: not-allowed; }
 
 .nx-select { position: relative; }
+/* NexCombobox: campo de texto libre con sugerencias. Reutiliza la lista de NexSelect (popup, opciones, gota). */
+.nx-combobox { position: relative; }
 .nx-select__trigger {
   display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; min-height: var(--nx-density-control); padding: 4px 12px 4px 14px;
   border: 0; border-radius: var(--nx-control-radius); corner-shape: var(--nx-control-corner); background: var(--nx-surface-sunken); color: var(--nx-fg); text-align: left; cursor: pointer;

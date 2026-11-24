@@ -4,6 +4,21 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
 
 ## Sin publicar
 
+### Añadido
+
+- **`NexCombobox`** (nuevo). Campo de texto libre con sugerencias (patrón
+  WAI-ARIA combobox con `aria-autocomplete="list"`): el foco se queda en el
+  `<input>` mientras la lista está abierta, la sugerencia activa la marca la
+  gota de NexSelect y sigue al puntero, y elegir NO vuelve a abrir la lista
+  aunque cambien las sugerencias. Las sugerencias las da la aplicación; con
+  `filter` (por defecto) se filtran aquí sin acentos, con `filter={false}` se
+  muestran tal cual (búsqueda propia). `onOptionSelect` avisa de la elección;
+  las teclas que el combobox no usa (Intro con la lista cerrada, Escape con la
+  lista ya cerrada) llegan a `onKeyDown`. Tab cierra sin elegir. Reutiliza la
+  membrana de `NexInput` y la lista de `NexSelect`. Origen: el campo de
+  producto de la caja V3, que no podía usar NexSelect porque éste mueve el
+  foco a su buscador.
+
 ### Corregido
 
 - NexSheets: arrastrar la barra de desplazamiento de la rejilla avanzaba una

@@ -39,7 +39,7 @@ const INTERACTIVE = 'a[href], button, input, select, textarea, [tabindex], [cont
  * corregirlo con `line-height`. Los controles dentro de los adornos (un botón
  * de borrar, un enlace) conservan su clic.
  */
-function focusFromMembrane(event: ReactMouseEvent<HTMLDivElement>, input: HTMLInputElement | null) {
+export function focusFromMembrane(event: ReactMouseEvent<HTMLDivElement>, input: HTMLInputElement | null) {
   if (!input || input.disabled || event.button !== 0) return;
   const target = event.target as Element;
   if (target === input) return;
