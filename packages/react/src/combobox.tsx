@@ -19,7 +19,7 @@
  * puntero.
  *
  * Teclado: ↓/↑ recorren (Alt+↓ abre), Intro elige la activa, Escape cierra (y
- * con la lista ya cerrada se propaga), Tab cierra sin elegir. Las teclas que
+ * con la lista ya cerrada se propaga), Tab cierra sin elegir (o elige, con `tabSelects`). Las teclas que
  * el combobox no usa llegan a `onKeyDown`: así la aplicación decide qué hace
  * Intro con la lista cerrada (pasar al siguiente campo, enviar…).
  */
@@ -62,6 +62,11 @@ export interface NexComboboxProps
   filter?: boolean;
   /** Al aparecer la lista, la primera sugerencia queda activa (Intro la elige). Por defecto, sí. */
   autoHighlight?: boolean;
+  /**
+   * Tab con la lista abierta elige la opción activa (o la primera) y deja pasar al siguiente campo,
+   * como NexSelect. Por defecto, Tab cierra sin elegir.
+   */
+  tabSelects?: boolean;
   /** Mensaje cuando lo escrito no tiene sugerencias. Sin él, la lista se cierra. */
   emptyMessage?: ReactNode;
   description?: ReactNode;
@@ -78,7 +83,7 @@ const norm = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').to
 
 export const NexCombobox = forwardRef<HTMLInputElement, NexComboboxProps>(function NexCombobox(
   {
-    label, options, value: controlled, defaultValue = '', onValueChange, onOptionSelect, filter = true, autoHighlight = true, emptyMessage,
+    label, options, value: controlled, defaultValue = '', onValueChange, onOptionSelect, filter = true, autoHighlight = true, tabSelects = false, emptyMessage,
     description, error, leading, trailing, hideLabel, density, motion, className, id: idProp, required, disabled, onKeyDown, onBlur, ...rest
   },
   ref,
@@ -169,7 +174,12 @@ export const NexCombobox = forwardRef<HTMLInputElement, NexComboboxProps>(functi
       e.stopPropagation();
       return true;
     }
-    if (k === 'Tab') setOpen(false); // cierra sin elegir y deja salir
+    if (k === 'Tab') {
+      // Con tabSelects elige la activa (o la primera); el Tab sigue su curso y sale del campo.
+      const o = tabSelects && !e.shiftKey ? enabled.find((x) => x.value === active) ?? enabled[0] : undefined;
+      if (o) choose(o);
+      else setOpen(false); // cierra sin elegir y deja salir
+    }
     return false;
   };
 

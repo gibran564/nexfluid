@@ -194,6 +194,27 @@ describe('NexCombobox', () => {
     );
   }
 
+  it('tabSelects: Tab elige la activa (o la primera); sin él, cierra sin elegir', () => {
+    act(() => root.render(<Host tabSelects />));
+    const input = $<HTMLInputElement>('input[role="combobox"]');
+    act(() => input.focus());
+    escribir(input, 'blusa');
+    key(input, 'ArrowDown');
+    key(input, 'Tab');
+    expect($('#elegida').textContent).toBe('2');
+    expect(input.getAttribute('aria-expanded')).toBe('false');
+    escribir(input, 'faja');
+    key(input, 'Tab');
+    expect($('#elegida').textContent).toBe('3');
+    act(() => root.render(<Host key="b" />));
+    const otro = $<HTMLInputElement>('input[role="combobox"]');
+    act(() => otro.focus());
+    escribir(otro, 'blusa');
+    key(otro, 'Tab');
+    expect($('#elegida').textContent).toBe('');
+    expect(otro.getAttribute('aria-expanded')).toBe('false');
+  });
+
   it('escribir abre y filtra sin acentos; Intro elige la primera, cierra y no reabre', () => {
     act(() => root.render(<Host />));
     const input = $<HTMLInputElement>('input[role="combobox"]');
