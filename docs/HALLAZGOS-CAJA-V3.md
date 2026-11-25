@@ -312,6 +312,15 @@ botones vuelven a ser cápsula. Arreglo en la caja: un `NexProvider` con la mism
 panel. Propuesta: que el panel copie también `--nx-control-radius` y `--nx-control-corner` (el
 contexto ya sabe ambos valores) o que `NexProvider` los exponga en su contexto.
 
+## 20. El modal de NexMorph no puede medir su contenido
+
+En `viewport` el panel mide 760 × 680 px. Con `panelStyle` se cambia, pero no a «lo que mida el
+contenido»: el contenido va en capas absolutas (`.nx-morph__clip`), así que con `height: fit-content`
+el panel queda en 0, y la geometría se mide una sola vez al abrir (si el contenido crece después,
+la membrana no lo sigue). Para diálogos pequeños (confirmar, pedir un dato) hace falta un alto
+fijo. Propuesta: un modo `size="content"` que mida el contenido al abrir (y con ResizeObserver
+mientras está abierto).
+
 ## Añadido para la caja: NexDatePicker
 
 Elegir un día en un calendario, con el disparador y la capa de NexSelect. Fechas `AAAA-MM-DD` locales,
