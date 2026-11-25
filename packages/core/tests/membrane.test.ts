@@ -66,6 +66,13 @@ describe('gota líquida (indicador)', () => {
     assert.ok(Math.max(...ys) <= 32 && Math.min(...ys) >= 0);
     assert.ok(d.includes(' 100 '), 'pasa por el centro');
   });
+  it('un anfitrión oculto (largo y grosor 0) no produce coordenadas NaN', () => {
+    // NexSegmented dentro de un panel colapsado mide 0 × 0: el trazado debe seguir siendo válido.
+    for (const d of [liquidCapsule(0, 0, 0, 0.6), liquidCapsule(0, 0, 0, 0), liquidCapsule(5, 5, 0, 1), liquidCapsule(0, 40, 0, 0.6)]) {
+      assert.ok(!d.includes('NaN'), d);
+      assert.ok(!d.includes('Infinity'), d);
+    }
+  });
   it('vertical intercambia ejes y acepta start > end', () => {
     assert.equal(liquidCapsule(50, 10, 20, 0, { vertical: true }).startsWith('M0 20'), true);
   });
