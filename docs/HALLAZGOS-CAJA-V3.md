@@ -321,6 +321,16 @@ la membrana no lo sigue). Para diálogos pequeños (confirmar, pedir un dato) ha
 fijo. Propuesta: un modo `size="content"` que mida el contenido al abrir (y con ResizeObserver
 mientras está abierto).
 
+## 21. Los carriles de NexSheets se sostienen entre sí
+
+Cada carril ocupa espacio (14 px). En una hoja con el alto justo de sus filas y las columnas
+ajustadas al ancho, basta un desborde momentáneo (al restaurar la ventana, las columnas todavía son
+las de la ventana grande) para que aparezca el horizontal; éste quita alto, aparece el vertical, que
+quita ancho, y el horizontal ya no se va aunque el contenido quepa: 13 px de desborde que sólo
+existen por el otro carril. Propuesta: decidir cada carril sin contar el espacio del otro
+(histéresis), o carriles superpuestos que no ocupen espacio. Arreglo en la caja: sin carril
+horizontal (las columnas siempre caben) y sin vertical en el carrito.
+
 ## Añadido para la caja: NexDatePicker
 
 Elegir un día en un calendario, con el disparador y la capa de NexSelect. Fechas `AAAA-MM-DD` locales,
