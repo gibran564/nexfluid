@@ -2,7 +2,13 @@
 
 Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco paquetes comparten versión y se fijan entre sí con versión exacta.
 
-## Sin publicar
+## 0.10.0 — 2026-11-25
+
+Edición de figuras no destructiva y dos correcciones de shells de aplicación. Compatible hacia atrás con 0.9.0: sólo añade la exportación `@nexfluid/react/image` y estilos nuevos. Origen: Image Focus de NexBook (Nextudio), que necesitaba recortar, ajustar y anotar figuras conservando el original.
+
+### Añadido
+
+- **`NexImageEditor`** (`@nexfluid/react/image`). Editor raster local y no destructivo: recibe un `Blob` autorizado por la aplicación y devuelve el derivado más la versión 1 de las operaciones (recorte normalizado, giro de 90°, volteos, brillo, contraste, saturación, escala de grises, ancho de salida y hasta 40 marcas: flechas, etiquetas y rectángulos). Siempre vuelve a renderizar desde el original, también al reanudar. Historial de 40 cambios, recorte por arrastre o por porcentajes, marcas con puntero, táctil o teclado y exportación PNG, JPEG o WebP. Límites: 25 MB de entrada, 24 megapíxeles tras decodificar, 960 px de vista previa y 4096 px de salida. Canvas 2D sin dependencias; no acepta URLs ni SVG. Modelo puro exportado (`normalizeImageEdits`, `imageGeometry`, `centeredImageCrop`…). Guía en `docs/NEXIMAGE-EDITOR.md`.
 
 ### Corregido
 
@@ -17,7 +23,7 @@ Versiones de `@nexfluid/{foundation,core,components,sheets,react}`. Los cinco pa
   repite `data-nx-theme`, `data-nx-direction` y `data-nx-density` del
   proveedor más cercano. `useNex()` expone `theme` y `direction` heredados.
 
-## 0.9.0 — preparada el 2026-11-20 (sin publicar)
+## 0.9.0 — 2026-11-20
 
 Navegación de aplicación: el riel lateral compacto, sus rótulos y los iconos de destino. Compatible hacia atrás con 0.8.0: sólo añade exportaciones y props opcionales; `NexNav` sin las props nuevas se pinta igual. Origen: la barra lateral de Nextudio (`AppSidebar`), que mantenía su propio sistema de iconos, rótulos y estados y ocultaba los iconos al expandirse.
 

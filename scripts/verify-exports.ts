@@ -14,6 +14,7 @@ const EXPECTED: Record<string, string[]> = {
   '@nexfluid/sheets': ['createWorkbook', 'evaluateSheet', 'pasteGrid', 'csvToSheet', 'toCsv', 'createHistory', 'moveSelection', 'fillRange', 'createAxis', 'parseWorkbook'],
   '@nexfluid/react': ['NexProvider', 'NexButton', 'NexIconButton', 'NexBadge', 'NexCard', 'NexCardTitle', 'NexTabs', 'NexTab', 'NexTabsList', 'NexTabsPanel', 'NexFrame', 'NexFrameRegion', 'NexCodeBlock', 'NexIcon', 'NexMenu', 'NexCommandMenu', 'NexFlow', 'NexEditorialBlock', 'useNexFlow', 'NexConsole', 'NexLiveConsole', 'NexGrid', 'NexGridItem'],
   '@nexfluid/react/markdown': ['NexMarkdown', 'NexMarkdownField'],
+  '@nexfluid/react/image': ['NexImageEditor', 'originalImageEdits', 'imageGeometry'],
   '@nexfluid/react/widgets': ['NexMarkdownWidget', 'NexPropertiesWidget'],
   '@nexfluid/react/motion': ['FluidBlob'],
   '@nexfluid/react/sheets': ['NexSheets', 'NexSheetGrid', 'NexFormulaBar', 'NexSheetTabs', 'useNexSheets', 'createWorkbook', 'NexDataView'],
