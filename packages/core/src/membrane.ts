@@ -136,7 +136,8 @@ export function liquidCapsule(start: number, end: number, h: number, pinch = 0, 
   const b = Math.max(start, end);
   const r = Math.min(h / 2, (b - a) / 2);
   const len = b - a;
-  const neck = Math.min(0.85, Math.max(0, pinch)) * (h / 2) * Math.min(1, len / (h * 2.5));
+  // Sin grosor no hay cuello: con h = 0 (anfitrión oculto) la proporción sería 0/0 = NaN.
+  const neck = h > 0 ? Math.min(0.85, Math.max(0, pinch)) * (h / 2) * Math.min(1, len / (h * 2.5)) : 0;
   const top = offset;
   const bottom = offset + h;
   const mid = (a + b) / 2;
