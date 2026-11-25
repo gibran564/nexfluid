@@ -15,6 +15,11 @@ Toda versión publicada tiene que poder reconstruirse desde un commit etiquetado
    ```sh
    npm publish release/0.4.0/nexfluid-foundation-0.4.0.tgz   # foundation, core, components, sheets, react, en ese orden
    ```
+   Atajo con 2FA desde cualquier equipo: `scripts/publish-release.sh X.Y.Z` hace los pasos 4 a 6 en un clon
+   temporal del tag, pide el código 2FA antes de cada paquete y aborta si npm no devuelve la integridad del
+   manifiesto. `--expected <manifest.json>` compara con un empaquetado hecho en otra máquina; `--dry-run` ensaya
+   sin sesión ni publicación. Necesita git, Node y npm.
+
    Para tener *provenance*, publicar desde GitHub Actions con `id-token: write` y `npm publish --provenance`. Ese workflow todavía no existe; es la decisión D1 del ADR de Nextudio.
 6. Verificar que lo publicado es lo empaquetado: `npm view @nexfluid/react@0.4.0 dist.integrity` tiene que coincidir con el manifiesto.
 
