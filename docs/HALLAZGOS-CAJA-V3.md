@@ -318,8 +318,13 @@ En `viewport` el panel mide 760 × 680 px. Con `panelStyle` se cambia, pero no a
 contenido»: el contenido va en capas absolutas (`.nx-morph__clip`), así que con `height: fit-content`
 el panel queda en 0, y la geometría se mide una sola vez al abrir (si el contenido crece después,
 la membrana no lo sigue). Para diálogos pequeños (confirmar, pedir un dato) hace falta un alto
-fijo. Propuesta: un modo `size="content"` que mida el contenido al abrir (y con ResizeObserver
-mientras está abierto).
+fijo.
+
+**Propuesta hecha en esta rama:** `NexMorph.Target size="content"` (opcional; por defecto `fill`,
+como hasta ahora). El contenido va en `.nx-morph__fit`, a su alto natural; el panel toma ese alto
+antes del primer fotograma y lo sigue con ResizeObserver mientras está abierto (la membrana se
+repinta, porque cada fotograma vuelve a leer el destino). En `viewport` el ancho por defecto es
+hasta 480 px y el alto no pasa de la ventana (si no cabe, el contenido se desplaza).
 
 ## 21. Los carriles de NexSheets se sostienen entre sí
 

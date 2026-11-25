@@ -264,6 +264,13 @@ export interface NexMorphTargetProps extends Omit<HTMLAttributes<HTMLDivElement>
   material?: 'base' | 'raised' | 'sunken';
   /** Posición y tamaño del panel dentro de su contenedor (por defecto lo ocupa entero). */
   panelStyle?: CSSProperties;
+  /**
+   * Alto del panel. `fill` (por defecto): el de `panelStyle` o el del contenedor (en `viewport`,
+   * hasta 680 px). `content`: el de su contenido, medido al abrir y mientras está abierto (un aviso
+   * que aparece lo agranda; la membrana lo sigue). Para diálogos pequeños; el ancho sigue siendo el
+   * de `panelStyle` (en `viewport`, por defecto hasta 480 px) y el alto no pasa del contenedor.
+   */
+  size?: 'fill' | 'content';
   children?: ReactNode;
 }
 
@@ -300,7 +307,7 @@ function MorphTarget(props: NexMorphTargetProps) {
   return ctx.present ? <MorphTargetPanel {...props} /> : null;
 }
 
-function MorphTargetPanel({ container = 'viewport', label, modal, radius, material = 'raised', panelStyle, className, children, style, onKeyDown, ...rest }: NexMorphTargetProps) {
+function MorphTargetPanel({ container = 'viewport', label, modal, radius, material = 'raised', panelStyle, size = 'fill', className, children, style, onKeyDown, ...rest }: NexMorphTargetProps) {
   const ctx = useMorph('NexMorph.Target');
   const preference = useMotionPreference();
   const [host, setHost] = useState<HTMLElement | null>(null);
@@ -327,7 +334,15 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
     const src = ctx.source.current;
     if (!host || !r || !p || !clip.current) return;
     setHasTitle(p.contains(document.getElementById(ctx.ids.title)));
-    markIncoming(clip.current.querySelector('.nx-morph__content')!);
+    // Con size="content" el contenido va en `.nx-morph__fit` (su alto natural): ahí se coreografía.
+    const fitBox = size === 'content' ? clip.current.querySelector<HTMLElement>('.nx-morph__fit') : null;
+    markIncoming(fitBox ?? clip.current.querySelector('.nx-morph__content')!);
+    // El contenido va en capas absolutas: el panel no puede tomar su alto del flujo. Se mide aquí,
+    // antes del primer fotograma, y el panel toma ese alto (el máximo lo pone la hoja de estilos).
+    const fit = () => {
+      if (fitBox) p.style.height = `${Math.ceil(fitBox.offsetHeight)}px`;
+    };
+    fit();
 
     // Datos estables durante la transformación (se rehacen si cambia el tamaño).
     const srcRadius = src ? readRadius(src, 20) : 20;
@@ -448,9 +463,16 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
       paint(t.frame());
     };
     addEventListener('resize', onResize);
+    // El contenido cambia de alto mientras está abierto: el panel lo sigue y se repinta la membrana
+    // (el fotograma vuelve a leer el destino).
+    const fitObserver = fitBox && typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(() => { fit(); onResize(); })
+      : null;
+    if (fitBox) fitObserver?.observe(fitBox);
     return () => {
       if (ctx.closeStart.current === cloneSource) ctx.closeStart.current = null;
       removeEventListener('resize', onResize);
+      fitObserver?.disconnect();
       t.dispose();
       if (ctx.transition.current === t) ctx.transition.current = null;
     };
@@ -496,6 +518,7 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
         style={panelStyle}
         data-nx-material={material}
         data-nx-shape="morph"
+        data-nx-morph-size={size === 'content' ? 'content' : undefined}
         role={isModal ? 'dialog' : 'region'}
         aria-modal={isModal || undefined}
         aria-labelledby={hasTitle ? ctx.ids.title : undefined}
@@ -508,7 +531,7 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
         </svg>
         <div ref={clip} className="nx-morph__clip">
           <div ref={outgoing} className="nx-morph__outgoing" aria-hidden="true" inert data-nx-morph-outgoing="" />
-          <div className="nx-morph__content">{children}</div>
+          <div className="nx-morph__content">{size === 'content' ? <div className="nx-morph__fit">{children}</div> : children}</div>
         </div>
       </div>
     </div>,

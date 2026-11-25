@@ -357,6 +357,14 @@
 .nx-morph__outgoing > * { background: none; box-shadow: none; }
 .nx-morph__outgoing :is(.nx-surface__shape, .nx-surface__zone), .nx-morph__outgoing [data-nx-morph-shared] { visibility: hidden; }
 .nx-morph__content { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+/*
+ * size="content": el panel toma el alto de su contenido (lo mide NexMorph). `.nx-morph__fit` lleva
+ * el contenido a su alto natural; si no cabe en el contenedor, se desplaza dentro.
+ */
+.nx-morph .nx-morph__panel[data-nx-morph-size='content'] { max-height: 100%; }
+.nx-morph[data-nx-morph-mode='viewport'] .nx-morph__panel[data-nx-morph-size='content'] { width: min(480px, 100vw - 32px); max-height: calc(100vh - 32px); }
+.nx-morph__panel[data-nx-morph-size='content'] .nx-morph__content { overflow: auto; }
+.nx-morph__fit { flex: none; display: flex; flex-direction: column; }
 /* Coreografía: lo entrante llega escalonado detrás de la superficie; nunca se estira. */
 .nx-morph [data-nx-morph-in] {
   --nx-morph-k: clamp(0, var(--nx-morph-in, 1) * 1.6 - var(--nx-morph-i, 0) * 0.12, 1);

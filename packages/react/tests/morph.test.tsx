@@ -69,6 +69,40 @@ describe('NexMorph (React)', () => {
     expect(portal.getAttribute('data-nx-density')).toBe('comfortable');
   });
 
+  it('size="content": el panel toma el alto de su contenido; por defecto, no', () => {
+    // El entorno de pruebas no maqueta: el contenido "mide" 123 px.
+    const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight')!;
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      get(this: HTMLElement) { return this.classList.contains('nx-morph__fit') ? 122.4 : 0; },
+    });
+    try {
+      render(
+        <NexProvider reducedMotion="reduce">
+          <NexMorph defaultOpen>
+            <NexMorph.Target label="Cobrar" size="content"><p>Uno</p><p>Dos</p></NexMorph.Target>
+          </NexMorph>
+        </NexProvider>,
+      );
+      const panel = $<HTMLElement>('.nx-morph__panel');
+      expect(panel.getAttribute('data-nx-morph-size')).toBe('content');
+      expect(panel.style.height).toBe('123px');
+      const fit = $('.nx-morph__fit');
+      expect(Array.from(fit.children).every((c) => c.hasAttribute('data-nx-morph-in'))).toBe(true);
+      render(
+        <NexProvider reducedMotion="reduce">
+          <NexMorph defaultOpen key="b">
+            <NexMorph.Target label="Detalle"><p>Detalle</p></NexMorph.Target>
+          </NexMorph>
+        </NexProvider>,
+      );
+      expect($<HTMLElement>('.nx-morph__panel').style.height).toBe('');
+      expect(document.querySelector('.nx-morph__fit')).toBeNull();
+    } finally {
+      Object.defineProperty(HTMLElement.prototype, 'offsetHeight', original);
+    }
+  });
+
   it('origen → destino con trigger accesible, región con nombre y vuelta del foco', () => {
     render(<NexProvider reducedMotion="reduce"><Workspace /></NexProvider>);
     const trigger = $('.nx-morph-trigger');
