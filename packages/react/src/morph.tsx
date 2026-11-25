@@ -340,7 +340,18 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
     // El contenido va en capas absolutas: el panel no puede tomar su alto del flujo. Se mide aquí,
     // antes del primer fotograma, y el panel toma ese alto (el máximo lo pone la hoja de estilos).
     const fit = () => {
-      if (fitBox) p.style.height = `${Math.ceil(fitBox.offsetHeight)}px`;
+      if (!fitBox) return;
+      // Alto con decimales (offsetHeight redondea: 200.4 px quedarían en 200 y sobraría 0.4), sin la
+      // escala de un ancestro transformado.
+      const k = p.getBoundingClientRect().width / (p.offsetWidth || 1) || 1;
+      const natural = Math.max(fitBox.offsetHeight, fitBox.getBoundingClientRect().height / k);
+      // Lo que el panel tiene de más respecto al área del contenido (bordes de la superficie).
+      const area = fitBox.parentElement?.clientHeight ?? p.offsetHeight;
+      const frame = Math.max(0, p.offsetHeight - area);
+      p.style.height = `${Math.ceil(natural + frame)}px`;
+      // Sólo se desplaza si de verdad no cabe (el máximo lo pone la hoja de estilos): sin esto, una
+      // diferencia de una fracción de píxel bastaba para que WebKit mostrara la barra.
+      p.toggleAttribute('data-nx-morph-overflow', (fitBox.parentElement?.clientHeight ?? 0) + 0.5 < natural);
     };
     fit();
 

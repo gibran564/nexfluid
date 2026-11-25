@@ -363,7 +363,8 @@
  */
 .nx-morph .nx-morph__panel[data-nx-morph-size='content'] { max-height: 100%; }
 .nx-morph[data-nx-morph-mode='viewport'] .nx-morph__panel[data-nx-morph-size='content'] { width: min(480px, 100vw - 32px); max-height: calc(100vh - 32px); }
-.nx-morph__panel[data-nx-morph-size='content'] .nx-morph__content { overflow: auto; }
+.nx-morph__panel[data-nx-morph-size='content'] .nx-morph__content { overflow: hidden; }
+.nx-morph__panel[data-nx-morph-size='content'][data-nx-morph-overflow] .nx-morph__content { overflow: auto; }
 .nx-morph__fit { flex: none; display: flex; flex-direction: column; }
 /* Coreografía: lo entrante llega escalonado detrás de la superficie; nunca se estira. */
 .nx-morph [data-nx-morph-in] {
