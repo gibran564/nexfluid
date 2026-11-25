@@ -42,15 +42,35 @@ export interface NexSheetGridProps {
   label?: string;
   /** Encabezados de columna con nombre: letra y nombre, sólo el nombre o sólo la letra. */
   columnLabels?: NexColumnLabels;
+  /**
+   * Cómo se muestran los NÚMEROS de cada columna (índice desde 0), con `Intl.NumberFormat`: p. ej.
+   * `{ 1: { style: 'currency', currency: 'MXN' } }`. El valor sigue siendo número (fórmulas,
+   * alineación, copiar); sólo cambia lo que se ve. Los textos no se tocan.
+   */
+  columnFormats?: Readonly<Record<number, Intl.NumberFormatOptions>>;
+  /** Idioma de `columnFormats` (por defecto, el del documento). */
+  locale?: string;
   className?: string;
   style?: CSSProperties;
+}
+
+/** Un formateador por columna con formato (se rehacen sólo si cambian los formatos o el idioma). */
+function useColumnFormatters(columnFormats: NexSheetGridProps['columnFormats'], locale: string | undefined) {
+  const key = JSON.stringify(columnFormats ?? null) + (locale ?? '');
+  return useMemo(() => {
+    const lang = locale ?? (typeof document !== 'undefined' ? document.documentElement.lang || undefined : undefined);
+    const out = new Map<number, Intl.NumberFormat>();
+    for (const [c, options] of Object.entries(columnFormats ?? {})) out.set(Number(c), new Intl.NumberFormat(lang, options));
+    return out;
+  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 interface Window { r0: number; r1: number; c0: number; c1: number }
 
 const rowHeaderWidth = (rows: number) => Math.max(44, String(rows).length * 9 + 24);
 
-export function NexSheetGrid({ label, columnLabels = 'both', className, style }: NexSheetGridProps) {
+export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, locale, className, style }: NexSheetGridProps) {
+  const formatters = useColumnFormatters(columnFormats, locale);
   const sheets = useNexSheets();
   const sheet = sheets.sheet;
   const preference = useMotionPreference();
@@ -330,7 +350,7 @@ export function NexSheetGrid({ label, columnLabels = 'both', className, style }:
             ))}
           </div>
           {rowList.map((r) => (
-            <SheetRow key={r} row={r} cols={colList} rowsAxis={rows} colsAxis={cols} W={W} sheet={sheet} values={values} baseId={baseId} />
+            <SheetRow key={r} row={r} cols={colList} rowsAxis={rows} colsAxis={cols} W={W} sheet={sheet} values={values} baseId={baseId} formatters={formatters} />
           ))}
           <SelectionSurface rows={rows} cols={cols} W={W} animate={animate} fillPreview={fillPreview} />
           <CellEditor rows={rows} cols={cols} W={W} />
@@ -352,10 +372,10 @@ export function NexSheetGrid({ label, columnLabels = 'both', className, style }:
 
 const rangeKey = (r: CellRange) => `${r.from.row}:${r.from.column}:${r.to.row}:${r.to.column}`;
 
-interface RowProps { row: number; cols: number[]; rowsAxis: Axis; colsAxis: Axis; W: number; sheet: Sheet; values: ReadonlyMap<string, CellValue>; baseId: string }
+interface RowProps { row: number; cols: number[]; rowsAxis: Axis; colsAxis: Axis; W: number; sheet: Sheet; values: ReadonlyMap<string, CellValue>; baseId: string; formatters: ReadonlyMap<number, Intl.NumberFormat> }
 
 /** Una fila visible. Sólo se vuelve a pintar si cambian sus datos, la ventana o los ejes. */
-const SheetRow = memo(function SheetRow({ row, cols, rowsAxis, colsAxis, W, sheet, values, baseId }: RowProps) {
+const SheetRow = memo(function SheetRow({ row, cols, rowsAxis, colsAxis, W, sheet, values, baseId, formatters }: RowProps) {
   return (
     <div className="nx-sheet__row" role="row" aria-rowindex={row + 2} style={{ top: HEAD_H + rowsAxis.offsetOf(row), height: rowsAxis.sizeOf(row), width: W + colsAxis.total }}>
       <div className="nx-sheet__rowhead" role="rowheader" aria-colindex={1}>{row + 1}</div>
@@ -375,7 +395,7 @@ const SheetRow = memo(function SheetRow({ row, cols, rowsAxis, colsAxis, W, shee
             data-formula={isFormula(input) ? '' : undefined}
             style={{ left: W + colsAxis.offsetOf(c), width: colsAxis.sizeOf(c) }}
           >
-            {error ? String(value) : formatValue(value)}
+            {error ? String(value) : typeof value === 'number' && Number.isFinite(value) && formatters.has(c) ? formatters.get(c)!.format(value) : formatValue(value)}
           </div>
         );
       })}

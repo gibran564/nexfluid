@@ -217,6 +217,10 @@ export interface NexSheetsProps extends NexSheetsProviderProps {
   label?: string;
   /** Encabezados de columna con nombre: `both` (letra y nombre, por defecto), `name` o `letter`. */
   columnLabels?: NexColumnLabels;
+  /** Formato de los números por columna (`Intl.NumberFormat`), p. ej. moneda. Ver NexSheetGrid. */
+  columnFormats?: Readonly<Record<number, Intl.NumberFormatOptions>>;
+  /** Idioma de `columnFormats`. */
+  locale?: string;
   className?: string;
   style?: CSSProperties;
 }
@@ -226,14 +230,14 @@ export interface NexSheetsProps extends NexSheetsProviderProps {
  * pestañas, estado e inspector opcional). Para otra composición, usa
  * `NexSheets.Provider` con las piezas sueltas.
  */
-export function NexSheetsEditor({ height = 560, toolbar = true, formulaBar = true, tabs = true, statusBar = true, inspector = false, label, columnLabels, className, style, ...provider }: NexSheetsProps) {
+export function NexSheetsEditor({ height = 560, toolbar = true, formulaBar = true, tabs = true, statusBar = true, inspector = false, label, columnLabels, columnFormats, locale, className, style, ...provider }: NexSheetsProps) {
   return (
     <NexSheetsProvider {...provider}>
       <div className={cx('nx-sheets', className)} style={{ ...style, '--nx-sheets-height': typeof height === 'number' ? `${height}px` : height } as CSSProperties} data-inspector={inspector ? '' : undefined}>
         {toolbar && <NexSheetToolbar />}
         {formulaBar && <NexFormulaBar />}
         <div className="nx-sheets__body">
-          <NexSheetGrid label={label} columnLabels={columnLabels} />
+          <NexSheetGrid label={label} columnLabels={columnLabels} columnFormats={columnFormats} locale={locale} />
           {inspector && <NexCellInspector />}
         </div>
         {(tabs || statusBar) && (

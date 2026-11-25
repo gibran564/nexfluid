@@ -336,6 +336,12 @@ existen por el otro carril. Propuesta: decidir cada carril sin contar el espacio
 (histéresis), o carriles superpuestos que no ocupen espacio. Arreglo en la caja: sin carril
 horizontal (las columnas siempre caben) y sin vertical en el carrito.
 
+## Añadido para la caja: NexSheets `columnFormats`
+
+Formato de los números por columna con `Intl.NumberFormat` (`columnFormats={{ 1: { style: 'currency',
+currency: 'MXN' } }}`, `locale`). El valor sigue siendo número (fórmulas, alineación a la derecha,
+copiar); sólo cambia lo que se ve. Antes no había forma de mostrar `$` sin convertir el número en texto.
+
 ## Añadido para la caja: NexDatePicker
 
 Elegir un día en un calendario, con el disparador y la capa de NexSelect. Fechas `AAAA-MM-DD` locales,

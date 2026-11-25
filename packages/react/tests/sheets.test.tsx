@@ -68,6 +68,20 @@ describe('NexSheets', () => {
     expect(total?.textContent).toBe('12');
   });
 
+  it('columnFormats: los números de una columna se ven con formato; los textos y fórmulas siguen igual', () => {
+    act(() => root.render(
+      <NexProvider reducedMotion="reduce">
+        <NexSheets defaultWorkbook={book()} height={300} extent={false} locale="es-MX"
+          columnFormats={{ 1: { style: 'currency', currency: 'MXN' } }} />
+      </NexProvider>,
+    ));
+    const celda = (r: number, c: number) => container.querySelector(`[role="gridcell"][aria-colindex="${c + 2}"]`) && Array.from(container.querySelectorAll(`[role="row"][aria-rowindex="${r + 2}"] [role="gridcell"]`))[c]!;
+    expect(celda(0, 0).textContent).toBe('a');
+    expect(celda(0, 1).textContent).toBe('$1.00');
+    expect(celda(2, 1).textContent).toBe('$3.00');
+    expect(celda(2, 1).getAttribute('data-kind')).toBe('number');
+  });
+
   it('Escape cancela sin tocar los datos', () => {
     const state = mount();
     const grid = $('[role="grid"]');
