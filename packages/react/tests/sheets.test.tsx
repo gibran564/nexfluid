@@ -75,7 +75,7 @@ describe('NexSheets', () => {
           columnFormats={{ 1: { style: 'currency', currency: 'MXN' } }} />
       </NexProvider>,
     ));
-    const celda = (r: number, c: number) => container.querySelector(`[role="gridcell"][aria-colindex="${c + 2}"]`) && Array.from(container.querySelectorAll(`[role="row"][aria-rowindex="${r + 2}"] [role="gridcell"]`))[c]!;
+    const celda = (r: number, c: number) => container.querySelectorAll(`[role="row"][aria-rowindex="${r + 2}"] [role="gridcell"]`)[c]!;
     expect(celda(0, 0).textContent).toBe('a');
     expect(celda(0, 1).textContent).toBe('$1.00');
     expect(celda(2, 1).textContent).toBe('$3.00');

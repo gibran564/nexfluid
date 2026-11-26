@@ -22,7 +22,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  MorphTransition, morphPath, resolveMorphPhysics, type MorphFrame, type MorphPhysics, type MorphPhysicsName,
+  FluidValue, sharedClock, type Tick, MorphTransition, morphPath, resolveMorphPhysics, type MorphFrame, type MorphPhysics, type MorphPhysicsName,
   type MorphPhysicsOverrides, type MorphTimeline, type Rect,
 } from '@nexfluid/core';
 import { cx, toDomId, type NexMotion } from '@nexfluid/components';
@@ -339,19 +339,61 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
     markIncoming(fitBox ?? clip.current.querySelector('.nx-morph__content')!);
     // El contenido va en capas absolutas: el panel no puede tomar su alto del flujo. Se mide aquí,
     // antes del primer fotograma, y el panel toma ese alto (el máximo lo pone la hoja de estilos).
+    // Mientras está abierto, el alto PERSIGUE al del contenido con la física de la familia de
+    // NexMorph (un FluidValue en el reloj compartido) y la membrana se repinta en cada fotograma:
+    // un aviso que aparece no hace saltar el panel. El primer alto se pone sin animar (al abrir,
+    // la que se mueve es la transformación); con movimiento reducido, nunca se anima.
+    const fisica = ctx.physics;
+    const alto = new FluidValue(0, { mass: fisica.mass, stiffness: fisica.stiffness, damping: fisica.damping }, fisica.viscosity);
+    let altoTick: Tick | null = null;
+    let primerAlto = true;
+    let repintar = () => {};
+    let natural = 0;
+    const desborde = () => {
+      // Sólo se desplaza si de verdad no cabe (el máximo lo pone la hoja de estilos): sin esto, una
+      // diferencia de una fracción de píxel bastaba para que WebKit mostrara la barra.
+      if (fitBox) p.toggleAttribute('data-nx-morph-overflow', (fitBox.parentElement?.clientHeight ?? 0) + 0.5 < natural);
+    };
+    const pararAlto = () => {
+      if (altoTick) sharedClock().remove(altoTick);
+      altoTick = null;
+    };
     const fit = () => {
       if (!fitBox) return;
       // Alto con decimales (offsetHeight redondea: 200.4 px quedarían en 200 y sobraría 0.4), sin la
       // escala de un ancestro transformado.
       const k = p.getBoundingClientRect().width / (p.offsetWidth || 1) || 1;
-      const natural = Math.max(fitBox.offsetHeight, fitBox.getBoundingClientRect().height / k);
+      natural = Math.max(fitBox.offsetHeight, fitBox.getBoundingClientRect().height / k);
       // Lo que el panel tiene de más respecto al área del contenido (bordes de la superficie).
       const area = fitBox.parentElement?.clientHeight ?? p.offsetHeight;
       const frame = Math.max(0, p.offsetHeight - area);
-      p.style.height = `${Math.ceil(natural + frame)}px`;
-      // Sólo se desplaza si de verdad no cabe (el máximo lo pone la hoja de estilos): sin esto, una
-      // diferencia de una fracción de píxel bastaba para que WebKit mostrara la barra.
-      p.toggleAttribute('data-nx-morph-overflow', (fitBox.parentElement?.clientHeight ?? 0) + 0.5 < natural);
+      let objetivo = Math.ceil(natural + frame);
+      // El máximo de la hoja de estilos (la ventana o el contenedor): no se anima más allá.
+      const maximo = parseFloat(getComputedStyle(p).maxHeight);
+      if (Number.isFinite(maximo)) objetivo = Math.min(objetivo, maximo);
+      if (primerAlto || reduced.current) {
+        primerAlto = false;
+        pararAlto();
+        alto.jump(objetivo);
+        p.style.height = `${objetivo}px`;
+        desborde();
+        return;
+      }
+      if (!altoTick) alto.jump(p.offsetHeight);
+      alto.set(objetivo);
+      if (altoTick) return;
+      altoTick = (dt) => {
+        alto.step(dt);
+        const quieto = alto.atRest(0.25);
+        if (quieto) alto.jump(alto.target);
+        p.style.height = `${alto.value.toFixed(2)}px`;
+        repintar();
+        if (quieto) {
+          pararAlto();
+          desborde();
+        }
+      };
+      sharedClock().add(altoTick);
     };
     fit();
 
@@ -474,6 +516,7 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
       paint(t.frame());
     };
     addEventListener('resize', onResize);
+    repintar = onResize;
     // El contenido cambia de alto mientras está abierto: el panel lo sigue y se repinta la membrana
     // (el fotograma vuelve a leer el destino).
     const fitObserver = fitBox && typeof ResizeObserver !== 'undefined'
@@ -484,6 +527,7 @@ function MorphTargetPanel({ container = 'viewport', label, modal, radius, materi
       if (ctx.closeStart.current === cloneSource) ctx.closeStart.current = null;
       removeEventListener('resize', onResize);
       fitObserver?.disconnect();
+      pararAlto();
       t.dispose();
       if (ctx.transition.current === t) ctx.transition.current = null;
     };
