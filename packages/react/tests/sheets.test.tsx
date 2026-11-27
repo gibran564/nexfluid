@@ -82,6 +82,19 @@ describe('NexSheets', () => {
     expect(celda(2, 1).getAttribute('data-kind')).toBe('number');
   });
 
+  it('headerHeight y headerOrientation: encabezado alto con los nombres en vertical; las filas empiezan debajo', () => {
+    const wb = createWorkbook([sheetFromRows('Datos', [['a', 1]], { rows: 3, columns: 2, headers: ['Nombre largo', 'Otro'] } as never)]);
+    act(() => root.render(
+      <NexProvider reducedMotion="reduce">
+        <NexSheets defaultWorkbook={wb} height={300} extent={false} columnLabels="name" headerHeight={120} headerOrientation="vertical" />
+      </NexProvider>,
+    ));
+    const contenido = $<HTMLElement>('.nx-sheet__content');
+    expect(contenido.getAttribute('data-nx-head')).toBe('vertical');
+    expect(contenido.style.getPropertyValue('--nx-sheet-head-h')).toBe('120px');
+    expect($<HTMLElement>('[role="row"][aria-rowindex="2"]').style.top).toBe('120px');
+  });
+
   it('Escape cancela sin tocar los datos', () => {
     const state = mount();
     const grid = $('[role="grid"]');

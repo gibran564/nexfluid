@@ -221,6 +221,9 @@ export interface NexSheetsProps extends NexSheetsProviderProps {
   columnFormats?: Readonly<Record<number, Intl.NumberFormatOptions>>;
   /** Idioma de `columnFormats`. */
   locale?: string;
+  /** Alto de la fila de encabezados (por defecto 30) y nombres en vertical. Ver NexSheetGrid. */
+  headerHeight?: number;
+  headerOrientation?: 'horizontal' | 'vertical';
   className?: string;
   style?: CSSProperties;
 }
@@ -230,14 +233,14 @@ export interface NexSheetsProps extends NexSheetsProviderProps {
  * pestañas, estado e inspector opcional). Para otra composición, usa
  * `NexSheets.Provider` con las piezas sueltas.
  */
-export function NexSheetsEditor({ height = 560, toolbar = true, formulaBar = true, tabs = true, statusBar = true, inspector = false, label, columnLabels, columnFormats, locale, className, style, ...provider }: NexSheetsProps) {
+export function NexSheetsEditor({ height = 560, toolbar = true, formulaBar = true, tabs = true, statusBar = true, inspector = false, label, columnLabels, columnFormats, locale, headerHeight, headerOrientation, className, style, ...provider }: NexSheetsProps) {
   return (
     <NexSheetsProvider {...provider}>
       <div className={cx('nx-sheets', className)} style={{ ...style, '--nx-sheets-height': typeof height === 'number' ? `${height}px` : height } as CSSProperties} data-inspector={inspector ? '' : undefined}>
         {toolbar && <NexSheetToolbar />}
         {formulaBar && <NexFormulaBar />}
         <div className="nx-sheets__body">
-          <NexSheetGrid label={label} columnLabels={columnLabels} columnFormats={columnFormats} locale={locale} />
+          <NexSheetGrid label={label} columnLabels={columnLabels} columnFormats={columnFormats} locale={locale} headerHeight={headerHeight} headerOrientation={headerOrientation} />
           {inspector && <NexCellInspector />}
         </div>
         {(tabs || statusBar) && (

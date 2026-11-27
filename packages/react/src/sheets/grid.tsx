@@ -25,7 +25,8 @@ import { useNexSheets, useSheetsInteraction } from './controller.tsx';
 
 const ROW_H = 30;
 const COL_W = 112;
-const HEAD_H = 30;
+/** Alto del encabezado por defecto (`headerHeight`). */
+const HEAD_H_DEFECTO = 30;
 const OVERSCAN = 3;
 /** Sin selección guardada, la activa es A1 (como al abrir cualquier hoja). */
 const ORIGIN = { row: 0, column: 0 };
@@ -50,6 +51,10 @@ export interface NexSheetGridProps {
   columnFormats?: Readonly<Record<number, Intl.NumberFormatOptions>>;
   /** Idioma de `columnFormats` (por defecto, el del documento). */
   locale?: string;
+  /** Alto de la fila de encabezados, en px (por defecto 30). Para nombres en vertical. */
+  headerHeight?: number;
+  /** `vertical`: los nombres de columna se leen de abajo arriba (columnas angostas, p. ej. casillas). */
+  headerOrientation?: 'horizontal' | 'vertical';
   className?: string;
   style?: CSSProperties;
 }
@@ -69,7 +74,8 @@ interface Window { r0: number; r1: number; c0: number; c1: number }
 
 const rowHeaderWidth = (rows: number) => Math.max(44, String(rows).length * 9 + 24);
 
-export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, locale, className, style }: NexSheetGridProps) {
+export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, locale, headerHeight = HEAD_H_DEFECTO, headerOrientation = 'horizontal', className, style }: NexSheetGridProps) {
+  const HEAD_H = headerHeight;
   const formatters = useColumnFormatters(columnFormats, locale);
   const sheets = useNexSheets();
   const sheet = sheets.sheet;
@@ -335,7 +341,7 @@ export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, loca
         onCut={(e) => { if (e.target !== e.currentTarget) return; e.preventDefault(); e.clipboardData.setData('text/plain', sheets.copyText()); sheets.clear(); }}
         onPaste={(e) => { if (e.target !== e.currentTarget) return; e.preventDefault(); sheets.paste(e.clipboardData.getData('text/plain')); }}
       >
-        <div ref={content} className="nx-sheet__content" data-sheet={sheet.id} style={{ width: totalW, height: totalH, '--nx-sheet-rowhead': `${W}px` } as CSSProperties}>
+        <div ref={content} className="nx-sheet__content" data-sheet={sheet.id} data-nx-head={headerOrientation === 'vertical' ? 'vertical' : undefined} style={{ width: totalW, height: totalH, '--nx-sheet-rowhead': `${W}px`, '--nx-sheet-head-h': `${HEAD_H}px` } as CSSProperties}>
           <div className="nx-sheet__headrow" role="row" aria-rowindex={1} style={{ width: totalW }}>
             <div className="nx-sheet__corner" role="columnheader" aria-colindex={1}><span className="nx-visually-hidden">Filas</span></div>
             {colList.map((c) => (
@@ -350,10 +356,10 @@ export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, loca
             ))}
           </div>
           {rowList.map((r) => (
-            <SheetRow key={r} row={r} cols={colList} rowsAxis={rows} colsAxis={cols} W={W} sheet={sheet} values={values} baseId={baseId} formatters={formatters} />
+            <SheetRow key={r} row={r} cols={colList} rowsAxis={rows} colsAxis={cols} W={W} sheet={sheet} values={values} baseId={baseId} formatters={formatters} headH={HEAD_H} />
           ))}
-          <SelectionSurface rows={rows} cols={cols} W={W} animate={animate} fillPreview={fillPreview} />
-          <CellEditor rows={rows} cols={cols} W={W} />
+          <SelectionSurface rows={rows} cols={cols} W={W} animate={animate} fillPreview={fillPreview} HEAD_H={HEAD_H} />
+          <CellEditor rows={rows} cols={cols} W={W} HEAD_H={HEAD_H} />
         </div>
       </div>
       <div ref={vLane} className="nx-sheet__lane nx-sheet__lane--v" aria-hidden="true">
@@ -372,10 +378,10 @@ export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, loca
 
 const rangeKey = (r: CellRange) => `${r.from.row}:${r.from.column}:${r.to.row}:${r.to.column}`;
 
-interface RowProps { row: number; cols: number[]; rowsAxis: Axis; colsAxis: Axis; W: number; sheet: Sheet; values: ReadonlyMap<string, CellValue>; baseId: string; formatters: ReadonlyMap<number, Intl.NumberFormat> }
+interface RowProps { row: number; cols: number[]; rowsAxis: Axis; colsAxis: Axis; W: number; sheet: Sheet; values: ReadonlyMap<string, CellValue>; baseId: string; formatters: ReadonlyMap<number, Intl.NumberFormat>; headH: number }
 
 /** Una fila visible. Sólo se vuelve a pintar si cambian sus datos, la ventana o los ejes. */
-const SheetRow = memo(function SheetRow({ row, cols, rowsAxis, colsAxis, W, sheet, values, baseId, formatters }: RowProps) {
+const SheetRow = memo(function SheetRow({ row, cols, rowsAxis, colsAxis, W, sheet, values, baseId, formatters, headH: HEAD_H }: RowProps) {
   return (
     <div className="nx-sheet__row" role="row" aria-rowindex={row + 2} style={{ top: HEAD_H + rowsAxis.offsetOf(row), height: rowsAxis.sizeOf(row), width: W + colsAxis.total }}>
       <div className="nx-sheet__rowhead" role="rowheader" aria-colindex={1}>{row + 1}</div>
@@ -410,7 +416,7 @@ const SheetRow = memo(function SheetRow({ row, cols, rowsAxis, colsAxis, W, shee
  * dirección del movimiento y se recoge al llegar. El rango real se pinta
  * siempre al final; con movimiento reducido, salta.
  */
-function SelectionSurface({ rows, cols, W, animate, fillPreview }: { rows: Axis; cols: Axis; W: number; animate: boolean; fillPreview: CellRange | null }) {
+function SelectionSurface({ rows, cols, W, animate, fillPreview, HEAD_H }: { rows: Axis; cols: Axis; W: number; animate: boolean; fillPreview: CellRange | null; HEAD_H: number }) {
   const sheets = useNexSheets();
   const selection = useSheetsInteraction(useCallback((st, c) => st.selections[c.sheet.id] ?? null, []));
   const editing = useSheetsInteraction(useCallback((st) => st.editing !== null, []));
@@ -492,7 +498,7 @@ function SelectionSurface({ rows, cols, W, animate, fillPreview }: { rows: Axis;
 }
 
 /** El editor en celda. Comparte el borrador con la barra de fórmulas; sólo existe cuando se escribe AQUÍ. */
-function CellEditor({ rows, cols, W }: { rows: Axis; cols: Axis; W: number }) {
+function CellEditor({ rows, cols, W, HEAD_H }: { rows: Axis; cols: Axis; W: number; HEAD_H: number }) {
   const sheets = useNexSheets();
   const editing = useSheetsInteraction(useCallback((st, c) => (st.editing && st.editing.sheet === c.sheet.id ? st.editing : null), []));
   const input = useRef<HTMLInputElement>(null);
