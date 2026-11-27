@@ -1077,6 +1077,11 @@
 /* headerOrientation="vertical": el nombre se lee de abajo arriba, pegado al borde inferior. */
 .nx-sheet__content[data-nx-head='vertical'] .nx-sheet__head { align-items: flex-end; padding: 6px 0; }
 .nx-sheet__content[data-nx-head='vertical'] .nx-sheet__head-name { writing-mode: vertical-rl; transform: rotate(180deg); max-height: 100%; }
+/* rowLabels: nombres en lugar de números, a la izquierda y con la letra del cuerpo. */
+.nx-sheet__content[data-nx-rowlabels] .nx-sheet__rowhead {
+  justify-content: flex-start; padding: 0 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  color: var(--nx-fg); font: 500 var(--nx-text-small) / 1 var(--nx-font-body);
+}
 .nx-sheet__resize { position: absolute; top: 0; right: -3px; width: 7px; height: 100%; cursor: col-resize; z-index: 1; touch-action: none; }
 .nx-sheet__resize:hover { background: var(--nx-accent-line); }
 .nx-sheet__row { position: absolute; left: 0; }

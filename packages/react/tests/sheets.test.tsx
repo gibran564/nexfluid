@@ -95,6 +95,18 @@ describe('NexSheets', () => {
     expect($<HTMLElement>('[role="row"][aria-rowindex="2"]').style.top).toBe('120px');
   });
 
+  it('rowLabels: nombres en lugar de números de fila, con su ancho', () => {
+    const wb = createWorkbook([sheetFromRows('Datos', [['x', 1], ['y', 2]], { rows: 2, columns: 2 })]);
+    act(() => root.render(
+      <NexProvider reducedMotion="reduce">
+        <NexSheets defaultWorkbook={wb} height={200} extent={false} rowLabels={['Activo', 'DEFAULT']} rowHeaderWidth={150} />
+      </NexProvider>,
+    ));
+    const rotulos = Array.from(container.querySelectorAll('[role="rowheader"]')).map((n) => n.textContent);
+    expect(rotulos).toEqual(['Activo', 'DEFAULT']);
+    expect($<HTMLElement>('.nx-sheet__content').style.getPropertyValue('--nx-sheet-rowhead')).toBe('150px');
+  });
+
   it('Escape cancela sin tocar los datos', () => {
     const state = mount();
     const grid = $('[role="grid"]');

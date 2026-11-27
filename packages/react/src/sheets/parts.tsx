@@ -224,6 +224,9 @@ export interface NexSheetsProps extends NexSheetsProviderProps {
   /** Alto de la fila de encabezados (por defecto 30) y nombres en vertical. Ver NexSheetGrid. */
   headerHeight?: number;
   headerOrientation?: 'horizontal' | 'vertical';
+  /** Nombres de las filas en lugar de sus números, y el ancho de esa columna. Ver NexSheetGrid. */
+  rowLabels?: readonly string[];
+  rowHeaderWidth?: number;
   className?: string;
   style?: CSSProperties;
 }
@@ -233,14 +236,14 @@ export interface NexSheetsProps extends NexSheetsProviderProps {
  * pestañas, estado e inspector opcional). Para otra composición, usa
  * `NexSheets.Provider` con las piezas sueltas.
  */
-export function NexSheetsEditor({ height = 560, toolbar = true, formulaBar = true, tabs = true, statusBar = true, inspector = false, label, columnLabels, columnFormats, locale, headerHeight, headerOrientation, className, style, ...provider }: NexSheetsProps) {
+export function NexSheetsEditor({ height = 560, toolbar = true, formulaBar = true, tabs = true, statusBar = true, inspector = false, label, columnLabels, columnFormats, locale, headerHeight, headerOrientation, rowLabels, rowHeaderWidth, className, style, ...provider }: NexSheetsProps) {
   return (
     <NexSheetsProvider {...provider}>
       <div className={cx('nx-sheets', className)} style={{ ...style, '--nx-sheets-height': typeof height === 'number' ? `${height}px` : height } as CSSProperties} data-inspector={inspector ? '' : undefined}>
         {toolbar && <NexSheetToolbar />}
         {formulaBar && <NexFormulaBar />}
         <div className="nx-sheets__body">
-          <NexSheetGrid label={label} columnLabels={columnLabels} columnFormats={columnFormats} locale={locale} headerHeight={headerHeight} headerOrientation={headerOrientation} />
+          <NexSheetGrid label={label} columnLabels={columnLabels} columnFormats={columnFormats} locale={locale} headerHeight={headerHeight} headerOrientation={headerOrientation} rowLabels={rowLabels} rowHeaderWidth={rowHeaderWidth} />
           {inspector && <NexCellInspector />}
         </div>
         {(tabs || statusBar) && (

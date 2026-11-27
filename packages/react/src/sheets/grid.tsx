@@ -55,6 +55,10 @@ export interface NexSheetGridProps {
   headerHeight?: number;
   /** `vertical`: los nombres de columna se leen de abajo arriba (columnas angostas, p. ej. casillas). */
   headerOrientation?: 'horizontal' | 'vertical';
+  /** Nombres de las filas en lugar de sus números (como `headers` para las columnas). */
+  rowLabels?: readonly string[];
+  /** Ancho de la columna de encabezados de fila, en px (por defecto, el de los números). */
+  rowHeaderWidth?: number;
   className?: string;
   style?: CSSProperties;
 }
@@ -72,9 +76,9 @@ function useColumnFormatters(columnFormats: NexSheetGridProps['columnFormats'], 
 
 interface Window { r0: number; r1: number; c0: number; c1: number }
 
-const rowHeaderWidth = (rows: number) => Math.max(44, String(rows).length * 9 + 24);
+const anchoNumeros = (rows: number) => Math.max(44, String(rows).length * 9 + 24);
 
-export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, locale, headerHeight = HEAD_H_DEFECTO, headerOrientation = 'horizontal', className, style }: NexSheetGridProps) {
+export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, locale, headerHeight = HEAD_H_DEFECTO, headerOrientation = 'horizontal', rowLabels, rowHeaderWidth, className, style }: NexSheetGridProps) {
   const HEAD_H = headerHeight;
   const formatters = useColumnFormatters(columnFormats, locale);
   const sheets = useNexSheets();
@@ -88,7 +92,7 @@ export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, loca
   const widths = preview ? { ...sheet.columnWidths, [preview.column]: preview.width } : sheet.columnWidths;
   const cols = useMemo(() => createAxis(sheet.columns, COL_W, widths ?? {}), [sheet.columns, widths]);
   const rows = useMemo(() => createAxis(sheet.rows, ROW_H, sheet.rowHeights ?? {}), [sheet.rows, sheet.rowHeights]);
-  const W = rowHeaderWidth(sheet.rows);
+  const W = rowHeaderWidth ?? anchoNumeros(sheet.rows);
   const [win, setWin] = useState<Window>({ r0: 0, r1: Math.min(sheet.rows - 1, 30), c0: 0, c1: Math.min(sheet.columns - 1, 12) });
   const axes = useRef({ rows, cols, W });
   axes.current = { rows, cols, W };
@@ -341,7 +345,7 @@ export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, loca
         onCut={(e) => { if (e.target !== e.currentTarget) return; e.preventDefault(); e.clipboardData.setData('text/plain', sheets.copyText()); sheets.clear(); }}
         onPaste={(e) => { if (e.target !== e.currentTarget) return; e.preventDefault(); sheets.paste(e.clipboardData.getData('text/plain')); }}
       >
-        <div ref={content} className="nx-sheet__content" data-sheet={sheet.id} data-nx-head={headerOrientation === 'vertical' ? 'vertical' : undefined} style={{ width: totalW, height: totalH, '--nx-sheet-rowhead': `${W}px`, '--nx-sheet-head-h': `${HEAD_H}px` } as CSSProperties}>
+        <div ref={content} className="nx-sheet__content" data-sheet={sheet.id} data-nx-head={headerOrientation === 'vertical' ? 'vertical' : undefined} data-nx-rowlabels={rowLabels ? '' : undefined} style={{ width: totalW, height: totalH, '--nx-sheet-rowhead': `${W}px`, '--nx-sheet-head-h': `${HEAD_H}px` } as CSSProperties}>
           <div className="nx-sheet__headrow" role="row" aria-rowindex={1} style={{ width: totalW }}>
             <div className="nx-sheet__corner" role="columnheader" aria-colindex={1}><span className="nx-visually-hidden">Filas</span></div>
             {colList.map((c) => (
@@ -356,7 +360,7 @@ export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, loca
             ))}
           </div>
           {rowList.map((r) => (
-            <SheetRow key={r} row={r} cols={colList} rowsAxis={rows} colsAxis={cols} W={W} sheet={sheet} values={values} baseId={baseId} formatters={formatters} headH={HEAD_H} />
+            <SheetRow key={r} row={r} cols={colList} rowsAxis={rows} colsAxis={cols} W={W} sheet={sheet} values={values} baseId={baseId} formatters={formatters} headH={HEAD_H} rowLabel={rowLabels?.[r]} />
           ))}
           <SelectionSurface rows={rows} cols={cols} W={W} animate={animate} fillPreview={fillPreview} HEAD_H={HEAD_H} />
           <CellEditor rows={rows} cols={cols} W={W} HEAD_H={HEAD_H} />
@@ -378,13 +382,13 @@ export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, loca
 
 const rangeKey = (r: CellRange) => `${r.from.row}:${r.from.column}:${r.to.row}:${r.to.column}`;
 
-interface RowProps { row: number; cols: number[]; rowsAxis: Axis; colsAxis: Axis; W: number; sheet: Sheet; values: ReadonlyMap<string, CellValue>; baseId: string; formatters: ReadonlyMap<number, Intl.NumberFormat>; headH: number }
+interface RowProps { row: number; cols: number[]; rowsAxis: Axis; colsAxis: Axis; W: number; sheet: Sheet; values: ReadonlyMap<string, CellValue>; baseId: string; formatters: ReadonlyMap<number, Intl.NumberFormat>; headH: number; rowLabel?: string }
 
 /** Una fila visible. Sólo se vuelve a pintar si cambian sus datos, la ventana o los ejes. */
-const SheetRow = memo(function SheetRow({ row, cols, rowsAxis, colsAxis, W, sheet, values, baseId, formatters, headH: HEAD_H }: RowProps) {
+const SheetRow = memo(function SheetRow({ row, cols, rowsAxis, colsAxis, W, sheet, values, baseId, formatters, headH: HEAD_H, rowLabel }: RowProps) {
   return (
     <div className="nx-sheet__row" role="row" aria-rowindex={row + 2} style={{ top: HEAD_H + rowsAxis.offsetOf(row), height: rowsAxis.sizeOf(row), width: W + colsAxis.total }}>
-      <div className="nx-sheet__rowhead" role="rowheader" aria-colindex={1}>{row + 1}</div>
+      <div className="nx-sheet__rowhead" role="rowheader" aria-colindex={1} title={rowLabel}>{rowLabel ?? row + 1}</div>
       {cols.map((c) => {
         const key = cellKey(row, c);
         const input = sheet.cells[key]?.input ?? '';
