@@ -348,6 +348,13 @@
 .nx-morph .nx-morph__panel { position: absolute; inset: 0; display: flex; flex-direction: column; pointer-events: auto; background: none; box-shadow: none; outline: none; }
 .nx-morph[data-nx-morph-mode='viewport'] .nx-morph__panel { margin: auto; width: min(760px, 100vw - 32px); height: min(84vh, 680px); }
 .nx-morph__shape { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; filter: drop-shadow(0 calc(var(--nx-glow) * 12px) calc(var(--nx-glow) * 18px) var(--nx-depth)); }
+/*
+ * WebKitGTK: al ACHICARSE el panel (ventana más chica, o un panel que sigue a su contenido), la
+ * sombra (drop-shadow, que se sale de la caja del SVG) no se repinta en la zona que ocupaba y queda
+ * un rastro rayado con la forma anterior. En su propia capa, la capa entera se rehace al cambiar
+ * de tamaño.
+ */
+.nx-morph__shape { will-change: transform; }
 .nx-morph__fill { fill: var(--nx-fill); }
 .nx-morph__edge { fill: none; stroke: var(--nx-edge-color); stroke-width: var(--nx-edge-w); }
 .nx-morph__clip { position: absolute; inset: 0; display: flex; flex-direction: column; }
