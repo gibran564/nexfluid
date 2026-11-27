@@ -277,12 +277,13 @@ primer movimiento valía `false`. Medido en WebKitGTK con arrastre sintético: 2
 quedaba. **Corrección (rama de errores):** un `useRef`, como `NexScrollRail`; avanza en cada paso.
 No depende del navegador.
 
-## 15. Doble barra de desplazamiento (sin reproducir)
+## 15. Doble barra de desplazamiento (resuelto en la rama de fixes)
 
-En la caja se vio una barra nativa además de los carriles de NexFluid en la hoja. En una página
-aislada en WebKitGTK no se reproduce: la hoja activa sus carriles (`data-nx-rails`), la barra
-nativa mide 0 px y `scrollbar-width: none` se aplica. Probablemente fue la combinación con la
-página de la caja. Queda abierto.
+Era la barra NATIVA junto al riel de NexFluid. El atributo que la oculta (`data-nx-rails` en
+NexSheets, `data-nx-scroll-ready` en NexScroll) llega después de montar, y WebKit (WebKitGTK al
+menos) no rehace una barra ya creada cuando cambia su estilo. Con las barras superpuestas de GTK solo
+se ve al pasar el puntero (gris, junto al riel); en modo clásico (`GTK_OVERLAY_SCROLLING=0`) ocupa
+21 px. Arreglo: al activarse los rieles se fuerza a rehacerla una vez (21 px → 0, medido).
 
 ## 16. Gráficas de NexDataView: paleta de 3 colores
 
