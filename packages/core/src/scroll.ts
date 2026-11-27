@@ -299,7 +299,20 @@ export class ScrollTracker {
     }
     this.paint();
     this.sync();
-    if (root) root.dataset.nxScrollReady = '';
+    if (root && !('nxScrollReady' in root.dataset)) {
+      root.dataset.nxScrollReady = '';
+      // El atributo oculta la barra nativa (CSS), pero WebKit (WebKitGTK al menos) no rehace una
+      // barra ya creada cuando cambia su estilo: quedaba la nativa junto al riel (en GTK,
+      // superpuesta: aparecía al pasar el puntero). Se fuerza a rehacerla una vez.
+      const v = this.viewport;
+      const { scrollTop, scrollLeft } = v;
+      const antes = v.style.overflow;
+      v.style.overflow = 'hidden';
+      void v.offsetWidth;
+      v.style.overflow = antes;
+      v.scrollTop = scrollTop;
+      v.scrollLeft = scrollLeft;
+    }
   }
 
   private onScroll = (): void => {
