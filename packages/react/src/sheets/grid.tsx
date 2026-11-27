@@ -272,6 +272,22 @@ export function NexSheetGrid({ label, columnLabels = 'both', columnFormats, loca
     return () => { for (const t of trackers.current) t.dispose(); trackers.current = []; };
   }, []);
   useLayoutEffect(() => { for (const t of trackers.current) t.refresh(); }, [rows.total, cols.total, sheet.id]);
+  /*
+   * WebKit (WebKitGTK al menos) crea la barra nativa del área con scroll al montarla y no la rehace
+   * cuando después cambia su estilo: `data-nx-rails` (que la oculta) llega un render más tarde, y la
+   * barra nativa se quedaba (en GTK superpuesta, aparecía gris junto al carril al pasar el puntero).
+   * Al activarse los carriles se fuerza a rehacerla una vez, conservando el desplazamiento.
+   */
+  useLayoutEffect(() => {
+    const v = viewport.current;
+    if (!railsReady || !v) return;
+    const { scrollTop, scrollLeft } = v;
+    v.style.overflow = 'hidden';
+    void v.offsetWidth;
+    v.style.overflow = '';
+    v.scrollTop = scrollTop;
+    v.scrollLeft = scrollLeft;
+  }, [railsReady]);
   // Qué carril se está arrastrando. En un ref, no en una variable de railHandlers: railHandlers se
   // llama en cada render y el desplazamiento vuelve a renderizar la rejilla (filas virtuales), así
   // que una variable local volvía a valer `false` tras el primer movimiento y el arrastre se
